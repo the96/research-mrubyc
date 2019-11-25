@@ -9,7 +9,7 @@
 
 SRC = array.rb numeric.rb object.rb range.rb string.rb
 OUTPUT = ../src/mrblib.c
-MRBC ?= mrbc
+MRBC = ./mrbc
 
 
 all: $(OUTPUT)
