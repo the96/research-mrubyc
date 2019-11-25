@@ -1013,6 +1013,25 @@ static void c_array_minmax(struct VM *vm, mrbc_value v[], int argc)
 
 
 //================================================================
+/*! (method) replace
+*/
+static void c_array_replace(struct VM *vm, mrbc_value v[], int argc)
+{
+  int i;
+  for (i = 0; i < v->array->n_stored; i++) {
+    mrbc_dec_ref_counter(v->array->data + i);
+  }
+  mrbc_raw_free(v->array->data);
+  mrbc_value src = mrbc_array_dup(vm, v + 1);
+  v->array->data = src.array->data;
+  v->array->data_size = src.array->data_size;
+  v->array->n_stored = src.array->n_stored;
+  mrbc_raw_free(src.array);
+  mrbc_release(v + 1);
+}
+
+
+//================================================================
 /*! (method) reverse
 */
 static void c_array_reverse(struct VM *vm, mrbc_value v[], int argc)
@@ -1145,6 +1164,7 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "min", c_array_min);
   mrbc_define_method(vm, mrbc_class_array, "max", c_array_max);
   mrbc_define_method(vm, mrbc_class_array, "minmax", c_array_minmax);
+  mrbc_define_method(vm, mrbc_class_array, "replace", c_array_replace);
   mrbc_define_method(vm, mrbc_class_array, "reverse", c_array_reverse);
   mrbc_define_method(vm, mrbc_class_array, "reverse!", c_array_reverse_bang);
 #if MRBC_USE_STRING
