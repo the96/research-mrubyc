@@ -25,6 +25,12 @@
 #define MAX_CALLINFO_SIZE 500
 #define MAX_OBJECT_COUNT 2000
 #endif
+
+#define REFERENCE_COUNT 0
+#define MARKSWEEP 1
+#define BITMAP_MARKING 2
+
+#define GC_MODE (REFERENCE_COUNT)
 /* custom config for research */
 
 #define BENCHMARK_MODE
