@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "mrubyc.h"
 #include "c_ext.h"
+#include <time.h>
+#include <math.h>
 
 #define MEMORY_SIZE (1024*32)
 
@@ -39,6 +41,7 @@ uint8_t * load_mrb_file(const char *filename)
 void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
 {
   struct VM *vm;
+  struct timespec vm_start, vm_end;
 
   mrbc_init_alloc(memory_pool, memory_pool_size);
   init_static();
@@ -56,7 +59,11 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
   }
 
   mrbc_vm_begin(vm);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &vm_start);
   mrbc_vm_run(vm);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &vm_end);
+  double vm_time = (double)(vm_end.tv_sec - vm_start.tv_sec) + (double)(vm_end.tv_nsec - vm_start.tv_nsec) * 1.0E-9;
+  printf("vm time %.9lf\n", vm_time);
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
 }
