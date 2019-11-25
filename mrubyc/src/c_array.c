@@ -1023,6 +1023,7 @@ static void c_array_replace(struct VM *vm, mrbc_value v[], int argc)
   }
   mrbc_raw_free(v->array->data);
   mrbc_value src = mrbc_array_dup(vm, v + 1);
+  if (src.tt == MRBC_TT_NIL) return;
   v->array->data = src.array->data;
   v->array->data_size = src.array->data_size;
   v->array->n_stored = src.array->n_stored;
@@ -1055,6 +1056,56 @@ static void c_array_reverse_bang(struct VM *vm, mrbc_value v[], int argc)
   mrbc_raw_free(v[0].array->data);
   v[0].array->data = ret.array->data;
   mrbc_raw_free(ret.array);
+}
+
+
+static uint16_t partition(mrbc_value *data, int start, int end, int (*compare) (const mrbc_value *v1, const mrbc_value *v2)) {
+  mrbc_value tmp;
+  int i, j;
+  for (i = start - 1, j = start; j < end; j++) {
+    if (compare(data + j, data + end) < 0) {
+      i++;
+      tmp = data[j];
+      data[j] = data[i];
+      data[i] = tmp;
+    }
+  }
+  tmp = data[end];
+  data[end] = data[i + 1];
+  data[i + 1] = tmp;
+  return i + 1;
+}
+
+
+static void quicksort(mrbc_value *data, int start, int end, int (*compare) (const mrbc_value *v1, const mrbc_value *v2)) {
+  if (start < end) {
+    uint16_t q = partition(data, start, end, compare);
+    quicksort(data, start, q - 1, compare);
+    quicksort(data, q + 1, end, compare);
+  }
+}
+
+//================================================================
+/* (method) sort
+* Returns a new array created by sorting +self+.
+* Default comparison method is #mrbc_compare.
+* 
+* TODO: Code block of comparisons is not implemented.
+*/
+static void c_array_sort(struct VM *vm, mrbc_value v[], int argc) {
+  mrbc_value ary = mrbc_array_dup(vm, v);
+  if (ary.tt == MRBC_TT_NIL) return;
+  quicksort(ary.array->data, 0, ary.array->n_stored - 1, mrbc_compare);
+  SET_RETURN(ary);
+}
+
+
+//================================================================
+/* (method) sort!
+* Destructive method
+*/
+static void c_array_sort_bang(struct VM *vm, mrbc_value v[], int argc) {
+  quicksort(v->array->data, 0, v->array->n_stored - 1, mrbc_compare);
 }
 
 
@@ -1167,6 +1218,8 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "replace", c_array_replace);
   mrbc_define_method(vm, mrbc_class_array, "reverse", c_array_reverse);
   mrbc_define_method(vm, mrbc_class_array, "reverse!", c_array_reverse_bang);
+  mrbc_define_method(vm, mrbc_class_array, "sort", c_array_sort);
+  mrbc_define_method(vm, mrbc_class_array, "sort!", c_array_sort_bang);
 #if MRBC_USE_STRING
   mrbc_define_method(vm, mrbc_class_array, "inspect", c_array_inspect);
   mrbc_define_method(vm, mrbc_class_array, "to_s", c_array_inspect);
