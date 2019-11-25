@@ -93,6 +93,28 @@ mrbc_value mrbc_array_new(struct VM *vm, int size)
 
 
 //================================================================
+/*! get array copy
+
+  @param  ary		pointer to source value
+  gc infomation:
+   * duplicated in method
+   * gc trigger
+*/
+mrbc_value mrbc_array_dup(struct VM *vm, mrbc_value *array)
+{
+  mrbc_value ret = mrbc_array_new(vm, array->array->n_stored);
+  if( ret.array == NULL ) return mrbc_nil_value();		// ENOMEM
+  memcpy(ret.array->data, array->array->data, sizeof(mrbc_value) * array->array->n_stored);
+  ret.array->n_stored = array->array->n_stored;
+  int i;
+  for (i = 0; i < ret.array->n_stored; i++) {
+    mrbc_dup(ret.array->data + i);
+  }
+  return ret;
+}
+
+
+//================================================================
 /*! destructor
 
   @param  ary	pointer to target value
@@ -573,29 +595,6 @@ static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
   /*
     in case of self[start, length] -> Array | nil
   */
-  // if( argc == 2 && v[1].tt == MRBC_TT_FIXNUM && v[2].tt == MRBC_TT_FIXNUM ) {
-  //   int len = mrbc_array_size(&v[0]);
-  //   int idx = v[1].i;
-  //   if( idx < 0 ) idx += len;
-  //   if( idx < 0 ) goto RETURN_NIL;
-
-  //   int size = (v[2].i < (len - idx)) ? v[2].i : (len - idx);
-	// 				// min( v[2].i, (len - idx) )
-  //   if( size < 0 ) goto RETURN_NIL;
-
-  //   mrbc_value ret = mrbc_array_new(vm, size);
-  //   if( ret.array == NULL ) return;		// ENOMEM
-
-  //   int i;
-  //   for( i = 0; i < size; i++ ) {
-  //     mrbc_value val = mrbc_array_get(v, v[1].i + i);
-  //     mrbc_dup(&val);
-  //     mrbc_array_push(&ret, &val);
-  //   }
-
-  //   SET_RETURN(ret);
-  //   return;
-  // }
   int start, end, size;
   if (argc == 2 && v[1].tt == MRBC_TT_FIXNUM && v[2].tt == MRBC_TT_FIXNUM) {
     start = v[1].i;
@@ -603,6 +602,9 @@ static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
     end = start + size - 1;
     goto RETURN_ARRAY_RANGE;
   } else
+  /*
+    in case of self[range] -> Array | nil
+  */
   if (argc == 1 && v[1].tt == MRBC_TT_RANGE) {
     mrbc_range *range = v[1].range;
     if (range->first.tt != MRBC_TT_FIXNUM || range->last.tt != MRBC_TT_FIXNUM) {
@@ -834,21 +836,23 @@ static void c_array_shift(struct VM *vm, mrbc_value v[], int argc)
 */
 static void c_array_dup(struct VM *vm, mrbc_value v[], int argc)
 {
-  mrbc_array *h = v[0].array;
-
-  mrbc_value value = mrbc_array_new(vm, h->n_stored);
-  if( value.array == NULL ) return;		// ENOMEM
-
-  memcpy( value.array->data, h->data, sizeof(mrbc_value) * h->n_stored );
-  value.array->n_stored = h->n_stored;
-
-  mrbc_value *p1 = value.array->data;
-  const mrbc_value *p2 = p1 + value.array->n_stored;
-  while( p1 < p2 ) {
-    mrbc_dup(p1++);
-  }
-
+  mrbc_value value = mrbc_array_dup(vm, v);
   SET_RETURN(value);
+  // mrbc_array *h = v[0].array;
+
+  // mrbc_value value = mrbc_array_new(vm, h->n_stored);
+  // if( value.array == NULL ) return;		// ENOMEM
+
+  // memcpy( value.array->data, h->data, sizeof(mrbc_value) * h->n_stored );
+  // value.array->n_stored = h->n_stored;
+
+  // mrbc_value *p1 = value.array->data;
+  // const mrbc_value *p2 = p1 + value.array->n_stored;
+  // while( p1 < p2 ) {
+  //   mrbc_dup(p1++);
+  // }
+
+  // SET_RETURN(value);
 }
 
 
