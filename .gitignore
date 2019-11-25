@@ -2,3 +2,4 @@ mrubyc/sample_c/mrubyc*
 mrubyc/src/hal
 **/*.a
 **/*.o
+**/*.mrb
