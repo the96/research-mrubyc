@@ -70,4 +70,36 @@ class Array
     self
   end
 
+  def uniq!(&block)
+    ary = self.dup
+    result = []
+    if block
+      hash = {}
+      while ary.size > 0
+        val = ary.shift
+        key = block.call(val)
+        hash[key] = val unless hash.has_key?(key)
+      end
+      hash.each_value do |value|
+        result << value
+      end
+    else
+      while ary.size > 0
+        result << ary.shift
+        ary.delete(result.last)
+      end
+    end
+    if result.size == self.size
+      nil
+    else
+      self.replace(result)
+    end
+  end
+
+  def uniq(&block)
+    ary = self.dup
+    ary.uniq!(&block)
+    ary
+  end
+
 end
