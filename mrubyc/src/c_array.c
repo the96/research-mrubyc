@@ -135,6 +135,28 @@ void mrbc_array_delete(mrbc_value *ary)
 
 
 //================================================================
+/*! delete all data what equal argument value from array.
+*!  destructive operation.
+*!  decremented ref_count in method.
+* @param array  pointer to target array
+* @param value pointer to comparison target value
+*/
+void mrbc_array_delete_value(mrbc_value *array, mrbc_value *value) {
+  mrbc_value *data = array->array->data;
+  int n_stored = array->array->n_stored;
+  int i, idx;
+  for (i = idx = 0; i < n_stored; i++) {
+    if (mrbc_compare(data + idx, value) == 0) {
+      mrbc_dec_ref_counter(data + idx);
+      mrbc_array_remove(array, idx);
+      continue;
+    }
+    idx++;
+  }
+}
+
+
+//================================================================
 /*! clear vm_id
 
   @param  ary	pointer to target value
@@ -602,6 +624,30 @@ static void c_array_add(struct VM *vm, mrbc_value v[], int argc)
 
 
 //================================================================
+/*! (operator) -
+*/
+static void c_array_sub(struct VM *vm, mrbc_value v[], int argc)
+{
+  if( GET_TT_ARG(1) != MRBC_TT_ARRAY ) {
+    console_print( "TypeError\n" );	// raise?
+    return;
+  }
+
+  mrbc_array *value = v[1].array;
+  mrbc_value array = mrbc_array_dup(vm, v);
+  if( array.tt == MRBC_TT_NIL ) return;		// ENOMEM
+
+  int i;
+  for (i = 0; i < value-> n_stored; i++) {
+    mrbc_array_delete_value(&array, value->data + i);
+  }
+
+  mrbc_release(v+1);
+  SET_RETURN(array);
+}
+
+
+//================================================================
 /*! (operator) []
 */
 static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
@@ -863,21 +909,6 @@ static void c_array_dup(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value value = mrbc_array_dup(vm, v);
   SET_RETURN(value);
-  // mrbc_array *h = v[0].array;
-
-  // mrbc_value value = mrbc_array_new(vm, h->n_stored);
-  // if( value.array == NULL ) return;		// ENOMEM
-
-  // memcpy( value.array->data, h->data, sizeof(mrbc_value) * h->n_stored );
-  // value.array->n_stored = h->n_stored;
-
-  // mrbc_value *p1 = value.array->data;
-  // const mrbc_value *p2 = p1 + value.array->n_stored;
-  // while( p1 < p2 ) {
-  //   mrbc_dup(p1++);
-  // }
-
-  // SET_RETURN(value);
 }
 
 
@@ -951,7 +982,7 @@ static void c_array_minmax(struct VM *vm, mrbc_value v[], int argc)
 */
 static void c_array_reverse(struct VM *vm, mrbc_value v[], int argc)
 {
-  mrbc_value ret = mrbc_array_reverse(vm, &v[0]);
+  mrbc_value ret = mrbc_array_reverse(vm, v);
   SET_RETURN(ret);
 }
 
@@ -961,7 +992,7 @@ static void c_array_reverse(struct VM *vm, mrbc_value v[], int argc)
 static void c_array_reverse_bang(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_array *ary = v[0].array;
-  mrbc_value ret = mrbc_array_reverse(vm, &v[0]);
+  mrbc_value ret = mrbc_array_reverse(vm, v);
   mrbc_value *p1 = ary->data;
   mrbc_value *p2 = p1 + ary->n_stored;
   while (p1 < p2) {
@@ -1056,6 +1087,7 @@ void mrbc_init_class_array(struct VM *vm)
 
   mrbc_define_method(vm, mrbc_class_array, "new", c_array_new);
   mrbc_define_method(vm, mrbc_class_array, "+", c_array_add);
+  mrbc_define_method(vm, mrbc_class_array, "-", c_array_sub);
   mrbc_define_method(vm, mrbc_class_array, "[]", c_array_get);
   mrbc_define_method(vm, mrbc_class_array, "at", c_array_get);
   mrbc_define_method(vm, mrbc_class_array, "[]=", c_array_set);
