@@ -791,6 +791,44 @@ static void c_array_delete_at(struct VM *vm, mrbc_value v[], int argc)
 }
 
 
+//==============================================================
+/*! (method) delete
+* Deletes all items that equal to mrbc_value of array from array.
+* Returns last deleted item, or nil when item isn't found from array.
+*
+* TODO:
+*  Specification of delete method of array of Ruby, is able to take code block.
+*/
+static void c_array_delete(struct VM *vm, mrbc_value v[], int argc)
+{
+  mrbc_value *value = &GET_ARG(1);
+  mrbc_value *data = v->array->data;
+  mrbc_value ret; // last deleted value
+  ret.tt = MRBC_TT_EMPTY;
+  int n = v->array->n_stored;
+  int i,idx;
+
+  for (i = idx = 0; i < n; i++) {
+    if (mrbc_compare(data + idx, value) == 0) {
+      if (ret.tt != MRBC_TT_EMPTY)
+        mrbc_dec_ref_counter(&ret);
+      ret = data[idx];
+      mrbc_array_remove(v, idx);
+      continue;
+    }
+    idx++;
+  }
+  mrbc_release(v+1);
+  if (i == idx) {
+    // v[0].tt = MRBC_TT_NIL;
+    SET_NIL_RETURN();
+  } else {
+    // v[0] = ret;
+    SET_RETURN(ret);
+  }
+}
+
+
 //================================================================
 /*! (method) empty?
 */
@@ -1199,6 +1237,7 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "[]=", c_array_set);
   mrbc_define_method(vm, mrbc_class_array, "<<", c_array_push);
   mrbc_define_method(vm, mrbc_class_array, "clear", c_array_clear);
+  mrbc_define_method(vm, mrbc_class_array, "delete", c_array_delete);
   mrbc_define_method(vm, mrbc_class_array, "delete_at", c_array_delete_at);
   mrbc_define_method(vm, mrbc_class_array, "empty?", c_array_empty);
   mrbc_define_method(vm, mrbc_class_array, "size", c_array_size);
