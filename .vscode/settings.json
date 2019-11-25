@@ -2,6 +2,7 @@
   "files.associations": {
     "type_traits": "c",
     "console.h": "c",
-    "alloc.h": "c"
+    "alloc.h": "c",
+    "string.h": "c"
   }
 }

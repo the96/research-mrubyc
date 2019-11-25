@@ -39,8 +39,10 @@ mrbc_value mrbc_range_new( struct VM *vm, mrbc_value *first, mrbc_value *last, i
   value.range = mrbc_alloc(vm, sizeof(mrbc_range));
   if( !value.range ) return value;		// ENOMEM
 
+#ifdef GC_RC
   value.range->ref_count = 1;
   value.range->tt = MRBC_TT_STRING;	// TODO: for DEBUG
+#endif /* GC_RC */
   value.range->flag_exclude = flag_exclude;
   value.range->first = *first;
   value.range->last = *last;
@@ -49,6 +51,7 @@ mrbc_value mrbc_range_new( struct VM *vm, mrbc_value *first, mrbc_value *last, i
 }
 
 
+#ifdef GC_RC
 //================================================================
 /*! destructor
 
@@ -61,6 +64,7 @@ void mrbc_range_delete(mrbc_value *v)
 
   mrbc_raw_free( v->range );
 }
+#endif /* GC_RC */
 
 
 //================================================================

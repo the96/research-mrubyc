@@ -72,8 +72,10 @@ mrbc_value mrbc_string_new(struct VM *vm, const void *src, int len)
     return value;
   }
 
+#ifdef GC_RC
   h->ref_count = 1;
   h->tt = MRBC_TT_STRING;	// TODO: for DEBUG
+#endif /* GC_RC */
   h->size = len;
   h->data = str;
 
@@ -124,8 +126,10 @@ mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len)
   h = (mrbc_string *)mrbc_alloc(vm, sizeof(mrbc_string));
   if( !h ) return value;		// ENOMEM
 
+#ifdef GC_RC
   h->ref_count = 1;
   h->tt = MRBC_TT_STRING;	// TODO: for DEBUG
+#endif /* GC_RC */
   h->size = len;
   h->data = buf;
 
@@ -134,6 +138,7 @@ mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len)
 }
 
 
+#ifdef GC_RC
 //================================================================
 /*! destructor
 
@@ -144,6 +149,7 @@ void mrbc_string_delete(mrbc_value *str)
   mrbc_raw_free(str->string->data);
   mrbc_raw_free(str->string);
 }
+#endif /* GC_RC */
 
 
 
@@ -700,7 +706,9 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
     limit = v[2].i;
     if( limit == 1 ) {
       mrbc_array_push( &ret, &v[0] );
+#ifdef GC_RC
       mrbc_dup( &v[0] );
+#endif /* GC_RC */
       goto DONE;
     }
   }

@@ -68,7 +68,9 @@ mrbc_proc *mrbc_rproc_alloc(struct VM *vm, const char *name)
   mrbc_proc *ptr = (mrbc_proc *)mrbc_alloc(vm, sizeof(mrbc_proc));
   if( !ptr ) return ptr;
 
+#ifdef GC_RC
   ptr->ref_count = 1;
+#endif /* GC_RC */
   ptr->sym_id = str_to_symid(name);
 #ifdef MRBC_DEBUG
   ptr->names = name;	// for debug; delete soon.
@@ -99,8 +101,10 @@ mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size)
     return v;
   }
 
+#ifdef GC_RC
   v.instance->ref_count = 1;
   v.instance->tt = MRBC_TT_OBJECT;	// for debug only.
+#endif /* GC_RC */
   v.instance->cls = cls;
 
   return v;
@@ -108,6 +112,7 @@ mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size)
 
 
 
+#ifdef GC_RC
 //================================================================
 /*! mrbc_instance destructor
 
@@ -118,6 +123,7 @@ void mrbc_instance_delete(mrbc_value *v)
   mrbc_kv_delete_data( &v->instance->ivar );
   mrbc_raw_free( v->instance );
 }
+#endif /* GC_RC */
 
 
 //================================================================
@@ -129,7 +135,9 @@ void mrbc_instance_delete(mrbc_value *v)
 */
 void mrbc_instance_setiv(mrbc_object *obj, mrbc_sym sym_id, mrbc_value *v)
 {
+#ifdef GC_RC
   mrbc_dup(v);
+#endif /* GC_RC */
   mrbc_kv_set( &obj->instance->ivar, sym_id, v );
 }
 
@@ -146,7 +154,9 @@ mrbc_value mrbc_instance_getiv(mrbc_object *obj, mrbc_sym sym_id)
   mrbc_value *v = mrbc_kv_get( &obj->instance->ivar, sym_id );
   if( !v ) return mrbc_nil_value();
 
+#ifdef GC_RC
   mrbc_dup(v);
+#endif /* GC_RC */
   return *v;
 }
 
@@ -373,18 +383,24 @@ mrbc_value mrbc_send( struct VM *vm, mrbc_value *v, int reg_ofs,
 
   // create call stack.
   mrbc_value *regs = v + reg_ofs + 2;
+#ifdef GC_RC
   mrbc_release( &regs[0] );
-  regs[0] = *recv;
   mrbc_dup(recv);
+#endif /* GC_RC */
+  regs[0] = *recv;
 
   va_list ap;
   va_start(ap, argc);
   int i;
   for( i = 1; i <= argc; i++ ) {
+#ifdef GC_RC
     mrbc_release( &regs[i] );
+#endif /* GC_RC */
     regs[i] = *va_arg(ap, mrbc_value *);
   }
+#ifdef GC_RC
   mrbc_release( &regs[i] );
+#endif /* GC_RC */
   regs[i] = mrbc_nil_value();
   va_end(ap);
 
@@ -721,9 +737,11 @@ static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
     NULL,  // reps
   };
 
+#ifdef GC_RC
   mrbc_release(&v[0]);
-  v[0] = new_obj;
   mrbc_dup(&new_obj);
+#endif /* GC_RC */
+  v[0] = new_obj;
 
   mrbc_irep *org_pc_irep = vm->pc_irep;
   uint16_t  org_pc = vm->pc;
@@ -951,12 +969,16 @@ void c_proc_call(struct VM *vm, mrbc_value v[], int argc)
   int offset = 1+argc;
   vm->current_regs = v+offset;
   // [obj]
+#ifdef GC_RC
   mrbc_dup(self);
+#endif /* GC_RC */
   v[offset] = *self;
   // [argc]
   int i;
   for( i = 1 ; i<=argc ; i++ ){
+#ifdef GC_RC
     mrbc_dup(&v[i]);
+#endif /* GC_RC */
     v[offset+i] = v[i];
   }
   // [nil]

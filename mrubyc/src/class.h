@@ -42,7 +42,9 @@ typedef struct RClass mrb_class;
 /*! mruby/c instance object.
 */
 typedef struct RInstance {
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   struct RClass *cls;
   struct RKeyValueHandle ivar;
@@ -56,7 +58,9 @@ typedef struct RInstance mrb_instance;
 /*! mruby/c proc object.
 */
 typedef struct RProc {
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   unsigned int c_func : 1;	// 0:IREP, 1:C Func
   mrbc_sym sym_id;
@@ -77,7 +81,9 @@ typedef struct RProc mrb_proc;
 int mrbc_obj_is_kind_of(const mrbc_value *obj, const mrb_class *cls);
 mrbc_proc *mrbc_rproc_alloc(struct VM *vm, const char *name);
 mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size);
+#ifdef GC_RC
 void mrbc_instance_delete(mrbc_value *v);
+#endif /* GC_RC */
 void mrbc_instance_setiv(mrbc_object *obj, mrbc_sym sym_id, mrbc_value *v);
 mrbc_value mrbc_instance_getiv(mrbc_object *obj, mrbc_sym sym_id);
 mrbc_class *find_class_by_object(struct VM *vm, const mrbc_object *obj);

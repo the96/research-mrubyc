@@ -26,11 +26,27 @@
 #define MAX_OBJECT_COUNT 2000
 #endif
 
+/* GC_MODE */
 #define REFERENCE_COUNT 0
 #define MARKSWEEP 1
 #define BITMAP_MARKING 2
+#define MARKSWEEP_DEBUG 3
+#define BITMAP_MARKING_DEBUG 4
 
-#define GC_MODE (REFERENCE_COUNT)
+#define GC_MODE (MARKSWEEP)
+
+#if (GC_MODE == REFERENCE_COUNT) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#define GC_RC
+#endif
+
+#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG)
+#define GC_MS
+#endif
+
+#if (GC_MODE == BITMAP_MARKING) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#define GC_BM
+#endif
+
 /* custom config for research */
 
 #define BENCHMARK_MODE

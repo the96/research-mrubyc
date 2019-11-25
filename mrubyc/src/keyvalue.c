@@ -101,6 +101,7 @@ int mrbc_kv_init_handle(struct VM *vm, mrbc_kv_handle *kvh, int size)
 }
 
 
+#ifdef GC_RC
 //================================================================
 /*! destructor
 
@@ -125,6 +126,7 @@ void mrbc_kv_delete_data(mrbc_kv_handle *kvh)
   mrbc_kv_clear(kvh);
   mrbc_raw_free(kvh->data);
 }
+#endif /* GC_RC */
 
 
 //================================================================
@@ -184,7 +186,9 @@ int mrbc_kv_set(mrbc_kv_handle *kvh, mrbc_sym sym_id, mrbc_value *set_val)
 
   // replace value ?
   if( kvh->data[idx].sym_id == sym_id ) {
+#ifdef GC_RC
     mrbc_dec_ref_counter( &kvh->data[idx].value );
+#endif /* GC_RC */
     kvh->data[idx].value = *set_val;
     return 0;
   }
@@ -306,7 +310,9 @@ int mrbc_kv_remove(mrbc_kv_handle *kvh, mrbc_sym sym_id)
   if( idx < 0 ) return 0;
   if( kvh->data[idx].sym_id != sym_id ) return 0;
 
+#ifdef GC_RC
   mrbc_dec_ref_counter( &kvh->data[idx].value );
+#endif /* GC_RC */
   kvh->n_stored--;
   memmove( kvh->data + idx, kvh->data + idx + 1,
 	   sizeof(mrbc_kv) * (kvh->n_stored - idx) );
@@ -323,12 +329,14 @@ int mrbc_kv_remove(mrbc_kv_handle *kvh, mrbc_sym sym_id)
 */
 void mrbc_kv_clear(mrbc_kv_handle *kvh)
 {
+#ifdef GC_RC
   mrbc_kv *p1 = kvh->data;
   const mrbc_kv *p2 = p1 + kvh->n_stored;
   while( p1 < p2 ) {
     mrbc_dec_ref_counter(&p1->value);
     p1++;
   }
+#endif /* GC_RC */
 
   kvh->n_stored = 0;
 }

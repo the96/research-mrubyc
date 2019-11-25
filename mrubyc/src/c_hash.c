@@ -69,8 +69,10 @@ mrbc_value mrbc_hash_new(struct VM *vm, int size)
     return value;
   }
 
+#ifdef GC_RC
   h->ref_count = 1;
   h->tt = MRBC_TT_HASH;
+#endif /* GC_RC */
   h->data_size = size * 2;
   h->n_stored = 0;
   h->data = data;
@@ -79,7 +81,7 @@ mrbc_value mrbc_hash_new(struct VM *vm, int size)
   return value;
 }
 
-
+#ifdef GC_RC
 //================================================================
 /*! destructor
 
@@ -91,6 +93,7 @@ void mrbc_hash_delete(mrbc_value *hash)
 
   mrbc_array_delete(hash);
 }
+#endif /* GC_RC */
 
 
 //================================================================
@@ -147,9 +150,11 @@ int mrbc_hash_set(mrbc_value *hash, mrbc_value *key, mrbc_value *val)
 
   } else {
     // replace a value
+#ifdef GC_RC
     mrbc_dec_ref_counter(v);
-    *v = *key;
     mrbc_dec_ref_counter(++v);
+#endif /* GC_RC */
+    *v = *key;
     *v = *val;
   }
 
@@ -184,7 +189,9 @@ mrbc_value mrbc_hash_remove(mrbc_value *hash, mrbc_value *key)
   mrbc_value *v = mrbc_hash_search(hash, key);
   if( v == NULL ) return mrbc_nil_value();
 
+#ifdef GC_RC
   mrbc_dec_ref_counter(v);	// key
+#endif /* GC_RC */
   mrbc_value val = v[1];		// value
 
   mrbc_hash *h = hash->hash;
@@ -250,11 +257,13 @@ mrbc_value mrbc_hash_dup( struct VM *vm, mrbc_value *src )
   memcpy( ret.hash->data, h->data, sizeof(mrbc_value) * h->n_stored );
   ret.hash->n_stored = h->n_stored;
 
+#ifdef GC_RC
   mrbc_value *p1 = h->data;
   const mrbc_value *p2 = p1 + h->n_stored;
   while( p1 < p2 ) {
     mrbc_dup(p1++);
   }
+#endif /* GC_RC */
 
   // TODO: dup other members.
 
@@ -284,7 +293,9 @@ static void c_hash_get(struct VM *vm, mrbc_value v[], int argc)
   }
 
   mrbc_value val = mrbc_hash_get(&v[0], &v[1]);
+#ifdef GC_RC
   mrbc_dup(&val);
+#endif /* GC_RC */
   SET_RETURN(val);
 }
 
@@ -406,7 +417,9 @@ static void c_hash_key(struct VM *vm, mrbc_value v[], int argc)
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *kv = mrbc_hash_i_next(&ite);
     if( mrbc_compare( &kv[1], &v[1]) == 0 ) {
+#ifdef GC_RC
       mrbc_dup( &kv[0] );
+#endif /* GC_RC */
       ret = &kv[0];
       break;
     }
@@ -431,7 +444,9 @@ static void c_hash_keys(struct VM *vm, mrbc_value v[], int argc)
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *key = mrbc_hash_i_next(&ite);
     mrbc_array_push(&ret, key);
+#ifdef GC_RC
     mrbc_dup(key);
+#endif /* GC_RC */
   }
 
   SET_RETURN(ret);
@@ -460,8 +475,10 @@ static void c_hash_merge(struct VM *vm, mrbc_value v[], int argc)
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *kv = mrbc_hash_i_next(&ite);
     mrbc_hash_set( &ret, &kv[0], &kv[1] );
+#ifdef GC_RC
     mrbc_dup( &kv[0] );
     mrbc_dup( &kv[1] );
+#endif /* GC_RC */
   }
 
   SET_RETURN(ret);
@@ -478,8 +495,10 @@ static void c_hash_merge_self(struct VM *vm, mrbc_value v[], int argc)
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *kv = mrbc_hash_i_next(&ite);
     mrbc_hash_set( v, &kv[0], &kv[1] );
+#ifdef GC_RC
     mrbc_dup( &kv[0] );
     mrbc_dup( &kv[1] );
+#endif /* GC_RC */
   }
 }
 
@@ -495,7 +514,9 @@ static void c_hash_values(struct VM *vm, mrbc_value v[], int argc)
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *val = mrbc_hash_i_next(&ite) + 1;
     mrbc_array_push(&ret, val);
+#ifdef GC_RC
     mrbc_dup(val);
+#endif /* GC_RC */
   }
 
   SET_RETURN(ret);

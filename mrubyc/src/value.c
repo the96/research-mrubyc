@@ -112,6 +112,7 @@ int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2)
 
 
 
+#ifdef GC_RC
 //================================================================
 /*! Duplicate mrbc_value
 
@@ -193,6 +194,7 @@ void mrbc_dec_ref_counter(mrbc_value *v)
     break;
   }
 }
+#endif /* GC_RC */
 
 
 //================================================================

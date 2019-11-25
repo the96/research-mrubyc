@@ -27,7 +27,9 @@ extern "C" {
   Define String handle.
 */
 typedef struct RString {
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   uint16_t size;	//!< string length.
   uint8_t *data;	//!< pointer to allocated buffer.
@@ -38,7 +40,9 @@ typedef struct RString {
 mrbc_value mrbc_string_new(struct VM *vm, const void *src, int len);
 mrbc_value mrbc_string_new_cstr(struct VM *vm, const char *src);
 mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len);
+#ifdef GC_RC
 void mrbc_string_delete(mrbc_value *str);
+#endif /* GC_RC */
 void mrbc_string_clear_vm_id(mrbc_value *str);
 mrbc_value mrbc_string_dup(struct VM *vm, mrbc_value *s1);
 mrbc_value mrbc_string_add(struct VM *vm, const mrbc_value *s1, const mrbc_value *s2);

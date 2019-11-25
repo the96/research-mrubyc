@@ -46,8 +46,10 @@ typedef struct RKeyValueHandle {
 
 mrbc_kv_handle *mrbc_kv_new(struct VM *vm, int size);
 int mrbc_kv_init_handle(struct VM *vm, mrbc_kv_handle *kvh, int size);
+#ifdef GC_RC
 void mrbc_kv_delete(mrbc_kv_handle *kvh);
 void mrbc_kv_delete_data(mrbc_kv_handle *kvh);
+#endif /* GC_RC */
 void mrbc_kv_clear_vm_id(mrbc_kv_handle *kvh);
 int mrbc_kv_resize(mrbc_kv_handle *kvh, int size);
 int mrbc_kv_set(mrbc_kv_handle *kvh, mrbc_sym sym_id, mrbc_value *set_val);

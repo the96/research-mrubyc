@@ -25,7 +25,9 @@ extern "C" {
   Define Array handle.
 */
 typedef struct RArray {
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   uint16_t data_size;	//!< data buffer size.
   uint16_t n_stored;	//!< # of stored.
@@ -35,7 +37,9 @@ typedef struct RArray {
 
 
 mrbc_value mrbc_array_new(struct VM *vm, int size);
+#ifdef GC_RC
 void mrbc_array_delete(mrbc_value *ary);
+#endif /* GC_RC */
 void mrbc_array_clear_vm_id(mrbc_value *ary);
 int mrbc_array_resize(mrbc_value *ary, int size);
 int mrbc_array_set(mrbc_value *ary, int idx, mrbc_value *set_val);

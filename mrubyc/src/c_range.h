@@ -26,7 +26,9 @@ extern "C" {
   Define Range object (same the handles of other objects)
 */
 typedef struct RRange {
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   uint8_t flag_exclude;	// true: exclude the end object, otherwise include.
   mrbc_value first;
@@ -36,7 +38,9 @@ typedef struct RRange {
 
 
 mrbc_value mrbc_range_new(struct VM *vm, mrbc_value *first, mrbc_value *last, int flag_exclude);
+#ifdef GC_RC
 void mrbc_range_delete(mrbc_value *v);
+#endif /* GC_RC */
 void mrbc_range_clear_vm_id(mrbc_value *v);
 int mrbc_range_compare(const mrbc_value *v1, const mrbc_value *v2);
 void mrbc_init_class_range(struct VM *vm);

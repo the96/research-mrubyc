@@ -16,6 +16,7 @@
 #define MRBC_SRC_VALUE_H_
 
 #include <stdint.h>
+#include "vm_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,11 +42,11 @@ typedef void (*mrbc_func_t)(struct VM *vm, struct RObject *v, int argc);
 #define MRB_ASPEC_REST(a)         (((a) >> 12) & 0x1)
 #define MRB_ASPEC_POST(a)         (((a) >> 7) & 0x1f)
 
+#ifdef GC_RC
 #define MRBC_OBJECT_HEADER \
   uint16_t ref_count; \
   mrbc_vtype tt : 8  // TODO: for debug use only.
-
-
+#endif
 
 //================================================================
 /*!@brief
@@ -161,9 +162,11 @@ typedef struct RObject mrbc_value;
 #define mrbc_bool_value(n)	((mrbc_value){.tt = (n)?MRBC_TT_TRUE:MRBC_TT_FALSE})
 
 int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2);
+#ifdef GC_RC
 void mrbc_dup(mrbc_value *v);
 void mrbc_release(mrbc_value *v);
 void mrbc_dec_ref_counter(mrbc_value *v);
+#endif /* GC_RC */
 void mrbc_clear_vm_id(mrbc_value *v);
 mrbc_int mrbc_atoi(const char *s, int base);
 

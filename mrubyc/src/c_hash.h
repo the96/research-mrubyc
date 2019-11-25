@@ -28,7 +28,9 @@ extern "C" {
 typedef struct RHash {
   // (NOTE)
   //  Needs to be same members and order as RArray.
+#ifdef GC_RC
   MRBC_OBJECT_HEADER;
+#endif
 
   uint16_t data_size;	//!< data buffer size.
   uint16_t n_stored;	//!< # of stored.
@@ -51,7 +53,9 @@ typedef struct RHashIterator {
 
 
 mrbc_value mrbc_hash_new(struct VM *vm, int size);
+#ifdef GC_RC
 void mrbc_hash_delete(mrbc_value *hash);
+#endif /* GC_RC */
 mrbc_value *mrbc_hash_search(const mrbc_value *hash, const mrbc_value *key);
 int mrbc_hash_set(mrbc_value *hash, mrbc_value *key, mrbc_value *val);
 mrbc_value mrbc_hash_get(mrbc_value *hash, mrbc_value *key);
