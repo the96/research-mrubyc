@@ -12,6 +12,27 @@
   </pre>
 */
 
+/* custom config for research */
+#define HEAP_EXPAND
+#ifdef HEAP_EXPAND
+
+#define MRBC_ALLOC_FLI_BIT_WIDTH 25
+#define MRBC_ALLOC_SLI_BIT_WIDTH 3
+#define MRBC_ALLOC_IGNORE_LSBS	  4
+#define MRBC_ALLOC_MEMSIZE_T     uint32_t
+
+#define MAX_REGS_SIZE 2000
+#define MAX_CALLINFO_SIZE 500
+#define MAX_OBJECT_COUNT 2000
+#endif
+/* custom config for research */
+
+#define BENCHMARK_MODE
+
+#ifndef BENCHMARK_MODE
+#define MRBC_DEBUG
+#endif
+
 #ifndef MRBC_SRC_VM_CONFIG_H_
 #define MRBC_SRC_VM_CONFIG_H_
 
@@ -64,7 +85,7 @@
 #define MRBC_USE_FLOAT 1
 
 /* USE Math class */
-#define MRBC_USE_MATH 0
+#define MRBC_USE_MATH 1
 
 /* USE String. Support String class */
 #define MRBC_USE_STRING 1

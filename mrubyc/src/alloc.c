@@ -17,10 +17,10 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 #include "vm.h"
 #include "alloc.h"
 #include "console.h"
-
 
 // Layer 1st(f) and 2nd(s) model
 // last 4bit is ignored
@@ -102,7 +102,10 @@ static uint8_t     *memory_pool;
 static FREE_BLOCK *free_blocks[SIZE_FREE_BLOCKS + 1];
 
 // free memory bitmap
-#define MSB_BIT1 0x8000
+#define MSB_BIT16 0x8000
+#ifdef HEAP_EXPAND
+#define MSB_BIT32 0x80000000
+#endif
 static uint16_t free_fli_bitmap;
 static uint16_t free_sli_bitmap[MRBC_ALLOC_FLI_BIT_WIDTH + 2]; // + sentinel
 
@@ -124,6 +127,20 @@ static inline int nlz16(uint16_t x)
   return n - (x >> 15);
 }
 
+#ifdef HEAP_EXPAND
+static inline int nlz32(uint32_t x)
+{
+    if (x == 0) return 32;
+
+    int n = 1;
+    if ((x >> 16) == 0) { n += 16; x <<= 16; }
+    if ((x >> 24) == 0) { n += 8; x <<= 8;   }
+    if ((x >> 28) == 0) { n += 4; x <<= 4;   }
+    if ((x >> 30) == 0) { n += 2; x <<= 2;   }
+    return n - (x >> 31);
+}
+#endif /* HEAP_EXPAND */
+
 
 //================================================================
 /*! calc f and s, and returns fli,sli of free_blocks
@@ -133,16 +150,23 @@ static inline int nlz16(uint16_t x)
 */
 static int calc_index(unsigned int alloc_size)
 {
+#ifndef HEAP_EXPAND
   // check overflow
   if( (alloc_size >> (MRBC_ALLOC_FLI_BIT_WIDTH
                       + MRBC_ALLOC_SLI_BIT_WIDTH
                       + MRBC_ALLOC_IGNORE_LSBS)) != 0) {
     return SIZE_FREE_BLOCKS;
   }
+#endif /* HEAP_EXPAND */
 
+#ifdef HEAP_EXPAND
   // calculate First Level Index.
+  int fli = 32 -
+    nlz32( alloc_size >> (MRBC_ALLOC_SLI_BIT_WIDTH + MRBC_ALLOC_IGNORE_LSBS) );
+#else
   int fli = 16 -
     nlz16( alloc_size >> (MRBC_ALLOC_SLI_BIT_WIDTH + MRBC_ALLOC_IGNORE_LSBS) );
+#endif /* HEAP_EXPAND */
 
   // calculate Second Level Index.
   int shift = (fli == 0) ? (fli + MRBC_ALLOC_IGNORE_LSBS) :
@@ -173,8 +197,12 @@ static void add_free_block(FREE_BLOCK *target)
   int fli   = FLI(index);
   int sli   = SLI(index);
 
-  free_fli_bitmap      |= (MSB_BIT1 >> fli);
-  free_sli_bitmap[fli] |= (MSB_BIT1 >> sli);
+#ifdef HEAP_EXPAND
+  free_fli_bitmap      |= (MSB_BIT32 >> fli);
+#else
+  free_fli_bitmap      |= (MSB_BIT16 >> fli);
+#endif /* HEAP_EXPAND */
+  free_sli_bitmap[fli] |= (MSB_BIT16 >> sli);
 
   target->prev_free = NULL;
   target->next_free = free_blocks[index];
@@ -207,8 +235,12 @@ static void remove_index(FREE_BLOCK *target)
     if( free_blocks[index] == NULL ) {
       int fli = FLI(index);
       int sli = SLI(index);
-      free_sli_bitmap[fli] &= ~(MSB_BIT1 >> sli);
-      if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT1 >> fli);
+      free_sli_bitmap[fli] &= ~(MSB_BIT16 >> sli);
+#ifdef HEAP_EXPAND
+      if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT32 >> fli);
+#else
+      if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT16 >> fli);
+#endif /* HEAP_EXPAND */
     }
   }
   else {
@@ -334,20 +366,29 @@ void * mrbc_raw_alloc(unsigned int size)
 
   if( target == NULL ) {
     // uses free_fli/sli_bitmap table.
-    uint16_t masked = free_sli_bitmap[fli] & ((MSB_BIT1 >> sli) - 1);
+    uint16_t masked = free_sli_bitmap[fli] & ((MSB_BIT16 >> sli) - 1);
     if( masked != 0 ) {
       sli = nlz16(masked);
     }
     else {
-      masked = free_fli_bitmap & ((MSB_BIT1 >> fli) - 1);
+#ifdef HEAP_EXPAND
+      masked = free_fli_bitmap & ((MSB_BIT32 >> fli) - 1);
+#else
+      masked = free_fli_bitmap & ((MSB_BIT16 >> fli) - 1);
+#endif /* HEAP_EXPAND */
       if( masked != 0 ) {
-	fli = nlz16(masked);
-	sli = nlz16(free_sli_bitmap[fli]);
+#ifdef HEAP_EXPAND
+        fli = nlz32(masked);
+#else
+        fli = nlz16(masked);
+#endif /* HEAP_EXPAND */
+        sli = nlz16(free_sli_bitmap[fli]);
       }
       else {
-	// out of memory
-	console_print("Fatal error: Out of memory.\n");
-	return NULL;  // ENOMEM
+        // out of memory
+        console_print("Fatal error: Out of memory.\n");
+        exit(1);
+        return NULL;  // ENOMEM
       }
     }
     assert(fli >= 0);
@@ -366,8 +407,12 @@ void * mrbc_raw_alloc(unsigned int size)
   free_blocks[index] = target->next_free;
 
   if( target->next_free == NULL ) {
-    free_sli_bitmap[fli] &= ~(MSB_BIT1 >> sli);
-    if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT1 >> fli);
+    free_sli_bitmap[fli] &= ~(MSB_BIT16 >> sli);
+#ifdef HEAP_EXPAND
+    if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT32 >> fli);
+#else
+    if( free_sli_bitmap[fli] == 0 ) free_fli_bitmap &= ~(MSB_BIT16 >> fli);
+#endif
   }
   else {
     target->next_free->prev_free = NULL;
@@ -550,7 +595,7 @@ void mrbc_free_all(const struct VM *vm)
     if( ptr->t == FLAG_TAIL_BLOCK ) flag_loop = 0;
     if( ptr->f == FLAG_USED_BLOCK && ptr->vm_id == vm_id ) {
       if( free_target ) {
-	mrbc_raw_free(free_target);
+	      mrbc_raw_free(free_target);
       }
       free_target = (char *)ptr + sizeof(USED_BLOCK);
     }
