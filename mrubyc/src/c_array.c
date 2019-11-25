@@ -22,6 +22,7 @@
 #include "class.h"
 #include "c_array.h"
 #include "c_string.h"
+#include "c_range.h"
 #include "console.h"
 #include "opcode.h"
 
@@ -44,6 +45,7 @@
  (getter)
   --[name]-------------[arg]---[ret]---[note]----------------------------------
     mrbc_array_get		T	Data remains in the container
+    mrbc_array_get_range  T Data remains in the container
     mrbc_array_pop		T	Data does not remain in the container
     mrbc_array_shift		T	Data does not remain in the container
     mrbc_array_remove		T	Data does not remain in the container
@@ -207,6 +209,40 @@ mrbc_value mrbc_array_get(mrbc_value *ary, int idx)
   return h->data[idx];
 }
 
+//================================================================
+/*! get many data what subset of array
+  @param  array pointer to source array
+  @param  start index of start
+  @param  end   index of end
+  @return       mrbc_array in mrbc_value or Nil
+
+  gc infomation:
+   * duplicated in method
+   * gc trigger
+*/
+mrbc_value mrbc_array_get_range(struct VM *vm, mrbc_value *array, int start, int end)
+{
+  mrbc_value ret;
+  mrbc_array *dist, *src;
+  int size;
+  int len = mrbc_array_size(array);
+  if (start < 0) start += len;
+  if (end < 0) end += len;
+  size = end - start + 1;
+  if (start < 0 || start > len || end < 0 || end > len) return mrbc_nil_value();
+  if (size < 0) return mrbc_array_new(vm, 0);
+  ret = mrbc_array_new(vm, size);
+  if (ret.array == NULL || ret.array->data == NULL) return mrbc_nil_value();
+  dist = ret.array;
+  src = array->array;
+  if (size > src->n_stored) {
+    size = src->n_stored;
+  }
+  memcpy(dist->data, src->data + start, sizeof(mrbc_value) * size);
+  dist->n_stored = size;
+  return ret;
+
+}
 
 //================================================================
 /*! push a data to tail
@@ -523,11 +559,12 @@ static void c_array_add(struct VM *vm, mrbc_value v[], int argc)
 */
 static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
 {
+  mrbc_value ret;
   /*
     in case of self[nth] -> object | nil
   */
   if( argc == 1 && v[1].tt == MRBC_TT_FIXNUM ) {
-    mrbc_value ret = mrbc_array_get(v, v[1].i);
+    ret = mrbc_array_get(v, v[1].i);
     mrbc_dup(&ret);
     SET_RETURN(ret);
     return;
@@ -536,34 +573,62 @@ static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
   /*
     in case of self[start, length] -> Array | nil
   */
-  if( argc == 2 && v[1].tt == MRBC_TT_FIXNUM && v[2].tt == MRBC_TT_FIXNUM ) {
-    int len = mrbc_array_size(&v[0]);
-    int idx = v[1].i;
-    if( idx < 0 ) idx += len;
-    if( idx < 0 ) goto RETURN_NIL;
+  // if( argc == 2 && v[1].tt == MRBC_TT_FIXNUM && v[2].tt == MRBC_TT_FIXNUM ) {
+  //   int len = mrbc_array_size(&v[0]);
+  //   int idx = v[1].i;
+  //   if( idx < 0 ) idx += len;
+  //   if( idx < 0 ) goto RETURN_NIL;
 
-    int size = (v[2].i < (len - idx)) ? v[2].i : (len - idx);
-					// min( v[2].i, (len - idx) )
-    if( size < 0 ) goto RETURN_NIL;
+  //   int size = (v[2].i < (len - idx)) ? v[2].i : (len - idx);
+	// 				// min( v[2].i, (len - idx) )
+  //   if( size < 0 ) goto RETURN_NIL;
 
-    mrbc_value ret = mrbc_array_new(vm, size);
-    if( ret.array == NULL ) return;		// ENOMEM
+  //   mrbc_value ret = mrbc_array_new(vm, size);
+  //   if( ret.array == NULL ) return;		// ENOMEM
 
-    int i;
-    for( i = 0; i < size; i++ ) {
-      mrbc_value val = mrbc_array_get(v, v[1].i + i);
-      mrbc_dup(&val);
-      mrbc_array_push(&ret, &val);
+  //   int i;
+  //   for( i = 0; i < size; i++ ) {
+  //     mrbc_value val = mrbc_array_get(v, v[1].i + i);
+  //     mrbc_dup(&val);
+  //     mrbc_array_push(&ret, &val);
+  //   }
+
+  //   SET_RETURN(ret);
+  //   return;
+  // }
+  int start, end, size;
+  if (argc == 2 && v[1].tt == MRBC_TT_FIXNUM && v[2].tt == MRBC_TT_FIXNUM) {
+    start = v[1].i;
+    size = v[2].i;
+    end = start + size - 1;
+    goto RETURN_ARRAY_RANGE;
+  } else
+  if (argc == 1 && v[1].tt == MRBC_TT_RANGE) {
+    mrbc_range *range = v[1].range;
+    if (range->first.tt != MRBC_TT_FIXNUM || range->last.tt != MRBC_TT_FIXNUM) {
+      console_print("Invalid range in Array#[].\n");
+      goto RETURN_NIL;
     }
-
-    SET_RETURN(ret);
-    return;
+    start = range->first.i;
+    end = range->last.i;
+    size = end - start + 1;
+    goto RETURN_ARRAY_RANGE;
   }
 
   /*
     other case
   */
   console_print( "Not support such case in Array#[].\n" );
+  return;
+
+RETURN_ARRAY_RANGE:
+  ret = mrbc_array_get_range(vm, v, start, end);
+  if (ret.tt == MRBC_TT_NIL) goto RETURN_NIL;
+  int i;
+  for ( i = 0; i < size; i++) {
+    mrbc_dup(ret.array->data + i);
+  }
+  SET_RETURN(ret);
   return;
 
  RETURN_NIL:
