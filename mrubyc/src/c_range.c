@@ -17,6 +17,7 @@
 #include "static.h"
 #include "class.h"
 #include "c_range.h"
+#include "c_array.h"
 #include "c_string.h"
 #include "console.h"
 #include "opcode.h"
@@ -145,6 +146,37 @@ static void c_range_exclude_end(struct VM *vm, mrbc_value v[], int argc)
 }
 
 
+/*! (method) to_a
+* range to array
+*/
+static void c_range_to_a(struct VM *vm, mrbc_value v[], int argc)
+{
+  mrbc_range *range = v[0].range;
+  mrbc_value first = range->first;
+  mrbc_value last = range->last;
+  if (!(first.tt == MRBC_TT_FIXNUM && last.tt == MRBC_TT_FIXNUM)) {
+    console_print("TypeError\n");
+    SET_NIL_RETURN();
+  }
+  int size = last.i - first.i;
+  if (size <= 0) {
+    SET_RETURN(mrbc_array_new(vm, 0));
+    return;
+  }
+  if (!range->flag_exclude) {
+    size++;
+  }
+  mrbc_value array = mrbc_array_new(vm, size);
+  mrbc_value val;
+  int i;
+  for (i = 0; i < size; i++) {
+    val.tt = MRBC_TT_FIXNUM;
+    val.i = first.i + i;
+    mrbc_array_push(&array, &val);
+  }
+  SET_RETURN(array);
+}
+
 
 #if MRBC_USE_STRING
 //================================================================
@@ -185,6 +217,7 @@ void mrbc_init_class_range(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_range, "first", c_range_first);
   mrbc_define_method(vm, mrbc_class_range, "last", c_range_last);
   mrbc_define_method(vm, mrbc_class_range, "exclude_end?", c_range_exclude_end);
+  mrbc_define_method(vm, mrbc_class_range, "to_a", c_range_to_a);
 
 #if MRBC_USE_STRING
   mrbc_define_method(vm, mrbc_class_range, "inspect", c_range_inspect);
