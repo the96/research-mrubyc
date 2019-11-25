@@ -780,6 +780,28 @@ static void c_array_clear(struct VM *vm, mrbc_value v[], int argc)
   mrbc_array_clear(v);
 }
 
+//================================================================
+/*! (method) include?
+*/
+static void c_array_include(struct VM *vm, mrbc_value v[], int argc)
+{
+  mrbc_value *value = &GET_ARG(1);
+  mrbc_value *data = v->array->data;
+  int n = v->array->n_stored;
+  int i;
+
+  for( i = 0; i < n; i++ ) {
+    if( mrbc_compare(&data[i], value) == 0 ) break;
+  }
+
+  mrbc_release(v+1);
+  if( i < n ) {
+    SET_BOOL_RETURN(1);
+  } else {
+    SET_BOOL_RETURN(0);
+  }
+}
+
 
 //================================================================
 /*! (method) delete_at
@@ -1237,6 +1259,7 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "[]=", c_array_set);
   mrbc_define_method(vm, mrbc_class_array, "<<", c_array_push);
   mrbc_define_method(vm, mrbc_class_array, "clear", c_array_clear);
+  mrbc_define_method(vm, mrbc_class_array, "include?", c_array_include);
   mrbc_define_method(vm, mrbc_class_array, "delete", c_array_delete);
   mrbc_define_method(vm, mrbc_class_array, "delete_at", c_array_delete_at);
   mrbc_define_method(vm, mrbc_class_array, "empty?", c_array_empty);
