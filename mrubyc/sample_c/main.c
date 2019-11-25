@@ -7,10 +7,7 @@
 #include "mrubyc.h"
 #include "c_ext.h"
 
-// #define MEMORY_SIZE (1024*32)
-// #define MEMORY_SIZE (1024*64-1)
-#define MEMORY_SIZE (1024*1024*1024)
-static uint8_t memory_pool[MEMORY_SIZE];
+#define MEMORY_SIZE (1024*32)
 
 uint8_t * load_mrb_file(const char *filename)
 {
@@ -39,11 +36,11 @@ uint8_t * load_mrb_file(const char *filename)
 }
 
 
-void mrubyc(uint8_t *mrbbuf)
+void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
 {
   struct VM *vm;
 
-  mrbc_init_alloc(memory_pool, MEMORY_SIZE);
+  mrbc_init_alloc(memory_pool, memory_pool_size);
   init_static();
   mrbc_init_class_extension(0);
 
@@ -67,16 +64,31 @@ void mrubyc(uint8_t *mrbbuf)
 
 int main(int argc, char *argv[])
 {
-  if( argc != 2 ) {
+  int prog_start = 1;
+  size_t memory_pool_size = MEMORY_SIZE;
+  uint8_t *memory_pool;
+  uint8_t *mrb_buf;
+
+    if (argc >= prog_start + 2 &&
+      strcmp(argv[prog_start], "-m") == 0) {
+    memory_pool_size = atoi(argv[prog_start + 1]);
+    prog_start += 2;
+  }
+
+  if( argc != prog_start + 1 ) {
     printf("Usage: %s <xxxx.mrb>\n", argv[0]);
     return 1;
   }
 
-  uint8_t *mrbbuf = load_mrb_file( argv[1] );
-  if( mrbbuf == 0 ) return 1;
+  memory_pool = (uint8_t *)malloc(memory_pool_size);
+  if ( memory_pool == 0 ) return 1;
 
-  mrubyc( mrbbuf );
-  free( mrbbuf );
+  mrb_buf = load_mrb_file( argv[prog_start] );
+  if ( mrb_buf == 0 ) return 1;
+
+  mrubyc( mrb_buf, memory_pool, memory_pool_size );
+  free( memory_pool );
+  free( mrb_buf );
 
   return 0;
 }
