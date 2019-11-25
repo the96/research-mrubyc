@@ -101,5 +101,10 @@ class Array
     ary.uniq!(&block)
     ary
   end
+  
+  def concat(&block)
+    self.replace(self + block)
+    self
+  end
 
 end
