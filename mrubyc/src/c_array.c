@@ -648,6 +648,41 @@ static void c_array_sub(struct VM *vm, mrbc_value v[], int argc)
 
 
 //================================================================
+/*! (operator) *
+*/
+static void c_array_mul(struct VM *vm, mrbc_value v[], int argc)
+{
+  if( GET_TT_ARG(1) != MRBC_TT_FIXNUM ) {
+    console_print( "TypeError\n" );	// raise?
+    return;
+  }
+
+  mrbc_array *h1 = v[0].array;
+  int n = v[1].i;
+
+  if (n < 0) {
+    SET_NIL_RETURN();
+    return;
+  }
+  mrbc_value value = mrbc_array_new(vm, h1->n_stored * n);
+  if( value.array == NULL ) return;		// ENOMEM
+
+  int i;
+  for (i = 0; i < n; i++) {
+    memcpy( value.array->data + h1->n_stored * i, h1->data, sizeof(mrbc_value) * h1->n_stored );
+  }
+  value.array->n_stored = h1->n_stored * n;
+
+  mrbc_value *p1 = value.array->data;
+  const mrbc_value *p2 = p1 + value.array->n_stored;
+  while( p1 < p2 ) {
+    mrbc_dup(p1++);
+  }
+  mrbc_release(v+1);
+  SET_RETURN(value);
+}
+
+//================================================================
 /*! (operator) []
 */
 static void c_array_get(struct VM *vm, mrbc_value v[], int argc)
@@ -1088,6 +1123,7 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "new", c_array_new);
   mrbc_define_method(vm, mrbc_class_array, "+", c_array_add);
   mrbc_define_method(vm, mrbc_class_array, "-", c_array_sub);
+  mrbc_define_method(vm, mrbc_class_array, "*", c_array_mul);
   mrbc_define_method(vm, mrbc_class_array, "[]", c_array_get);
   mrbc_define_method(vm, mrbc_class_array, "at", c_array_get);
   mrbc_define_method(vm, mrbc_class_array, "[]=", c_array_set);
