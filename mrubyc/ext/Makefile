@@ -7,7 +7,7 @@
 #  This file is distributed under BSD 3-Clause License.
 #
 
-CFLAGS = -Wall -Wpointer-arith -g -DMRBC_DEBUG -I../src # -std=c99 -pedantic -pedantic-errors
+CFLAGS = -Wall -Wpointer-arith -g -I../src $(BENCHMARK) # -std=c99 -pedantic -pedantic-errors
 
 EXT_SRCS = c_ext.c
 TARGET = libmrubyc_ext.a 

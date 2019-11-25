@@ -8,7 +8,11 @@
 #
 
 all: mrubyc_lib mrubyc_ext mrubyc_bin
-
+benchmark: 
+	cd mrblib ; $(MAKE)
+	cd src ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
+	cd ext ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
+	cd sample_c ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
 
 mrubyc_lib:
 	cd mrblib ; $(MAKE) all
