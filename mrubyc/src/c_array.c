@@ -490,6 +490,31 @@ void mrbc_array_minmax(mrbc_value *ary, mrbc_value **pp_min_value, mrbc_value **
 
 
 //================================================================
+/*! get reversed array
+
+  @param  ary		pointer to source value
+  @return       reversed array in mrbc_value
+  gc infomation:
+   * duplicated in method
+   * gc trigger
+*/
+mrbc_value mrbc_array_reverse (struct VM *vm, mrbc_value *array)
+{
+  mrbc_value ret = mrbc_array_new(vm, array->array->data_size);
+  if (ret.array == NULL) return mrbc_nil_value(); // ENOMEM
+  int i;
+  mrbc_value *data = array->array->data;
+  int n_stored = array->array->n_stored;
+  for (i = 0; i < n_stored; i++) {
+    mrbc_value val = data[n_stored - i - 1];
+    mrbc_dup(&val);
+    mrbc_array_push(&ret, &val);
+  }
+  return ret;
+}
+
+
+//================================================================
 /*! method new
 */
 static void c_array_new(struct VM *vm, mrbc_value v[], int argc)
@@ -921,6 +946,33 @@ static void c_array_minmax(struct VM *vm, mrbc_value v[], int argc)
 }
 
 
+//================================================================
+/*! (method) reverse
+*/
+static void c_array_reverse(struct VM *vm, mrbc_value v[], int argc)
+{
+  mrbc_value ret = mrbc_array_reverse(vm, &v[0]);
+  SET_RETURN(ret);
+}
+
+//================================================================
+/*! (method) reverse!
+*/
+static void c_array_reverse_bang(struct VM *vm, mrbc_value v[], int argc)
+{
+  mrbc_array *ary = v[0].array;
+  mrbc_value ret = mrbc_array_reverse(vm, &v[0]);
+  mrbc_value *p1 = ary->data;
+  mrbc_value *p2 = p1 + ary->n_stored;
+  while (p1 < p2) {
+    mrbc_dec_ref_counter(p1++);
+  }
+  mrbc_raw_free(v[0].array->data);
+  v[0].array->data = ret.array->data;
+  mrbc_raw_free(ret.array);
+}
+
+
 #if MRBC_USE_STRING
 //================================================================
 /*! (method) inspect
@@ -1025,6 +1077,8 @@ void mrbc_init_class_array(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_array, "min", c_array_min);
   mrbc_define_method(vm, mrbc_class_array, "max", c_array_max);
   mrbc_define_method(vm, mrbc_class_array, "minmax", c_array_minmax);
+  mrbc_define_method(vm, mrbc_class_array, "reverse", c_array_reverse);
+  mrbc_define_method(vm, mrbc_class_array, "reverse!", c_array_reverse_bang);
 #if MRBC_USE_STRING
   mrbc_define_method(vm, mrbc_class_array, "inspect", c_array_inspect);
   mrbc_define_method(vm, mrbc_class_array, "to_s", c_array_inspect);
