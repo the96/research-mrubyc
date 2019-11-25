@@ -14,6 +14,9 @@
 #include "static.h"
 #include "global.h"
 #include "class.h"
+#ifdef GC_MS_OR_BM
+#include "alloc.h"
+#endif /* GC_MS_OR_BM */
 
 /* Class Tree */
 mrbc_class *mrbc_class_object;
@@ -39,4 +42,15 @@ void init_static(void)
   mrbc_init_global();
 
   mrbc_init_class();
+
+#ifdef GC_MS_OR_BM
+  ready_marksweep_static();
+#endif /* GC_MS_OR_BM */
+}
+
+void end_static(void)
+{
+#ifdef GC_MS_OR_BM
+  end_marksweep_static();
+#endif /* GC_MS_OR_BM */
 }

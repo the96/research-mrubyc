@@ -34,5 +34,7 @@ int main(void)
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
 
+  end_static();
+
   return 0;
 }

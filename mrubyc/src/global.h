@@ -28,6 +28,11 @@ mrbc_value *mrbc_get_global(mrbc_sym sym_id);
 void mrbc_global_clear_vm_id(void);
 
 
+#ifdef GC_MS_OR_BM
+mrbc_kv_handle * get_const_handle();
+mrbc_kv_handle * get_global_handle();
+#endif /* GC_MS_OR_BM */
+
 #ifdef __cplusplus
 }
 #endif

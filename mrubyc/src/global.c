@@ -108,3 +108,12 @@ void mrbc_global_clear_vm_id(void)
     mrbc_clear_vm_id( &p->value );
   }
 }
+
+#ifdef GC_MS_OR_BM
+mrbc_kv_handle * get_const_handle() {
+  return &handle_const;
+}
+mrbc_kv_handle * get_global_handle() {
+  return &handle_global;
+}
+#endif /* GC_MS_OR_BM */

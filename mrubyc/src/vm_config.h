@@ -37,14 +37,25 @@
 
 #if (GC_MODE == REFERENCE_COUNT) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_RC
+#define GC_MS_DEBUG
+#define GC_BM_DEBUG
 #endif
 
-#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG)
+#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#define GC_MS_OR_BM
+#endif
+
+#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_MS
+#define GC_BM_DEBUG
 #endif
 
 #if (GC_MODE == BITMAP_MARKING) || (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_BM
+#endif
+
+#ifdef GC_MS_OR_BM
+#define MARK_STACK_SIZE 500000
 #endif
 
 /* custom config for research */

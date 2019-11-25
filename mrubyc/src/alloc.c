@@ -22,6 +22,16 @@
 #include "alloc.h"
 #include "console.h"
 
+#ifdef GC_MS_OR_BM
+#include "global.h"
+#include "keyvalue.h"
+#include "c_array.h"
+#include "c_hash.h"
+#include "c_range.h"
+#include "c_string.h"
+#include "class.h"
+#endif /* GC_MS_OR_BM */
+
 // Layer 1st(f) and 2nd(s) model
 // last 4bit is ignored
 // f : size
@@ -63,6 +73,12 @@
 typedef struct USED_BLOCK {
   unsigned int         t : 1;       //!< FLAG_TAIL_BLOCK or FLAG_NOT_TAIL_BLOCK
   unsigned int         f : 1;       //!< FLAG_FREE_BLOCK or BLOCK_IS_NOT_FREE
+#ifdef GC_MS
+  unsigned int         m : 1;       //!< mark bit
+#endif /* GC_MS */
+#ifdef GC_MS_OR_BM
+  block_type           bt: 5;       //!< type of object in block
+#endif /* GC_MS_OR_BM */
   uint8_t              vm_id;       //!< mruby/c VM ID
 
   MRBC_ALLOC_MEMSIZE_T size;        //!< block size, header included
@@ -72,6 +88,12 @@ typedef struct USED_BLOCK {
 typedef struct FREE_BLOCK {
   unsigned int         t : 1;       //!< FLAG_TAIL_BLOCK or FLAG_NOT_TAIL_BLOCK
   unsigned int         f : 1;       //!< FLAG_FREE_BLOCK or BLOCK_IS_NOT_FREE
+#ifdef GC_MS
+  unsigned int         m : 1;       //!< mark bit
+#endif /* GC_MS */
+#ifdef GC_MS_OR_BM
+  block_type           bt: 5;       //!< type of object in block
+#endif /* GC_MS_OR_BM */
   uint8_t              vm_id;       //!< dummy
 
   MRBC_ALLOC_MEMSIZE_T size;        //!< block size, header included
@@ -109,6 +131,15 @@ static FREE_BLOCK *free_blocks[SIZE_FREE_BLOCKS + 1];
 static uint16_t free_fli_bitmap;
 static uint16_t free_sli_bitmap[MRBC_ALLOC_FLI_BIT_WIDTH + 2]; // + sentinel
 
+#ifdef GC_MS_OR_BM
+uint8_t marked_flag;
+mrbc_instance **mark_stack;
+mrbc_instance **root_stack;
+int mark_stack_top;
+int root_stack_top;
+struct VM **vms;
+int vm_count;
+#endif /* GC_MS_OR_BM */
 
 //================================================================
 /*! Number of leading zeros.
@@ -693,3 +724,278 @@ int mrbc_alloc_vm_used( int vm_id )
 }
 
 #endif
+
+
+#ifdef GC_MS_OR_BM
+void ready_marksweep_static()
+{
+  mark_stack = (mrbc_instance **) malloc(sizeof(mrbc_instance *) * MARK_STACK_SIZE);
+  root_stack = (mrbc_instance **) malloc(sizeof(mrbc_instance *) * MARK_STACK_SIZE);
+  if (mark_stack == 0 || root_stack == 0) {
+    console_print("Fatal error: initialize allocation error\n");
+    exit(1);
+  }
+  mark_stack_top = 0;
+  root_stack_top = 0;
+  vms = (struct VM **) malloc(sizeof(struct VM *) * MAX_VM_COUNT);
+  vm_count = 0;
+  marked_flag = 1;
+}
+
+void end_marksweep_static()
+{
+  free(vms);
+  free(mark_stack);
+  free(root_stack);
+}
+
+void init_mark_stack()
+{
+  if (mark_stack_top != 0)
+    console_printf("Warning: mark_stack_top is nonzero. %d\n", mark_stack_top);
+  memcpy(mark_stack, root_stack, sizeof(mrbc_instance *) * root_stack_top);
+  mark_stack_top = root_stack_top;
+}
+
+void push_root_stack(mrbc_instance *obj)
+{
+  if (root_stack_top < MARK_STACK_SIZE) {
+    root_stack[root_stack_top++] = obj;
+  } else {
+    console_printf("Error: StackOverFlow at root_stack\n");
+    exit(1);
+  }
+}
+
+mrbc_instance * pop_root_stack()
+{
+  if (root_stack_top > 0) {
+    return root_stack[--root_stack_top];
+  } else {
+    console_print("Error: Stack Item Exhaust at root_stack");
+    exit(1);
+  }
+}
+
+void push_mrbc_value_for_root_stack(mrbc_value *obj)
+{
+  if ((obj->tt >= MRBC_TT_OBJECT && obj->tt <= MRBC_TT_HASH) || obj->tt == MRBC_TT_CLASS) {
+    push_root_stack(obj->instance);
+  }
+}
+
+static inline void push_mark_stack(mrbc_instance *obj)
+{
+  if (mark_stack_top < MARK_STACK_SIZE) {
+    mark_stack[mark_stack_top++] = obj;
+  } else {
+    console_print("Error: StackOverFlow at mark_stack\n");
+    exit(1);
+  }
+}
+
+static inline mrbc_instance * pop_mark_stack()
+{
+  return mark_stack[--mark_stack_top];
+}
+
+static inline void push_mrbc_value_for_mark_stack(mrbc_value *obj)
+{
+  if ((obj->tt >= MRBC_TT_OBJECT && obj->tt <= MRBC_TT_HASH) || obj->tt == MRBC_TT_CLASS) {
+    push_mark_stack(obj->instance);
+  }
+}
+
+void add_vm_set(struct VM *vm)
+{
+  vms[vm_count++] = vm;
+}
+
+void remove_vm_set(struct VM *vm)
+{
+  int i;
+  for (i = 0; i < vm_count; i++) {
+    if (vms[i]->vm_id == vm->vm_id) {
+      memmove(vms + i, vms + i + 1, sizeof(struct VM *) * (vm_count - i));
+      return;
+    }
+  }
+  console_print("Error: VM is not found from vms.\n");
+}
+
+#ifdef GC_MS
+void reverse_mark_flag()
+{
+  marked_flag = !marked_flag;
+}
+#endif /* GC_MS */
+
+void push_vm();
+void mark_from_stack();
+
+void mrbc_mark ()
+{
+  int i;
+  init_mark_stack();
+
+  mrbc_kv_handle *const_h = get_const_handle();
+  mrbc_kv_handle *global_h = get_global_handle();
+  for (i = 0; i < const_h->n_stored ; i++) {
+    push_mrbc_value_for_mark_stack(&const_h->data[i].value);
+  }
+  for (i = 0; i < global_h->n_stored; i++) {
+    push_mrbc_value_for_mark_stack(&global_h->data[i].value);
+  }
+
+  for (i = 0; i < vm_count; i++) {
+    push_vm(vms[i]);
+  }
+  mark_from_stack();
+}
+
+void push_vm(struct VM *vm) {
+  int i;
+  if (vm->pc_irep != NULL)
+    for (i = 0; vm->regs + i < vm->current_regs + vm->pc_irep->nregs && i < MAX_REGS_SIZE; i++) {
+      push_mrbc_value_for_mark_stack(vm->regs + i);
+    }
+
+  if (vm->target_class != NULL) {
+    push_mark_stack((mrbc_instance *)vm->target_class);
+  }
+
+  if (vm->callinfo_tail != NULL) {
+    mrb_callinfo *callinfo = vm->callinfo_tail;
+    while(1) {
+      if (callinfo->target_class != NULL) {
+        push_mark_stack(callinfo->target_class);
+      }
+      if (callinfo->prev == NULL)
+        break;
+      callinfo = callinfo->prev;
+    }
+  }
+}
+
+#define GET_BLOCK_HEADER(obj) (USED_BLOCK *)((uint8_t *)obj - sizeof(USED_BLOCK *))
+
+#ifdef GC_MS
+static inline void mark(USED_BLOCK *block) {
+  block->m = marked_flag;
+}
+#endif
+#ifdef GC_BM
+static inline void mark(USED_BLOCK *block) {
+// TODO
+}
+#endif
+
+#ifdef GC_MS
+static inline int is_marked(USED_BLOCK *block) {
+  return block->m == marked_flag;
+}
+#endif
+#ifdef GC_BM
+static inline int is_marked(USED_BLOCK *block) {
+// TODO
+}
+#endif
+
+void mark_from_stack() {
+
+  while (1) {
+    if (mark_stack_top <= 0) break;
+    mrbc_instance *obj = pop_mark_stack();
+    USED_BLOCK *block = GET_BLOCK_HEADER(obj);
+    if (is_marked(block)) continue;
+    mark(block);
+    switch (block->bt) {
+      case BT_INSTANCE:
+      {
+        mrbc_instance *instance = obj;
+        if (instance->cls == NULL) {
+          push_mark_stack((mrbc_instance *)instance->cls);
+        }
+
+        if (instance->ivar.data_size != 0) {
+          mark(GET_BLOCK_HEADER(instance->ivar.data));
+          int i = 0;
+          while (i < instance->ivar.n_stored) {
+            push_mrbc_value_for_mark_stack(&instance->ivar.data[i].value);
+            i++;
+          }
+        }
+        break;
+      }
+      case BT_PROC:
+      {
+        mrbc_proc *proc = (mrbc_proc *) obj;
+        if (proc->next != NULL) {
+          push_mark_stack(proc->next);
+        }
+        break;
+      }
+      case BT_ARRAY:
+      {
+        mrbc_array *array = (mrbc_array *) obj;
+        mark(GET_BLOCK_HEADER(array->data));
+        int i = 0;
+        while (i < array->n_stored) {
+          push_mrbc_value_for_mark_stack(array->data + i++);
+        }
+        break;
+      }
+      case BT_STRING:
+      {
+        mrbc_string *string = (mrbc_string *) obj;
+        mark(GET_BLOCK_HEADER(string->data));
+        break;
+      }
+      case BT_RANGE:
+      {
+        mrbc_range *range = (mrbc_range *) obj;
+        push_mrbc_value_for_mark_stack(&range->first);
+        push_mrbc_value_for_mark_stack(&range->last);
+        break;
+      }
+      case BT_HASH:
+      {
+        mrbc_hash *hash = (mrbc_hash *) obj;
+        mark(GET_BLOCK_HEADER(hash->data));
+        int i = 0;
+        while (i < hash->n_stored) {
+          push_mrbc_value_for_mark_stack(hash->data + i++);
+        }
+      }
+      case BT_CLASS:
+      {
+        mrbc_class *class = (mrbc_class *)obj;
+        if (class->super != NULL) {
+          push_mark_stack(class->super);
+        }
+        if (class->procs != NULL) {
+          push_mark_stack(class->procs);
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
+void mrbc_sweep() {
+  USED_BLOCK *block = (USED_BLOCK *) memory_pool;
+  while (1) {
+    while (block->f == FLAG_FREE_BLOCK || block->bt < BT_CLASS ||
+           block->bt > BT_KV_DATA || block->m == marked_flag) {
+      if ((uint8_t *)block >= memory_pool + memory_pool_size) {
+        return;
+      }
+      block = (USED_BLOCK *) PHYS_NEXT(block);
+    }
+    free(block);
+  }
+}
+
+#endif /* GC_MS_OR_BM */

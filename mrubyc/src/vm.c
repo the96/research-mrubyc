@@ -1952,6 +1952,9 @@ mrbc_vm *mrbc_vm_open( struct VM *vm_arg )
   memset(vm, 0, sizeof(mrbc_vm));	// caution: assume NULL is zero.
   if( vm_arg == NULL ) vm->flag_need_memfree = 1;
   vm->vm_id = vm_id;
+#ifdef GC_MS_OR_BM
+  add_vm_set(vm);
+#endif /* GC_MS_OR_BM */
 
   return vm;
 }
@@ -2020,6 +2023,9 @@ void mrbc_vm_begin( struct VM *vm )
 */
 void mrbc_vm_end( struct VM *vm )
 {
+#ifdef GC_MS_OR_BM
+  remove_vm_set(vm);
+#endif /* GC_MS_OR_BM */
   mrbc_global_clear_vm_id();
   mrbc_free_all(vm);
 }

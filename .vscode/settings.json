@@ -3,6 +3,9 @@
     "type_traits": "c",
     "console.h": "c",
     "alloc.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "vm.h": "c",
+    "class.h": "c",
+    "value.h": "c"
   }
 }

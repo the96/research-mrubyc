@@ -1131,7 +1131,7 @@ static void c_array_replace(struct VM *vm, mrbc_value v[], int argc)
   v->array->n_stored = src.array->n_stored;
   mrbc_raw_free(src.array);
 #ifdef GC_RC
-  mrbc_release(v + 1);
+  mrbc_release(v+1);
 #endif /* GC_RC */
 }
 

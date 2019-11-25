@@ -66,6 +66,8 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
   printf("vm time %.9lf\n", vm_time);
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
+  
+  end_static();
 }
 
 
