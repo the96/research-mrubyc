@@ -469,7 +469,7 @@ void * mrbc_raw_alloc(unsigned int size)
 }
 
 
-#ifdef GC_RC
+#if defined(GC_RC) && !defined(RC_REF_STOP)
 //================================================================
 /*! release memory
 
@@ -500,7 +500,7 @@ void mrbc_raw_free(void *ptr)
   // target, add to index
   add_free_block(target);
 }
-#endif /* GC_RC */
+#endif /* GC_RC and !RC_REF_STOP */
 
 #if defined(GC_MS) || defined (GC_BM)
 //================================================================

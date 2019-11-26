@@ -61,8 +61,9 @@ void mrbc_range_delete(mrbc_value *v)
 {
   mrbc_release( &v->range->first );
   mrbc_release( &v->range->last );
-
+#ifndef RC_REF_STOP
   mrbc_raw_free( v->range );
+#endif /* RC_REF_STOP */
 }
 #endif /* GC_RC */
 

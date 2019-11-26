@@ -133,8 +133,10 @@ void mrbc_array_delete(mrbc_value *ary)
     mrbc_dec_ref_counter(p1++);
   }
 
+#ifndef RC_REF_STOP
   mrbc_raw_free(h->data);
   mrbc_raw_free(h);
+#endif /* RC_REF_STOP */
 }
 #endif /* GC_RC */
 
