@@ -26,6 +26,7 @@
 #define MAX_OBJECT_COUNT 2000
 #endif
 
+
 /* GC_MODE */
 #define REFERENCE_COUNT 0
 #define MARKSWEEP 1
@@ -35,23 +36,30 @@
 
 #define GC_MODE (MARKSWEEP)
 
-#if (GC_MODE == REFERENCE_COUNT) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#if (GC_MODE == REFERENCE_COUNT)
 #define GC_RC
-#define GC_MS_DEBUG
-#define GC_BM_DEBUG
 #endif
 
-#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#if (GC_MODE == MARKSWEEP)
+#define GC_MS
 #define GC_MS_OR_BM
 #endif
 
-#if (GC_MODE == MARKSWEEP) || (GC_MODE == MARKSWEEP_DEBUG) || (GC_MODE == BITMAP_MARKING_DEBUG)
-#define GC_MS
-#define GC_BM_DEBUG
+#if (GC_MODE == BITMAP_MARKING)
+#define GC_BM
+#define GC_MS_OR_BM
 #endif
 
-#if (GC_MODE == BITMAP_MARKING) || (GC_MODE == BITMAP_MARKING_DEBUG)
+#if (GC_MODE == MARKSWEEP_DEBUG)
+#define GC_MS
+#define GC_MS_OR_BM
+#define GC_MS_DEBUG
+#endif
+
+#if (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_BM
+#define GC_MS_OR_BM
+#define GC_BM_DEBUG
 #endif
 
 #ifdef GC_MS_OR_BM
@@ -65,6 +73,7 @@
 #ifndef BENCHMARK_MODE
 #define MRBC_DEBUG
 #endif
+
 
 #ifndef MRBC_SRC_VM_CONFIG_H_
 #define MRBC_SRC_VM_CONFIG_H_

@@ -32,6 +32,10 @@
 #include "class.h"
 #endif /* GC_MS_OR_BM */
 
+#ifdef HEAP_DUMP
+#include <stdio.h>
+#endif /* HEAP_DUMP */
+
 // Layer 1st(f) and 2nd(s) model
 // last 4bit is ignored
 // f : size
@@ -465,6 +469,7 @@ void * mrbc_raw_alloc(unsigned int size)
 }
 
 
+#ifdef GC_RC
 //================================================================
 /*! release memory
 
@@ -495,6 +500,38 @@ void mrbc_raw_free(void *ptr)
   // target, add to index
   add_free_block(target);
 }
+#endif /* GC_RC */
+
+#if defined(GC_MS) || defined (GC_BM)
+//================================================================
+/*! release memory
+
+  @param  ptr	block
+*/
+void mrbc_raw_free(FREE_BLOCK *target)
+{
+  // check next block, merge?
+  FREE_BLOCK *next = (FREE_BLOCK *)PHYS_NEXT(target);
+
+  if((target->t == FLAG_NOT_TAIL_BLOCK) && (next->f == FLAG_FREE_BLOCK)) {
+    remove_index(next);
+    merge_block(target, next);
+  }
+
+  // check previous block, merge?
+  FREE_BLOCK *prev = (FREE_BLOCK *)PHYS_PREV(target);
+
+  if((prev != NULL) && (prev->f == FLAG_FREE_BLOCK)) {
+    remove_index(prev);
+    merge_block(prev, target);
+    target = prev;
+  }
+
+  // target, add to index
+  add_free_block(target);
+}
+#endif /* GC_MS OR GC_BM */
+
 
 
 //================================================================
@@ -826,7 +863,7 @@ void remove_vm_set(struct VM *vm)
 #ifdef GC_MS
 void reverse_mark_flag()
 {
-  marked_flag = !marked_flag;
+  marked_flag = !marked_flag & 1;
 }
 #endif /* GC_MS */
 
@@ -985,17 +1022,77 @@ void mark_from_stack() {
 }
 
 void mrbc_sweep() {
-  USED_BLOCK *block = (USED_BLOCK *) memory_pool;
+  FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
   while (1) {
     while (block->f == FLAG_FREE_BLOCK || block->bt < BT_CLASS ||
            block->bt > BT_KV_DATA || block->m == marked_flag) {
       if ((uint8_t *)block >= memory_pool + memory_pool_size) {
         return;
       }
-      block = (USED_BLOCK *) PHYS_NEXT(block);
+      block = (FREE_BLOCK *) PHYS_NEXT(block);
     }
-    free(block);
+    mrbc_raw_free(block);
   }
 }
 
 #endif /* GC_MS_OR_BM */
+
+#if defined(GC_MS_DEBUG) || defined(GC_BM_DEBUG)
+
+char* block_type_to_name(uint8_t bt);
+
+void heap_dump() {
+  printf("==[heap dump]========\n");
+  FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
+  FREE_BLOCK *heap_end = (FREE_BLOCK *) (memory_pool + memory_pool_size);
+  int block_count, free_count, used_count;
+  block_count = free_count =  used_count = 0;
+  while (1) {
+    if (block >= heap_end) break;
+    if (block->f == FLAG_FREE_BLOCK) {
+      printf("[%4d]FREE_BLOCK(%d) size: %4d offset: %8d (%p)\n", 
+             block_count++, free_count++, block->size, (uint8_t *)block - memory_pool, block);
+    } else {
+      printf("[%4d]USED_BLOCK(%d) size: %4d offset: %8d (%p) type: %s mark: %d vm_id: %d\n", 
+             block_count++, used_count++, block->size, (uint8_t *)block - memory_pool, block, block_type_to_name(block->bt), is_marked(block), block->vm_id);
+
+    }
+    block = (FREE_BLOCK *) PHYS_NEXT(block);
+  }
+  printf("==[heap summary]=====\n");
+  printf("FREE_BLOCK: %d " , free_count);
+  printf("USED_BLOCK: %d " , used_count);
+  printf("HEAP_SIZE : %d\n", memory_pool_size);
+  print("======================\n");
+}
+
+char* block_type_to_name(uint8_t bt) {
+  switch (bt) {
+    case BT_OBJECT      : return "Object";
+    case BT_CALLINFO    : return "Callinfo";
+    case BT_CLASS       : return "Class";
+    case BT_INSTANCE    : return "Instance";
+    case BT_PROC        : return "Proc";
+    case BT_ARRAY       : return "Array";
+    case BT_STRING      : return "String";
+    case BT_RANGE       : return "Range";
+    case BT_HASH        : return "Hash";
+    case BT_ARRAY_DATA  : return "Array Data";
+    case BT_STRING_DATA : return "String Data";
+    case BT_HASH_DATA   : return "Hash Data";
+    case BT_KV_DATA     : return "KeyValue Data";
+    case BT_KV_HANDLE   : return "KeyValue Handle";
+    case BT_NAME        : return "Name";
+    case BT_SYMBOL      : return "Symbol";
+    case BT_IREP        : return "Irep";
+    case BT_POOLS       : return "Pools";
+    case BT_TCB         : return "Tcb";
+    case BT_MUTEX       : return "Mutex";
+    case BT_VM          : return "VM";
+    case BT_PATTERN     : return "Pattern";
+    case BT_OTHER       : 
+    default             : return "Other";
+  }
+}
+
+#endif /* defined(GC_MS_DEBUG) || defined(GC_BM_DEBUG) */
