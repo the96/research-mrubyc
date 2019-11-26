@@ -182,9 +182,9 @@ void mrbc_dec_ref_counter(mrbc_value *v)
   switch( v->tt ) {
   case MRBC_TT_OBJECT:	mrbc_instance_delete(v);	break;
   case MRBC_TT_PROC:
-#ifndef RC_REF_STOP
+#ifndef RC_RELEASE_STOP
 	  mrbc_raw_free(v->handle);
-#endif /* RC_REF_STOP */
+#endif /* RC_RELEASE_STOP */
     break;
   case MRBC_TT_ARRAY:	mrbc_array_delete(v);		break;
 #if MRBC_USE_STRING

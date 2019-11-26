@@ -121,9 +121,9 @@ mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size)
 void mrbc_instance_delete(mrbc_value *v)
 {
   mrbc_kv_delete_data( &v->instance->ivar );
-#ifndef RC_REF_STOP
+#ifndef RC_RELEASE_STOP
   mrbc_raw_free( v->instance );
-#endif /* RC_REF_STOP */
+#endif /* RC_RELEASE_STOP */
 }
 #endif /* GC_RC */
 

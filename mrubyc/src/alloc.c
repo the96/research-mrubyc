@@ -469,7 +469,7 @@ void * mrbc_raw_alloc(unsigned int size)
 }
 
 
-#if defined(GC_RC) && !defined(RC_REF_STOP)
+#if defined(GC_RC) && !defined(RC_RELEASE_STOP)
 //================================================================
 /*! release memory
 
@@ -500,7 +500,7 @@ void mrbc_raw_free(void *ptr)
   // target, add to index
   add_free_block(target);
 }
-#endif /* GC_RC and !RC_REF_STOP */
+#endif /* GC_RC and !RC_RELEASE_STOP */
 
 #if defined(GC_MS) || defined (GC_BM)
 //================================================================
@@ -1041,7 +1041,8 @@ void mrbc_sweep() {
 
 char* block_type_to_name(uint8_t bt);
 
-void heap_dump() {
+void heap_dump()
+{
   printf("==[heap dump]========\n");
   FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
   FREE_BLOCK *heap_end = (FREE_BLOCK *) (memory_pool + memory_pool_size);

@@ -53,7 +53,7 @@
 #if (GC_MODE == MARKSWEEP_DEBUG)
 #define GC_MS
 #define GC_RC
-#define RC_REF_STOP
+#define RC_RELEASE_STOP
 #define GC_MS_OR_BM
 #define GC_MS_DEBUG
 #endif
@@ -61,7 +61,7 @@
 #if (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_BM
 #define GC_RC
-#define RC_REF_STOP
+#define RC_RELEASE_STOP
 #define GC_MS_OR_BM
 #define GC_BM_DEBUG
 #endif

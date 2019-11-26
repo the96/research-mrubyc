@@ -146,10 +146,10 @@ mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len)
 */
 void mrbc_string_delete(mrbc_value *str)
 {
-#ifndef RC_REF_STOP
+#ifndef RC_RELEASE_STOP
   mrbc_raw_free(str->string->data);
   mrbc_raw_free(str->string);
-#endif /* RC_REF_STOP */
+#endif /* RC_RELEASE_STOP */
 }
 #endif /* GC_RC */
 

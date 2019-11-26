@@ -24,7 +24,12 @@ struct VM;
 
 void mrbc_init_alloc(void *ptr, unsigned int size);
 void *mrbc_raw_alloc(unsigned int size);
+#if defined(GC_RC) && !defined(RC_RELEASE_STOP)
 void mrbc_raw_free(void *ptr);
+#endif
+#if defined(GC_MS) || defined(GC_BM)
+void mrbc_raw_free(FREE_BLOCK *target);
+#endif
 void *mrbc_raw_realloc(void *ptr, unsigned int size);
 void *mrbc_alloc(const struct VM *vm, unsigned int size);
 void *mrbc_realloc(const struct VM *vm, void *ptr, unsigned int size);
@@ -71,6 +76,10 @@ void push_mrbc_value_for_root_stack(mrbc_value *obj);
 void add_vm_set(struct VM *vm);
 void remove_vm_set(struct VM *vm);
 #endif
+
+#if defined(GC_MS_DEBUG) || defined (GC_BM_DEBUG)
+void heap_dump();
+#endif /* GC_MS_DEBUG or GC_BM_DEBUG */
 
 #ifdef __cplusplus
 }
