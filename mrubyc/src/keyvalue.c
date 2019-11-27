@@ -59,12 +59,23 @@ static int binary_search(mrbc_kv_handle *kvh, mrbc_sym sym_id)
   @param  vm	Pointer to VM.
   @param  size	Initial size of data.
   @return 	Key-Value handle.
+  gc trigger
 */
 mrbc_kv_handle * mrbc_kv_new(struct VM *vm, int size)
 {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_kv_handle *kvh = mrbc_alloc(vm, sizeof(mrbc_kv_handle));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_kv_handle *kvh = mrbc_alloc(vm, sizeof(mrbc_kv_handle), BT_KV_HANDLE);
+#endif /* GC_MS_OR_BM */
+
   if( !kvh ) return NULL;	// ENOMEM
 
+#ifdef GC_MS_OR_BM
+  kvh->data_size = 0;
+  push_root_stack((mrbc_instance *)kvh);
+#endif /* GC_MS_OR_BM */
   if( mrbc_kv_init_handle( vm, kvh, size ) != 0 ) {
     mrbc_raw_free( kvh );
     return NULL;
@@ -81,6 +92,7 @@ mrbc_kv_handle * mrbc_kv_new(struct VM *vm, int size)
   @param  kvh	Pointer to Key-Value handle.
   @param  size	Initial size of data.
   @return 	0 if no error.
+  gc trigger
 */
 int mrbc_kv_init_handle(struct VM *vm, mrbc_kv_handle *kvh, int size)
 {
@@ -93,7 +105,12 @@ int mrbc_kv_init_handle(struct VM *vm, mrbc_kv_handle *kvh, int size)
 
   } else {
     // Allocate data buffer.
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     kvh->data = mrbc_alloc(vm, sizeof(mrbc_kv) * size);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    kvh->data = mrbc_alloc(vm, sizeof(mrbc_kv) * size, BT_KV_DATA);
+#endif /* GC_MS_OR_BM */
     if( !kvh->data ) return -1;		// ENOMEM
   }
 
@@ -154,10 +171,11 @@ void mrbc_kv_clear_vm_id(mrbc_kv_handle *kvh)
   @param  kvh	pointer to key-value handle.
   @param  size	size.
   @return	mrbc_error_code.
+  gc trigger
 */
 int mrbc_kv_resize(mrbc_kv_handle *kvh, int size)
 {
-  mrbc_kv *data2 = mrbc_raw_realloc(kvh->data, sizeof(mrbc_kv) * size);
+  mrbc_kv *data2 = mrbc_realloc(kvh->data, sizeof(mrbc_kv) * size);
   if( !data2 ) return E_NOMEMORY_ERROR;		// ENOMEM
 
   kvh->data = data2;
@@ -175,6 +193,7 @@ int mrbc_kv_resize(mrbc_kv_handle *kvh, int size)
   @param  sym_id	symbol ID.
   @param  set_val	set value.
   @return		mrbc_error_code.
+  gc trigger
 */
 int mrbc_kv_set(mrbc_kv_handle *kvh, mrbc_sym sym_id, mrbc_value *set_val)
 {
@@ -200,7 +219,12 @@ int mrbc_kv_set(mrbc_kv_handle *kvh, mrbc_sym sym_id, mrbc_value *set_val)
  INSERT_VALUE:
   // need alloc?
   if( kvh->data_size == 0 ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     kvh->data = mrbc_alloc(kvh->vm, sizeof(mrbc_kv) * MRBC_KV_SIZE_INIT);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    kvh->data = mrbc_alloc(kvh->vm, sizeof(mrbc_kv) * MRBC_KV_SIZE_INIT, BT_KV_DATA);
+#endif /* GC_MS_OR_BM */
     if( kvh->data == NULL ) return E_NOMEMORY_ERROR;	// ENOMEM
     kvh->data_size = MRBC_KV_SIZE_INIT;
 
@@ -255,7 +279,12 @@ int mrbc_kv_append(mrbc_kv_handle *kvh, mrbc_sym sym_id, mrbc_value *set_val)
 {
   // need alloc?
   if( kvh->data_size == 0 ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     kvh->data = mrbc_alloc(kvh->vm, sizeof(mrbc_kv) * MRBC_KV_SIZE_INIT);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    kvh->data = mrbc_alloc(kvh->vm, sizeof(mrbc_kv) * MRBC_KV_SIZE_INIT, BT_KV_DATA);
+#endif /* GC_MS_OR_BM */
     if( kvh->data == NULL ) return E_NOMEMORY_ERROR;	// ENOMEM
     kvh->data_size = MRBC_KV_SIZE_INIT;
 

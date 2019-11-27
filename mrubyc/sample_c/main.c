@@ -39,6 +39,9 @@ uint8_t * load_mrb_file(const char *filename)
 void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
 {
   struct VM *vm;
+#ifdef GC_MS_OR_BM
+  ready_marksweep_static();
+#endif
 
   mrbc_init_alloc(memory_pool, memory_pool_size);
   init_static();
@@ -59,7 +62,9 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
   mrbc_vm_run(vm);
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
-  end_static();
+#ifdef GC_MS_OR_BM
+  end_marksweep_static();
+#endif /* GC_MS_OR_BM */
 }
 
 

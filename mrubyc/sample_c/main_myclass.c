@@ -54,6 +54,10 @@ void mrubyc(uint8_t *mrbbuf)
 {
   struct VM *vm;
 
+#ifdef GC_MS_OR_BM
+  ready_marksweep_static();
+#endif
+
   mrbc_init_alloc(memory_pool, MEMORY_SIZE);
   init_static();
 
@@ -76,7 +80,9 @@ void mrubyc(uint8_t *mrbbuf)
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
 
-  end_static();
+#ifdef GC_MS_OR_BM
+  end_marksweep_static();
+#endif /* GC_MS_OR_BM */
 }
 
 

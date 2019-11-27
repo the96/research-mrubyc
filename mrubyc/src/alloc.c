@@ -32,9 +32,9 @@
 #include "class.h"
 #endif /* GC_MS_OR_BM */
 
-#ifdef HEAP_DUMP
 #include <stdio.h>
-#endif /* HEAP_DUMP */
+#ifdef GC_DEBUG
+#endif /* GC_DEBUG */
 
 // Layer 1st(f) and 2nd(s) model
 // last 4bit is ignored
@@ -50,8 +50,9 @@
 // 8 : 4000-7fff
 // 9 : 8000-ffff
 
+#ifndef HEAP_EXPAND
 #ifndef MRBC_ALLOC_FLI_BIT_WIDTH	// 0000 0000 0000 0000
-# define MRBC_ALLOC_FLI_BIT_WIDTH 9	// ~~~~~~~~~~~
+# define MRBC_ALLOC_FLI_BIT_WIDTH 25	// ~~~~~~~~~~~
 #endif
 #ifndef MRBC_ALLOC_SLI_BIT_WIDTH	// 0000 0000 0000 0000
 # define MRBC_ALLOC_SLI_BIT_WIDTH 3	//            ~~~
@@ -62,6 +63,7 @@
 #ifndef MRBC_ALLOC_MEMSIZE_T
 # define MRBC_ALLOC_MEMSIZE_T     uint16_t
 #endif
+#endif /* HEAP_EXPAND */
 
 #define FLI(x) (((x) >> MRBC_ALLOC_SLI_BIT_WIDTH) & ((1 << MRBC_ALLOC_FLI_BIT_WIDTH) - 1))
 #define SLI(x) ((x) & ((1 << MRBC_ALLOC_SLI_BIT_WIDTH) - 1))
@@ -73,39 +75,6 @@
 #define FLAG_FREE_BLOCK     1
 #define FLAG_USED_BLOCK     0
 
-// memory block header
-typedef struct USED_BLOCK {
-  unsigned int         t : 1;       //!< FLAG_TAIL_BLOCK or FLAG_NOT_TAIL_BLOCK
-  unsigned int         f : 1;       //!< FLAG_FREE_BLOCK or BLOCK_IS_NOT_FREE
-#ifdef GC_MS
-  unsigned int         m : 1;       //!< mark bit
-#endif /* GC_MS */
-#ifdef GC_MS_OR_BM
-  block_type           bt: 5;       //!< type of object in block
-#endif /* GC_MS_OR_BM */
-  uint8_t              vm_id;       //!< mruby/c VM ID
-
-  MRBC_ALLOC_MEMSIZE_T size;        //!< block size, header included
-  MRBC_ALLOC_MEMSIZE_T prev_offset; //!< offset of previous physical block
-} USED_BLOCK;
-
-typedef struct FREE_BLOCK {
-  unsigned int         t : 1;       //!< FLAG_TAIL_BLOCK or FLAG_NOT_TAIL_BLOCK
-  unsigned int         f : 1;       //!< FLAG_FREE_BLOCK or BLOCK_IS_NOT_FREE
-#ifdef GC_MS
-  unsigned int         m : 1;       //!< mark bit
-#endif /* GC_MS */
-#ifdef GC_MS_OR_BM
-  block_type           bt: 5;       //!< type of object in block
-#endif /* GC_MS_OR_BM */
-  uint8_t              vm_id;       //!< dummy
-
-  MRBC_ALLOC_MEMSIZE_T size;        //!< block size, header included
-  MRBC_ALLOC_MEMSIZE_T prev_offset; //!< offset of previous physical block
-
-  struct FREE_BLOCK *next_free;
-  struct FREE_BLOCK *prev_free;
-} FREE_BLOCK;
 
 #define PHYS_NEXT(p) ((uint8_t *)(p) + (p)->size)
 #define PHYS_PREV(p) ((uint8_t *)(p) - (p)->prev_offset)
@@ -132,7 +101,7 @@ static FREE_BLOCK *free_blocks[SIZE_FREE_BLOCKS + 1];
 #ifdef HEAP_EXPAND
 #define MSB_BIT32 0x80000000
 #endif
-static uint16_t free_fli_bitmap;
+static uint32_t free_fli_bitmap;
 static uint16_t free_sli_bitmap[MRBC_ALLOC_FLI_BIT_WIDTH + 2]; // + sentinel
 
 #ifdef GC_MS_OR_BM
@@ -144,6 +113,10 @@ int root_stack_top;
 struct VM **vms;
 int vm_count;
 #endif /* GC_MS_OR_BM */
+
+#ifdef GC_COUNT
+int gc_count;
+#endif
 
 //================================================================
 /*! Number of leading zeros.
@@ -407,22 +380,21 @@ void * mrbc_raw_alloc(unsigned int size)
     }
     else {
 #ifdef HEAP_EXPAND
-      masked = free_fli_bitmap & ((MSB_BIT32 >> fli) - 1);
-#else
-      masked = free_fli_bitmap & ((MSB_BIT16 >> fli) - 1);
-#endif /* HEAP_EXPAND */
+      uint32_t masked = free_fli_bitmap & ((MSB_BIT32 >> fli) - 1);
       if( masked != 0 ) {
-#ifdef HEAP_EXPAND
         fli = nlz32(masked);
-#else
-        fli = nlz16(masked);
-#endif /* HEAP_EXPAND */
         sli = nlz16(free_sli_bitmap[fli]);
       }
+#else
+      masked = free_fli_bitmap & ((MSB_BIT16 >> fli) - 1);
+      if( masked != 0 ) {
+        fli = nlz16(masked);
+        sli = nlz16(free_sli_bitmap[fli]);
+      }
+#endif /* HEAP_EXPAND */
       else {
         // out of memory
-        console_print("Fatal error: Out of memory.\n");
-        exit(1);
+        // console_print("Fatal error: Out of memory.\n");
         return NULL;  // ENOMEM
       }
     }
@@ -469,7 +441,6 @@ void * mrbc_raw_alloc(unsigned int size)
 }
 
 
-#if defined(GC_RC) && !defined(RC_RELEASE_STOP)
 //================================================================
 /*! release memory
 
@@ -500,37 +471,6 @@ void mrbc_raw_free(void *ptr)
   // target, add to index
   add_free_block(target);
 }
-#endif /* GC_RC and !RC_RELEASE_STOP */
-
-#if defined(GC_MS) || defined (GC_BM)
-//================================================================
-/*! release memory
-
-  @param  ptr	block
-*/
-void mrbc_raw_free(FREE_BLOCK *target)
-{
-  // check next block, merge?
-  FREE_BLOCK *next = (FREE_BLOCK *)PHYS_NEXT(target);
-
-  if((target->t == FLAG_NOT_TAIL_BLOCK) && (next->f == FLAG_FREE_BLOCK)) {
-    remove_index(next);
-    merge_block(target, next);
-  }
-
-  // check previous block, merge?
-  FREE_BLOCK *prev = (FREE_BLOCK *)PHYS_PREV(target);
-
-  if((prev != NULL) && (prev->f == FLAG_FREE_BLOCK)) {
-    remove_index(prev);
-    merge_block(prev, target);
-    target = prev;
-  }
-
-  // target, add to index
-  add_free_block(target);
-}
-#endif /* GC_MS OR GC_BM */
 
 
 
@@ -601,7 +541,7 @@ void * mrbc_raw_realloc(void *ptr, unsigned int size)
 
 
 //// for mruby/c
-
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
 //================================================================
 /*! allocate memory
 
@@ -613,12 +553,14 @@ void * mrbc_raw_realloc(void *ptr, unsigned int size)
 void * mrbc_alloc(const struct VM *vm, unsigned int size)
 {
   uint8_t *ptr = mrbc_raw_alloc(size);
-  if( ptr == NULL ) return NULL;	// ENOMEM
+  if( ptr == NULL ) {
+    console_printf("Fatal error: Out of memory.\n");
+    exit(1);	// ENOMEM
+  }
   if( vm ) SET_VM_ID(ptr, vm->vm_id);
 
   return ptr;
 }
-
 
 //================================================================
 /*! re-allocate memory
@@ -629,10 +571,95 @@ void * mrbc_alloc(const struct VM *vm, unsigned int size)
   @return void * pointer to allocated memory.
   @retval NULL	error.
 */
-void * mrbc_realloc(const struct VM *vm, void *ptr, unsigned int size)
+void * mrbc_realloc(void *ptr, unsigned int size)
 {
-  return mrbc_raw_realloc(ptr, size);
+  uint8_t *new_ptr = mrbc_raw_realloc(ptr, size);
+  if (new_ptr == NULL) {
+    console_printf("Fatal error: Out of memory.\n");
+    exit(1);	// ENOMEM
+  }
+
+  return new_ptr;
 }
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+
+#ifdef GC_MS_OR_BM
+//================================================================
+/*! allocate memory
+
+  @param  vm	pointer to VM.
+  @param  size	request size.
+  @return void * pointer to allocated memory.
+  @retval NULL	error.
+*/
+void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_type)
+{
+  uint8_t *ptr = mrbc_raw_alloc(size);
+  if( ptr == NULL ) {
+#ifdef GC_COUNT
+    gc_count++;
+#endif /* GC_COUNT */
+#ifdef GC_DEBUG
+    printf("Triggered GC count %d\n", gc_count);
+#ifdef HEAP_DUMP
+    printf("allocation size: %d\n", size);
+    heap_dump();
+#endif /* HEAP_DUMP */
+#endif /* GC_DEBUG */
+    mrbc_mark();
+    mrbc_sweep();
+    ptr = mrbc_raw_alloc(size);
+    if (ptr == NULL) {
+      print_heap_summary();
+      printf("allocation size: %d gc_count %d\n", size, gc_count);
+      console_printf("Fatal error: Out of memory.\n");
+      exit(1);	// ENOMEM
+    }
+  }
+  USED_BLOCK *block = (USED_BLOCK *)(ptr - sizeof(USED_BLOCK));
+  block->bt = block_type;
+  if( vm ) block->vm_id = vm->vm_id;
+
+  return ptr;
+}
+//================================================================
+/*! re-allocate memory
+
+  @param  vm	pointer to VM.
+  @param  ptr	Return value of mrbc_alloc()
+  @param  size	request size.
+  @return void * pointer to allocated memory.
+  @retval NULL	error.
+*/
+void * mrbc_realloc(void *ptr, unsigned int size)
+{
+  USED_BLOCK *header = (USED_BLOCK *)((uint8_t *)ptr - sizeof(USED_BLOCK));
+  int block_type = header->bt;
+  uint8_t *new_ptr = mrbc_raw_realloc(ptr, size);
+  if (new_ptr == NULL) {
+#ifdef GC_COUNT
+    gc_count++;
+#endif /* GC_COUNT */
+#ifdef GC_DEBUG
+    printf("Triggered GC count %d\n", gc_count);
+#ifdef HEAP_DUMP
+    heap_dump();
+#endif /* HEAP_DUMP */
+#endif /* GC_DEBUG */
+    mrbc_mark();
+    mrbc_sweep();
+    new_ptr = mrbc_raw_realloc(ptr, size);
+    if (new_ptr == NULL) {
+      print_heap_summary();
+      printf("allocation size: %d\n", size);
+      console_printf("Fatal error: Out of memory.\n");
+      exit(1);	// ENOMEM
+    }
+  }
+  ((USED_BLOCK *)((uint8_t *)new_ptr - sizeof(USED_BLOCK)))->bt = block_type;
+  return new_ptr;
+}
+#endif /* GC_MS_OR_BM */
 
 
 //================================================================
@@ -777,10 +804,16 @@ void ready_marksweep_static()
   vms = (struct VM **) malloc(sizeof(struct VM *) * MAX_VM_COUNT);
   vm_count = 0;
   marked_flag = 1;
+#ifdef GC_COUNT
+  gc_count = 0;
+#endif /* GC_COUNT */
 }
 
 void end_marksweep_static()
 {
+#ifdef GC_COUNT
+  console_printf("gc_count %d\n", gc_count);
+#endif /* GC_COUNT */
   free(vms);
   free(mark_stack);
   free(root_stack);
@@ -796,6 +829,9 @@ void init_mark_stack()
 
 void push_root_stack(mrbc_instance *obj)
 {
+  if ((uint8_t *) obj < memory_pool || (uint8_t *) obj >= memory_pool + memory_pool_size) {
+    printf("[push_root_stack] obj->tt %d\n", obj->tt);
+  }
   if (root_stack_top < MARK_STACK_SIZE) {
     root_stack[root_stack_top++] = obj;
   } else {
@@ -854,6 +890,7 @@ void remove_vm_set(struct VM *vm)
   for (i = 0; i < vm_count; i++) {
     if (vms[i]->vm_id == vm->vm_id) {
       memmove(vms + i, vms + i + 1, sizeof(struct VM *) * (vm_count - i));
+      vm_count--;
       return;
     }
   }
@@ -870,13 +907,24 @@ void reverse_mark_flag()
 void push_vm();
 void mark_from_stack();
 
-void mrbc_mark ()
+#include "symbol.h"
+void mrbc_mark()
 {
   int i;
   init_mark_stack();
 
   mrbc_kv_handle *const_h = get_const_handle();
   mrbc_kv_handle *global_h = get_global_handle();
+  if (const_h->data_size > 0) {
+    if ((uint8_t *)const_h->data < memory_pool || (uint8_t *)const_h->data >= memory_pool + memory_pool_size)
+      printf("aaaaa\n");
+    push_mark_stack((mrbc_instance *) const_h->data);
+  }
+  if (global_h->data_size > 0) {
+    if ((uint8_t *)global_h->data < memory_pool || (uint8_t *)global_h->data >= memory_pool + memory_pool_size)
+      printf("bbbb\n");
+    push_mark_stack((mrbc_instance *) global_h->data);
+  }
   for (i = 0; i < const_h->n_stored ; i++) {
     push_mrbc_value_for_mark_stack(&const_h->data[i].value);
   }
@@ -905,7 +953,7 @@ void push_vm(struct VM *vm) {
     mrb_callinfo *callinfo = vm->callinfo_tail;
     while(1) {
       if (callinfo->target_class != NULL) {
-        push_mark_stack(callinfo->target_class);
+        push_mark_stack((mrbc_instance *) callinfo->target_class);
       }
       if (callinfo->prev == NULL)
         break;
@@ -914,7 +962,7 @@ void push_vm(struct VM *vm) {
   }
 }
 
-#define GET_BLOCK_HEADER(obj) (USED_BLOCK *)((uint8_t *)obj - sizeof(USED_BLOCK *))
+#define GET_BLOCK_HEADER(obj) (USED_BLOCK *)((uint8_t *)obj - sizeof(USED_BLOCK))
 
 #ifdef GC_MS
 static inline void mark(USED_BLOCK *block) {
@@ -968,13 +1016,14 @@ void mark_from_stack() {
       {
         mrbc_proc *proc = (mrbc_proc *) obj;
         if (proc->next != NULL) {
-          push_mark_stack(proc->next);
+          push_mark_stack((mrbc_instance *)proc->next);
         }
         break;
       }
       case BT_ARRAY:
       {
         mrbc_array *array = (mrbc_array *) obj;
+        if (array->data == NULL) break;
         mark(GET_BLOCK_HEADER(array->data));
         int i = 0;
         while (i < array->n_stored) {
@@ -985,6 +1034,7 @@ void mark_from_stack() {
       case BT_STRING:
       {
         mrbc_string *string = (mrbc_string *) obj;
+        if (string->data == NULL) break;
         mark(GET_BLOCK_HEADER(string->data));
         break;
       }
@@ -998,6 +1048,7 @@ void mark_from_stack() {
       case BT_HASH:
       {
         mrbc_hash *hash = (mrbc_hash *) obj;
+        if (hash->data == NULL) break;
         mark(GET_BLOCK_HEADER(hash->data));
         int i = 0;
         while (i < hash->n_stored) {
@@ -1008,10 +1059,10 @@ void mark_from_stack() {
       {
         mrbc_class *class = (mrbc_class *)obj;
         if (class->super != NULL) {
-          push_mark_stack(class->super);
+          push_mark_stack((mrbc_instance *)class->super);
         }
         if (class->procs != NULL) {
-          push_mark_stack(class->procs);
+          push_mark_stack((mrbc_instance *)class->procs);
         }
         break;
       }
@@ -1021,25 +1072,67 @@ void mark_from_stack() {
   }
 }
 
-void mrbc_sweep() {
-  FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
+void mrbc_sweep()
+{
+  USED_BLOCK *block = (USED_BLOCK *) memory_pool;
+  while (block->f == FLAG_FREE_BLOCK || block->bt < BT_INSTANCE || block->bt > BT_KV_HANDLE || is_marked(block)) {
+    if ((uint8_t *)block >= memory_pool + memory_pool_size)
+      return;
+    block = (USED_BLOCK *) PHYS_NEXT(block);
+  }
+  USED_BLOCK *next = (USED_BLOCK *)PHYS_NEXT(block);
+  if ((uint8_t *)next >= memory_pool + memory_pool_size) {
+    next = NULL;
+  }
   while (1) {
-    while (block->f == FLAG_FREE_BLOCK || block->bt < BT_CLASS ||
-           block->bt > BT_KV_DATA || block->m == marked_flag) {
-      if ((uint8_t *)block >= memory_pool + memory_pool_size) {
+    while (next->f == FLAG_FREE_BLOCK || next->bt < BT_INSTANCE || next->bt > BT_KV_HANDLE || is_marked(next)) {
+      if ((uint8_t *)next >= memory_pool + memory_pool_size)
         return;
-      }
-      block = (FREE_BLOCK *) PHYS_NEXT(block);
+      next = (USED_BLOCK *) PHYS_NEXT(next);
     }
-    mrbc_raw_free(block);
+    mrbc_raw_free((uint8_t *)block + sizeof(USED_BLOCK));
+    if (next == NULL) return;
+    block = next;
+    next = (USED_BLOCK *) PHYS_NEXT(block);
   }
 }
 
 #endif /* GC_MS_OR_BM */
 
-#if defined(GC_MS_DEBUG) || defined(GC_BM_DEBUG)
+#ifdef GC_DEBUG
 
 char* block_type_to_name(uint8_t bt);
+
+void print_heap_summary()
+{
+  printf("==[heap summary]========\n");
+  FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
+  FREE_BLOCK *heap_end = (FREE_BLOCK *) (memory_pool + memory_pool_size);
+  int block_count, free_count, used_count;
+  uint32_t used_size, free_size, max_free_size;
+  block_count = free_count =  used_count = 0;
+  used_size = free_size = max_free_size = 0;
+  while (1) {
+    if (block >= heap_end) break;
+    if (block->f == FLAG_FREE_BLOCK) {
+      printf("[%4d]FREE_BLOCK(%4d) size: %8d(0x%6x) offset: %8d(0x%6x) (%p)\n", 
+             block_count++, free_count++, block->size, block->size, block->prev_offset, block->prev_offset, block);
+      free_size += block->size;
+      if (max_free_size < block->size) max_free_size = block->size;
+    } else {
+      block_count++;
+      used_count++;
+      used_size += block->size;
+    }
+    block = (FREE_BLOCK *) PHYS_NEXT(block);
+  }
+  printf("==[heap summary]=====\n");
+  printf("MAX_FREE_SIZE: %d bytes\n",max_free_size);
+  printf("FREE_BLOCK: %d bytes %d counts\n" , free_size, free_count);
+  printf("USED_BLOCK: %d bytes %d counts\n" , used_size, used_count);
+  printf("HEAP_SIZE : %d bytes\n", memory_pool_size);
+  printf("======================\n");
+}
 
 void heap_dump()
 {
@@ -1047,24 +1140,27 @@ void heap_dump()
   FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
   FREE_BLOCK *heap_end = (FREE_BLOCK *) (memory_pool + memory_pool_size);
   int block_count, free_count, used_count;
+  uint32_t used_size, free_size;
   block_count = free_count =  used_count = 0;
+  used_size = free_size = 0;
   while (1) {
     if (block >= heap_end) break;
     if (block->f == FLAG_FREE_BLOCK) {
-      printf("[%4d]FREE_BLOCK(%d) size: %4d offset: %8d (%p)\n", 
-             block_count++, free_count++, block->size, (uint8_t *)block - memory_pool, block);
+      printf("[%4d]FREE_BLOCK(%4d) size: %8d(0x%6x) offset: %8d(0x%6x) (%p)\n", 
+             block_count++, free_count++, block->size, block->size, block->prev_offset, block->prev_offset, block);
+      free_size += block->size;
     } else {
-      printf("[%4d]USED_BLOCK(%d) size: %4d offset: %8d (%p) type: %s mark: %d vm_id: %d\n", 
-             block_count++, used_count++, block->size, (uint8_t *)block - memory_pool, block, block_type_to_name(block->bt), is_marked(block), block->vm_id);
-
+      printf("[%4d]USED_BLOCK(%4d) size: %8d(0x%6x) offset: %8d(0x%6x) (%p) type: %s mark: %d vm_id: %d\n", 
+             block_count++, used_count++, block->size, block->size, block->prev_offset, block->prev_offset, block, block_type_to_name(block->bt), is_marked((USED_BLOCK *)block), block->vm_id);
+      used_size += block->size;
     }
     block = (FREE_BLOCK *) PHYS_NEXT(block);
   }
   printf("==[heap summary]=====\n");
-  printf("FREE_BLOCK: %d " , free_count);
-  printf("USED_BLOCK: %d " , used_count);
+  printf("FREE_BLOCK: %d bytes (%d) " , free_size, free_count);
+  printf("USED_BLOCK: %d bytes (%d) " , used_size, used_count);
   printf("HEAP_SIZE : %d\n", memory_pool_size);
-  print("======================\n");
+  printf("======================\n");
 }
 
 char* block_type_to_name(uint8_t bt) {

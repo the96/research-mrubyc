@@ -29,6 +29,7 @@ void mrbc_global_clear_vm_id(void);
 
 
 #ifdef GC_MS_OR_BM
+#include "keyvalue.h"
 mrbc_kv_handle * get_const_handle();
 mrbc_kv_handle * get_global_handle();
 #endif /* GC_MS_OR_BM */

@@ -14,7 +14,9 @@
 */
 
 #include <stdio.h>
+#include <stdint.h>
 
+#include "vm_config.h"
 #include "alloc.h"
 #include "class.h"
 #include "value.h"

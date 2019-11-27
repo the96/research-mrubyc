@@ -54,6 +54,7 @@ static int is_space( int ch )
   @param  src	source string or NULL
   @param  len	source length
   @return 	string object
+  gc trigger
 */
 mrbc_value mrbc_string_new(struct VM *vm, const void *src, int len)
 {
@@ -63,10 +64,23 @@ mrbc_value mrbc_string_new(struct VM *vm, const void *src, int len)
     Allocate handle and string buffer.
   */
   mrbc_string *h;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   h = (mrbc_string *)mrbc_alloc(vm, sizeof(mrbc_string));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  h = (mrbc_string *)mrbc_alloc(vm, sizeof(mrbc_string), BT_STRING);
+  h->data = NULL;
+  push_root_stack((mrbc_instance *)h);
+#endif /* GC_MS_OR_BM */
   if( !h ) return value;		// ENOMEM
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   uint8_t *str = mrbc_alloc(vm, len+1);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  uint8_t *str = mrbc_alloc(vm, len+1, BT_STRING_DATA);
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   if( !str ) {				// ENOMEM
     mrbc_raw_free( h );
     return value;
@@ -100,6 +114,7 @@ mrbc_value mrbc_string_new(struct VM *vm, const void *src, int len)
   @param  vm	pointer to VM.
   @param  src	source string or NULL
   @return 	string object
+  gc trigger
 */
 mrbc_value mrbc_string_new_cstr(struct VM *vm, const char *src)
 {
@@ -123,7 +138,12 @@ mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len)
     Allocate handle
   */
   mrbc_string *h;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   h = (mrbc_string *)mrbc_alloc(vm, sizeof(mrbc_string));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  h = (mrbc_string *)mrbc_alloc(vm, sizeof(mrbc_string), BT_STRING);
+#endif /* GC_MS_OR_BM */
   if( !h ) return value;		// ENOMEM
 
 #ifdef GC_RC
@@ -146,10 +166,10 @@ mrbc_value mrbc_string_new_alloc(struct VM *vm, void *buf, int len)
 */
 void mrbc_string_delete(mrbc_value *str)
 {
-#ifndef RC_RELEASE_STOP
+#ifndef RC_OPERATION_ONLY
   mrbc_raw_free(str->string->data);
   mrbc_raw_free(str->string);
-#endif /* RC_RELEASE_STOP */
+#endif /* RC_OPERATION_ONLY */
 }
 #endif /* GC_RC */
 
@@ -172,6 +192,7 @@ void mrbc_string_clear_vm_id(mrbc_value *str)
   @param  s1	pointer to target value 1
   @param  s2	pointer to target value 2
   @return	new string as s1 + s2
+  gc trigger
 */
 mrbc_value mrbc_string_dup(struct VM *vm, mrbc_value *s1)
 {
@@ -193,6 +214,7 @@ mrbc_value mrbc_string_dup(struct VM *vm, mrbc_value *s1)
   @param  s1	pointer to target value 1
   @param  s2	pointer to target value 2
   @return	new string as s1 + s2
+  gc trigger
 */
 mrbc_value mrbc_string_add(struct VM *vm, const mrbc_value *s1, const mrbc_value *s2)
 {
@@ -215,13 +237,14 @@ mrbc_value mrbc_string_add(struct VM *vm, const mrbc_value *s1, const mrbc_value
   @param  s1	pointer to target value 1
   @param  s2	pointer to target value 2
   @param	mrbc_error_code
+  gc trigger
 */
 int mrbc_string_append(mrbc_value *s1, const mrbc_value *s2)
 {
   int len1 = s1->string->size;
   int len2 = (s2->tt == MRBC_TT_STRING) ? s2->string->size : 1;
 
-  uint8_t *str = mrbc_raw_realloc(s1->string->data, len1+len2+1);
+  uint8_t *str = mrbc_realloc(s1->string->data, len1+len2+1);
   if( !str ) return E_NOMEMORY_ERROR;
 
   if( s2->tt == MRBC_TT_STRING ) {
@@ -244,13 +267,14 @@ int mrbc_string_append(mrbc_value *s1, const mrbc_value *s2)
   @param  s1	pointer to target value 1
   @param  s2	pointer to char (c_str)
   @param	mrbc_error_code
+  gc trigger
 */
 int mrbc_string_append_cstr(mrbc_value *s1, const char *s2)
 {
   int len1 = s1->string->size;
   int len2 = strlen(s2);
 
-  uint8_t *str = mrbc_raw_realloc(s1->string->data, len1+len2+1);
+  uint8_t *str = mrbc_realloc(s1->string->data, len1+len2+1);
   if( !str ) return E_NOMEMORY_ERROR;
 
   memcpy(str + len1, s2, len2 + 1);
@@ -294,6 +318,7 @@ int mrbc_string_index(const mrbc_value *src, const mrbc_value *pattern, int offs
   @param  src	pointer to target value
   @param  mode	1:left-side, 2:right-side, 3:each
   @return	0 when not removed.
+  gc trigger
 */
 int mrbc_string_strip(mrbc_value *src, int mode)
 {
@@ -322,7 +347,7 @@ int mrbc_string_strip(mrbc_value *src, int mode)
   char *buf = mrbc_string_cstr(src);
   if( p1 != buf ) memmove( buf, p1, new_size );
   buf[new_size] = '\0';
-  mrbc_raw_realloc(buf, new_size+1);	// shrink suitable size.
+  mrbc_realloc(buf, new_size+1);	// shrink suitable size.
   src->string->size = new_size;
 
   return 1;
@@ -577,7 +602,7 @@ static void c_string_insert(struct VM *vm, mrbc_value v[], int argc)
     return;
   }
 
-  uint8_t *str = mrbc_realloc(vm, mrbc_string_cstr(v), len1 + len2 - len + 1);
+  uint8_t *str = mrbc_realloc(mrbc_string_cstr(v), len1 + len2 - len + 1);
   if( !str ) return;
 
   memmove( str + nth + len2, str + nth + len, len1 - nth - len + 1 );
@@ -716,6 +741,9 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
   }
 
   // check separator parameter.
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.array);
+#endif
   mrb_value sep = (argc == 0) ? mrbc_string_new_cstr(vm, " ") : v[1];
   switch( sep.tt ) {
   case MRBC_TT_NIL:
@@ -729,6 +757,9 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
     console_print( "TypeError\n" );     // raise?
     return;
   }
+  #ifdef GC_MS_OR_BM
+  pop_root_stack();
+  #endif /* GC_MS_OR_BM */
 
   int flag_strip = (mrbc_string_cstr(&sep)[0] == ' ') &&
 		   (mrbc_string_size(&sep) == 1);
@@ -777,7 +808,13 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
   SPLIT_ITEM:
     if( pos < 0 ) len = mrbc_string_size(&v[0]) - offset;
 
+#ifdef GC_MS_OR_BM
+    push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
     mrb_value v1 = mrbc_string_new(vm, mrbc_string_cstr(&v[0]) + offset, len);
+#ifdef GC_MS_OR_BM
+    pop_root_stack();
+#endif /* GC_MS_OR_BM */
     mrbc_array_push( &ret, &v1 );
 
     if( pos < 0 ) break;
@@ -794,13 +831,17 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
       if( mrbc_string_size(&v1) != 0 ) break;
 
       mrbc_array_remove(&ret, idx);
+#ifdef GC_RC
       mrbc_string_delete( &v1 );
+#endif /* GC_RC */
     }
   }
 
+#ifdef GC_RC
   if( argc == 0 || v[1].tt == MRBC_TT_NIL ) {
     mrbc_string_delete(&sep);
   }
+#endif /* GC_RC */
 
  DONE:
   SET_RETURN( ret );
@@ -809,6 +850,7 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
 
 //================================================================
 /*! (method) sprintf
+gc_trigger
 */
 static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
 {
@@ -821,7 +863,12 @@ static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
   }
 
   int buflen = BUF_INC_STEP;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   char *buf = mrbc_alloc(vm, buflen);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  char *buf = mrbc_alloc(vm, buflen, BT_OTHER);
+#endif /* GC_MS_OR_BM */
   if( !buf ) { return; }	// ENOMEM raise?
 
   mrbc_printf pf;
@@ -841,15 +888,15 @@ static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
     switch(pf.fmt.type) {
     case 'c':
       if( v[i].tt == MRBC_TT_FIXNUM ) {
-	ret = mrbc_printf_char( &pf, v[i].i );
+	      ret = mrbc_printf_char( &pf, v[i].i );
       }
       break;
 
     case 's':
       if( v[i].tt == MRBC_TT_STRING ) {
-	ret = mrbc_printf_bstr( &pf, mrbc_string_cstr(&v[i]), mrbc_string_size(&v[i]),' ');
+	      ret = mrbc_printf_bstr( &pf, mrbc_string_cstr(&v[i]), mrbc_string_size(&v[i]),' ');
       } else if( v[i].tt == MRBC_TT_SYMBOL ) {
-	ret = mrbc_printf_str( &pf, mrbc_symbol_cstr( &v[i] ), ' ');
+	      ret = mrbc_printf_str( &pf, mrbc_symbol_cstr( &v[i] ), ' ');
       }
       break;
 
@@ -857,28 +904,28 @@ static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
     case 'i':
     case 'u':
       if( v[i].tt == MRBC_TT_FIXNUM ) {
-	ret = mrbc_printf_int( &pf, v[i].i, 10);
+	      ret = mrbc_printf_int( &pf, v[i].i, 10);
 #if MRBC_USE_FLOAT
       } else if( v[i].tt == MRBC_TT_FLOAT ) {
-	ret = mrbc_printf_int( &pf, (mrbc_int)v[i].d, 10);
+	      ret = mrbc_printf_int( &pf, (mrbc_int)v[i].d, 10);
 #endif
       } else if( v[i].tt == MRBC_TT_STRING ) {
-	mrbc_int ival = atol(mrbc_string_cstr(&v[i]));
-	ret = mrbc_printf_int( &pf, ival, 10 );
+        mrbc_int ival = atol(mrbc_string_cstr(&v[i]));
+        ret = mrbc_printf_int( &pf, ival, 10 );
       }
       break;
 
     case 'b':
     case 'B':
       if( v[i].tt == MRBC_TT_FIXNUM ) {
-	ret = mrbc_printf_int( &pf, v[i].i, 2);
+        ret = mrbc_printf_int( &pf, v[i].i, 2);
       }
       break;
 
     case 'x':
     case 'X':
       if( v[i].tt == MRBC_TT_FIXNUM ) {
-	ret = mrbc_printf_int( &pf, v[i].i, 16);
+	      ret = mrbc_printf_int( &pf, v[i].i, 16);
       }
       break;
 
@@ -889,11 +936,11 @@ static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
     case 'g':
     case 'G':
       if( v[i].tt == MRBC_TT_FLOAT ) {
-	ret = mrbc_printf_float( &pf, v[i].d );
+	      ret = mrbc_printf_float( &pf, v[i].d );
       } else
-	if( v[i].tt == MRBC_TT_FIXNUM ) {
-	  ret = mrbc_printf_float( &pf, v[i].i );
-	}
+      if( v[i].tt == MRBC_TT_FIXNUM ) {
+	      ret = mrbc_printf_float( &pf, v[i].i );
+      }
       break;
 #endif
 
@@ -911,16 +958,20 @@ static void c_object_sprintf(struct VM *vm, mrbc_value v[], int argc)
 
   INCREASE_BUFFER:
     buflen += BUF_INC_STEP;
-    buf = mrbc_realloc(vm, pf.buf, buflen);
+    buf = mrbc_realloc(pf.buf, buflen);
     if( !buf ) { return; }	// ENOMEM raise? TODO: leak memory.
     mrbc_printf_replace_buffer(&pf, buf, buflen);
   }
   mrbc_printf_end( &pf );
 
   buflen = mrbc_printf_len( &pf );
-  mrbc_realloc(vm, pf.buf, buflen+1);	// shrink suitable size.
+  mrbc_realloc(pf.buf, buflen+1);	// shrink suitable size.
 
   mrbc_value value = mrbc_string_new_alloc( vm, pf.buf, buflen );
+#ifdef GC_MS_OR_BM
+  USED_BLOCK *header = (USED_BLOCK *)((uint8_t*)pf.buf - sizeof(USED_BLOCK));
+  header->bt = BT_STRING_DATA;
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(value);
 }
@@ -943,8 +994,13 @@ static void c_object_printf(struct VM *vm, mrbc_value v[], int argc)
 static void c_string_lstrip(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value ret = mrbc_string_dup(vm, &v[0]);
-
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   mrbc_string_strip(&ret, 0x01);	// 1: left side only
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif
 
   SET_RETURN(ret);
 }
@@ -967,8 +1023,13 @@ static void c_string_lstrip_self(struct VM *vm, mrbc_value v[], int argc)
 static void c_string_rstrip(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value ret = mrbc_string_dup(vm, &v[0]);
-
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   mrbc_string_strip(&ret, 0x02);	// 2: right side only
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(ret);
 }
@@ -991,8 +1052,13 @@ static void c_string_rstrip_self(struct VM *vm, mrbc_value v[], int argc)
 static void c_string_strip(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value ret = mrbc_string_dup(vm, &v[0]);
-
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   mrbc_string_strip(&ret, 0x03);	// 3: left and right
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(ret);
 }
@@ -1064,14 +1130,19 @@ static struct tr_pattern * tr_parse_pattern( struct VM *vm, const mrb_value *v_p
   while( i < pattern_length ) {
     // is range pattern ?
     if( (i+2) < pattern_length && pattern[i+1] == '-' ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
       pat1 = mrbc_alloc( vm, sizeof(struct tr_pattern) + 2 );
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+      pat1 = mrbc_alloc( vm, sizeof(struct tr_pattern) + 2, BT_PATTERN);
+#endif /* GC_MS_OR_BM */
       if( pat1 != NULL ) {
-	pat1->type = 2;
-	pat1->flag_reverse = flag_reverse;
-	pat1->n = pattern[i+2] - pattern[i] + 1;
-	pat1->next = NULL;
-	pat1->ch[0] = pattern[i];
-	pat1->ch[1] = pattern[i+2];
+        pat1->type = 2;
+        pat1->flag_reverse = flag_reverse;
+        pat1->n = pattern[i+2] - pattern[i] + 1;
+        pat1->next = NULL;
+        pat1->ch[0] = pattern[i];
+        pat1->ch[1] = pattern[i+2];
       }
       i += 3;
 
@@ -1084,13 +1155,18 @@ static struct tr_pattern * tr_parse_pattern( struct VM *vm, const mrb_value *v_p
       }
 
       int len = i - start_pos;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
       pat1 = mrbc_alloc( vm, sizeof(struct tr_pattern) + len );
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+      pat1 = mrbc_alloc( vm, sizeof(struct tr_pattern) + len, BT_PATTERN);
+#endif /* GC_MS_OR_BM */
       if( pat1 != NULL ) {
-	pat1->type = 1;
-	pat1->flag_reverse = flag_reverse;
-	pat1->n = len;
-	pat1->next = NULL;
-	memcpy( pat1->ch, &pattern[start_pos], len );
+        pat1->type = 1;
+        pat1->flag_reverse = flag_reverse;
+        pat1->n = len;
+        pat1->next = NULL;
+        memcpy( pat1->ch, &pattern[start_pos], len );
       }
     }
 

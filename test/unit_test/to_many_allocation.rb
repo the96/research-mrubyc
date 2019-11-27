@@ -8,5 +8,5 @@ cnt = 2
         cnt += 1
     end
 end
-print "allocation count:"
+print "array and mrbc_value allocation count:"
 puts cnt

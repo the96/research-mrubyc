@@ -36,7 +36,13 @@ mrbc_value mrbc_range_new( struct VM *vm, mrbc_value *first, mrbc_value *last, i
 {
   mrbc_value value = {.tt = MRBC_TT_RANGE};
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   value.range = mrbc_alloc(vm, sizeof(mrbc_range));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  value.range = mrbc_alloc(vm, sizeof(mrbc_range), BT_RANGE);
+#endif /* GC_MS_OR_BM */
+
   if( !value.range ) return value;		// ENOMEM
 
 #ifdef GC_RC
@@ -61,9 +67,9 @@ void mrbc_range_delete(mrbc_value *v)
 {
   mrbc_release( &v->range->first );
   mrbc_release( &v->range->last );
-#ifndef RC_RELEASE_STOP
+#ifndef RC_OPERATION_ONLY
   mrbc_raw_free( v->range );
-#endif /* RC_RELEASE_STOP */
+#endif /* RC_OPERATION_ONLY */
 }
 #endif /* GC_RC */
 
@@ -174,11 +180,17 @@ static void c_range_to_a(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value array = mrbc_array_new(vm, size);
   mrbc_value val;
   int i;
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)array.array);
+#endif /* GC_MS_OR_BM */
   for (i = 0; i < size; i++) {
     val.tt = MRBC_TT_FIXNUM;
     val.i = first.i + i;
     mrbc_array_push(&array, &val);
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN(array);
 }
 
@@ -192,14 +204,22 @@ static void c_range_inspect(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_string_new(vm, NULL, 0);
   if( !ret.string ) goto RETURN_NIL;		// ENOMEM
 
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   int i;
   for( i = 0; i < 2; i++ ) {
     if( i != 0 ) mrbc_string_append_cstr( &ret, ".." );
     mrbc_value v1 = (i == 0) ? mrbc_range_first(v) : mrbc_range_last(v);
     mrbc_value s1 = mrbc_send( vm, v, argc, &v1, "inspect", 0 );
     mrbc_string_append( &ret, &s1 );
+#ifdef GC_RC
     mrbc_string_delete( &s1 );
+#endif /* GC_RC */
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(ret);
   return;

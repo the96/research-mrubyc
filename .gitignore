@@ -1,4 +1,5 @@
 mrubyc/sample_c/mrubyc*
+test/**/mrubyc*
 mrubyc/src/hal
 **/*.a
 **/*.o

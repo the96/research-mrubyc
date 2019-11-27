@@ -52,6 +52,8 @@
   @param  vm	pointer to VM.
   @param  size	initial size
   @return 	hash object
+
+  gc trigger
 */
 mrbc_value mrbc_hash_new(struct VM *vm, int size)
 {
@@ -60,10 +62,24 @@ mrbc_value mrbc_hash_new(struct VM *vm, int size)
   /*
     Allocate handle and data buffer.
   */
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_hash *h = mrbc_alloc(vm, sizeof(mrbc_hash));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_hash *h = mrbc_alloc(vm, sizeof(mrbc_hash), BT_HASH);
+  h->data = NULL;
+  push_root_stack((mrbc_instance *)h);
+#endif /* GC_MS_OR_BM */
   if( !h ) return value;	// ENOMEM
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_value *data = mrbc_alloc(vm, sizeof(mrbc_value) * size * 2);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_value *data = mrbc_alloc(vm, sizeof(mrbc_value) * size * 2, BT_HASH_DATA);
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
+
   if( !data ) {			// ENOMEM
     mrbc_raw_free( h );
     return value;
@@ -138,6 +154,8 @@ mrbc_value * mrbc_hash_search(const mrbc_value *hash, const mrbc_value *key)
   @param  key	pointer to key value
   @param  val	pointer to value
   @return	mrbc_error_code
+
+  gc trigger
 */
 int mrbc_hash_set(mrbc_value *hash, mrbc_value *key, mrbc_value *val)
 {
@@ -441,6 +459,9 @@ static void c_hash_keys(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_array_new( vm, mrbc_hash_size(v) );
   mrbc_hash_iterator ite = mrbc_hash_iterator_new(v);
 
+#ifdef GC_MS_OR_BM 
+  push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *key = mrbc_hash_i_next(&ite);
     mrbc_array_push(&ret, key);
@@ -448,6 +469,9 @@ static void c_hash_keys(struct VM *vm, mrbc_value v[], int argc)
     mrbc_dup(key);
 #endif /* GC_RC */
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif
 
   SET_RETURN(ret);
 }
@@ -472,6 +496,9 @@ static void c_hash_merge(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_hash_dup( vm, &v[0] );
   mrbc_hash_iterator ite = mrbc_hash_iterator_new(&v[1]);
 
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.hash);
+#endif /* GC_MS_OR_BM */
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *kv = mrbc_hash_i_next(&ite);
     mrbc_hash_set( &ret, &kv[0], &kv[1] );
@@ -480,6 +507,9 @@ static void c_hash_merge(struct VM *vm, mrbc_value v[], int argc)
     mrbc_dup( &kv[1] );
 #endif /* GC_RC */
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /*GC_MS_OR_BM */
 
   SET_RETURN(ret);
 }
@@ -510,7 +540,9 @@ static void c_hash_values(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value ret = mrbc_array_new( vm, mrbc_hash_size(v) );
   mrbc_hash_iterator ite = mrbc_hash_iterator_new(v);
-
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
   while( mrbc_hash_i_has_next(&ite) ) {
     mrbc_value *val = mrbc_hash_i_next(&ite) + 1;
     mrbc_array_push(&ret, val);
@@ -518,6 +550,9 @@ static void c_hash_values(struct VM *vm, mrbc_value v[], int argc)
     mrbc_dup(val);
 #endif /* GC_RC */
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(ret);
 }
@@ -535,6 +570,9 @@ static void c_hash_inspect(struct VM *vm, mrbc_value v[], int argc)
   mrbc_hash_iterator ite = mrbc_hash_iterator_new(v);
   int flag_first = 1;
 
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   while( mrbc_hash_i_has_next(&ite) ) {
     if( !flag_first ) mrbc_string_append_cstr( &ret, ", " );
     flag_first = 0;
@@ -542,17 +580,23 @@ static void c_hash_inspect(struct VM *vm, mrbc_value v[], int argc)
 
     mrbc_value s1 = mrbc_send( vm, v, argc, &kv[0], "inspect", 0 );
     mrbc_string_append( &ret, &s1 );
+#ifdef GC_RC
     mrbc_string_delete( &s1 );
+#endif /* GC_RC */
 
     mrbc_string_append_cstr( &ret, "=>" );
 
     s1 = mrbc_send( vm, v, argc, &kv[1], "inspect", 0 );
     mrbc_string_append( &ret, &s1 );
+#ifdef GC_RC
     mrbc_string_delete( &s1 );
+#endif /* GC_RC */
   }
 
   mrbc_string_append_cstr( &ret, "}" );
-
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN(ret);
   return;
 

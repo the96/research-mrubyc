@@ -122,7 +122,12 @@ static mrbc_irep * load_irep_1(struct VM *vm, const uint8_t **pos)
 
   // allocate memory for child irep's pointers
   if( irep->rlen ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     irep->reps = (mrbc_irep **)mrbc_alloc(0, sizeof(mrbc_irep *) * irep->rlen);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    irep->reps = (mrbc_irep **)mrbc_alloc(0, sizeof(mrbc_irep *) * irep->rlen, BT_IREP);
+#endif /* GC_MS_OR_BM */
     if( irep->reps == NULL ) {
       vm->error_code = LOAD_FILE_IREP_ERROR_ALLOCATION;
       return NULL;
@@ -136,7 +141,13 @@ static mrbc_irep * load_irep_1(struct VM *vm, const uint8_t **pos)
   // POOL BLOCK
   irep->plen = bin_to_uint32(p);	p += 4;
   if( irep->plen ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     irep->pools = (mrbc_object**)mrbc_alloc(0, sizeof(void*) * irep->plen);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    irep->pools = (mrbc_object**)mrbc_alloc(0, sizeof(void*) * irep->plen, BT_POOLS);
+#endif /* GC_MS_OR_BM */
+
     if(irep->pools == NULL ) {
       vm->error_code = LOAD_FILE_IREP_ERROR_ALLOCATION;
       return NULL;
@@ -147,7 +158,13 @@ static mrbc_irep * load_irep_1(struct VM *vm, const uint8_t **pos)
   for( i = 0; i < irep->plen; i++ ) {
     int tt = *p++;
     int obj_size = bin_to_uint16(p);	p += 2;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     mrbc_object *obj = mrbc_alloc(0, sizeof(mrbc_object));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    mrbc_object *obj = mrbc_alloc(0, sizeof(mrbc_object), BT_OBJECT);
+#endif /* GC_MS_OR_BM */
+
     if( obj == NULL ) {
       vm->error_code = LOAD_FILE_IREP_ERROR_ALLOCATION;
       return NULL;

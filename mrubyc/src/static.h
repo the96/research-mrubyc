@@ -39,7 +39,6 @@ extern mrbc_class *mrbc_class_hash;
 
 void init_static(void);
 
-
 #ifdef __cplusplus
 }
 #endif

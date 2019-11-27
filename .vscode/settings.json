@@ -6,6 +6,8 @@
     "string.h": "c",
     "vm.h": "c",
     "class.h": "c",
-    "value.h": "c"
+    "value.h": "c",
+    "vm_config.h": "c",
+    "keyvalue.h": "c"
   }
 }

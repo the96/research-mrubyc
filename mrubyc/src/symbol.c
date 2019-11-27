@@ -129,6 +129,7 @@ static int add_index( uint16_t hash, const char *str )
   @param  vm	pointer to VM.
   @param  str	String
   @return 	symbol object
+  gc_trigger
 */
 mrbc_value mrbc_symbol_new(struct VM *vm, const char *str)
 {
@@ -143,7 +144,12 @@ mrbc_value mrbc_symbol_new(struct VM *vm, const char *str)
 
   // create symbol object dynamically.
   int size = strlen(str) + 1;
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   char *buf = mrbc_raw_alloc(size);
+#endif
+#ifdef GC_MS_OR_BM
+  char *buf = mrbc_alloc(vm, size, BT_OTHER);
+#endif /* GC_MS_OR_BM */
   if( buf == NULL ) return ret;		// ENOMEM raise?
 
   memcpy(buf, str, size);

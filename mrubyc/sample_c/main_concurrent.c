@@ -71,6 +71,8 @@ int main(int argc, char *argv[])
   for ( i=0 ; i<vm_cnt ; i++ ){
     if ( p[i] != NULL ) free( p[i] );
   }
-  end_static();
+#ifdef GC_MS_OR_BM
+  end_marksweep_static();
+#endif /* GC_MS_OR_BM */
   return 0;
 }

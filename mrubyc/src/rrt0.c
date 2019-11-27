@@ -380,6 +380,10 @@ void mrbc_tick(void)
 */
 void mrbc_init(uint8_t *ptr, unsigned int size )
 {
+  
+#ifdef GC_MS_OR_BM
+  ready_marksweep_static();
+#endif
   mrbc_init_alloc(ptr, size);
   init_static();
   hal_init();

@@ -64,6 +64,8 @@
   @param  vm	pointer to VM.
   @param  size	initial size
   @return 	array object
+  gc infomation:
+   * gc trigger
 */
 mrbc_value mrbc_array_new(struct VM *vm, int size)
 {
@@ -72,10 +74,23 @@ mrbc_value mrbc_array_new(struct VM *vm, int size)
   /*
     Allocate handle and data buffer.
   */
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_array *h = mrbc_alloc(vm, sizeof(mrbc_array));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_array *h = mrbc_alloc(vm, sizeof(mrbc_array), BT_ARRAY);
+  h->data = NULL;
+  push_root_stack((mrbc_instance *) h);
+#endif
   if( !h ) return value;	// ENOMEM
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_value *data = mrbc_alloc(vm, sizeof(mrbc_value) * size);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_value *data = mrbc_alloc(vm, sizeof(mrbc_value) * size, BT_ARRAY_DATA);
+  pop_root_stack();
+#endif
   if( !data ) {			// ENOMEM
     mrbc_raw_free( h );
     return value;
@@ -133,10 +148,10 @@ void mrbc_array_delete(mrbc_value *ary)
     mrbc_dec_ref_counter(p1++);
   }
 
-#ifndef RC_RELEASE_STOP
+#ifndef RC_OPERATION_ONLY
   mrbc_raw_free(h->data);
   mrbc_raw_free(h);
-#endif /* RC_RELEASE_STOP */
+#endif /* RC_OPERATION_ONLY */
 }
 #endif /* GC_RC */
 
@@ -190,12 +205,14 @@ void mrbc_array_clear_vm_id(mrbc_value *ary)
   @param  ary	pointer to target value
   @param  size	size
   @return	mrbc_error_code
+
+gc infomation:
+   * gc trigger
 */
 int mrbc_array_resize(mrbc_value *ary, int size)
 {
   mrbc_array *h = ary->array;
-
-  mrbc_value *data2 = mrbc_raw_realloc(h->data, sizeof(mrbc_value) * size);
+  mrbc_value *data2 = mrbc_realloc(h->data, sizeof(mrbc_value) * size);
   if( !data2 ) return E_NOMEMORY_ERROR;	// ENOMEM
 
   h->data = data2;
@@ -212,6 +229,9 @@ int mrbc_array_resize(mrbc_value *ary, int size)
   @param  idx		index
   @param  set_val	set value
   @return		mrbc_error_code
+
+gc infomation:
+   * gc trigger
 */
 int mrbc_array_set(mrbc_value *ary, int idx, mrbc_value *set_val)
 {
@@ -304,6 +324,8 @@ mrbc_value mrbc_array_get_range(struct VM *vm, mrbc_value *array, int start, int
   @param  ary		pointer to target value
   @param  set_val	set value
   @return		mrbc_error_code
+
+  gc trigger
 */
 int mrbc_array_push(mrbc_value *ary, mrbc_value *set_val)
 {
@@ -342,6 +364,7 @@ mrbc_value mrbc_array_pop(mrbc_value *ary)
   @param  ary		pointer to target value
   @param  set_val	set value
   @return		mrbc_error_code
+  gc trigger
 */
 int mrbc_array_unshift(mrbc_value *ary, mrbc_value *set_val)
 {
@@ -375,6 +398,8 @@ mrbc_value mrbc_array_shift(mrbc_value *ary)
   @param  idx		index
   @param  set_val	set value
   @return		mrbc_error_code
+
+  gc trigger
 */
 int mrbc_array_insert(mrbc_value *ary, int idx, mrbc_value *set_val)
 {
@@ -575,7 +600,13 @@ static void c_array_new(struct VM *vm, mrbc_value v[], int argc)
 
     mrbc_value nil = mrbc_nil_value();
     if( v[1].i > 0 ) {
+#ifdef GC_MS_OR_BM
+      push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
       mrbc_array_set(&ret, v[1].i - 1, &nil);
+#ifdef GC_MS_OR_BM
+      pop_root_stack();
+#endif /* GC_MS_OR_BM */
     }
     SET_RETURN(ret);
     return;
@@ -589,12 +620,18 @@ static void c_array_new(struct VM *vm, mrbc_value v[], int argc)
     if( ret.array == NULL ) return;		// ENOMEM
 
     int i;
+#ifdef GC_MS_OR_BM
+    push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
     for( i = 0; i < v[1].i; i++ ) {
 #ifdef GC_RC
       mrbc_dup(&v[2]);
 #endif /* GC_RC */
       mrbc_array_set(&ret, i, &v[2]);
     }
+#ifdef GC_MS_OR_BM
+    pop_root_stack();
+#endif /* GC_MS_OR_BM */
     SET_RETURN(ret);
     return;
   }
@@ -1124,7 +1161,7 @@ static void c_array_replace(struct VM *vm, mrbc_value v[], int argc)
   for (i = 0; i < v->array->n_stored; i++) {
     mrbc_dec_ref_counter(v->array->data + i);
   }
-#endif GC_RC
+#endif /* GC_RC */
   mrbc_raw_free(v->array->data);
   mrbc_value src = mrbc_array_dup(vm, v + 1);
   if (src.tt == MRBC_TT_NIL) return;
@@ -1152,9 +1189,9 @@ static void c_array_reverse(struct VM *vm, mrbc_value v[], int argc)
 */
 static void c_array_reverse_bang(struct VM *vm, mrbc_value v[], int argc)
 {
-  mrbc_array *ary = v[0].array;
   mrbc_value ret = mrbc_array_reverse(vm, v);
 #ifdef GC_RC
+  mrbc_array *ary = v[0].array;
   mrbc_value *p1 = ary->data;
   mrbc_value *p2 = p1 + ary->n_stored;
   while (p1 < p2) {
@@ -1226,6 +1263,9 @@ static void c_array_inspect(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_string_new_cstr(vm, "[");
   if( !ret.string ) goto RETURN_NIL;		// ENOMEM
 
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   int i;
   for( i = 0; i < mrbc_array_size(v); i++ ) {
     if( i != 0 ) mrbc_string_append_cstr( &ret, ", " );
@@ -1233,11 +1273,15 @@ static void c_array_inspect(struct VM *vm, mrbc_value v[], int argc)
     mrbc_value v1 = mrbc_array_get(v, i);
     mrbc_value s1 = mrbc_send( vm, v, argc, &v1, "inspect", 0 );
     mrbc_string_append( &ret, &s1 );
+#ifdef GC_RC
     mrbc_string_delete( &s1 );
+#endif /* GC_RC */
   }
 
   mrbc_string_append_cstr( &ret, "]" );
-
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN(ret);
   return;
 
@@ -1276,6 +1320,9 @@ static void c_array_join(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_string_new(vm, NULL, 0);
   if( !ret.string ) goto RETURN_NIL;		// ENOMEM
 
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   mrbc_value separator = (argc == 0) ? mrbc_string_new_cstr(vm, "") :
     mrbc_send( vm, v, argc, &v[1], "to_s", 0 );
 
@@ -1283,7 +1330,9 @@ static void c_array_join(struct VM *vm, mrbc_value v[], int argc)
 #ifdef GC_RC
   mrbc_dec_ref_counter(&separator);
 #endif /* GC_RC */
-
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN(ret);
   return;
 

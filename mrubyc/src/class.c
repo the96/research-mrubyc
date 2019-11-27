@@ -62,10 +62,17 @@ int mrbc_obj_is_kind_of( const mrbc_value *obj, const mrb_class *cls )
   @param  vm	Pointer to VM.
   @param  name	Proc name.
   @return	Pointer to allocated memory or NULL.
+  gc trigger
 */
 mrbc_proc *mrbc_rproc_alloc(struct VM *vm, const char *name)
 {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_proc *ptr = (mrbc_proc *)mrbc_alloc(vm, sizeof(mrbc_proc));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_proc *ptr = (mrbc_proc *)mrbc_alloc(vm, sizeof(mrbc_proc), BT_PROC);
+#endif /* GC_MS_OR_BM */
+
   if( !ptr ) return ptr;
 
 #ifdef GC_RC
@@ -88,24 +95,37 @@ mrbc_proc *mrbc_rproc_alloc(struct VM *vm, const char *name)
   @param  cls	Pointer to Class (mrbc_class).
   @param  size	size of additional data.
   @return       mrbc_instance object.
+  gc trigger
 */
 mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size)
 {
   mrbc_value v = {.tt = MRBC_TT_OBJECT};
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   v.instance = (mrbc_instance *)mrbc_alloc(vm, sizeof(mrbc_instance) + size);
-  if( v.instance == NULL ) return v;	// ENOMEM
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  v.instance = (mrbc_instance *)mrbc_alloc(vm, sizeof(mrbc_instance) + size, BT_INSTANCE);
+#endif /* GC_MS_OR_BM */
+  v.instance->cls = cls;
 
+  if( v.instance == NULL ) return v;	// ENOMEM
+#ifdef GC_MS_OR_BM
+  v.instance->ivar.data_size = 0;
+  push_root_stack(v.instance);
+#endif /* GC_MS_OR_BM */
   if( mrbc_kv_init_handle(vm, &v.instance->ivar, 0) != 0 ) {
     mrbc_raw_free(v.instance);
     v.instance = NULL;
     return v;
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
 #ifdef GC_RC
   v.instance->ref_count = 1;
   v.instance->tt = MRBC_TT_OBJECT;	// for debug only.
 #endif /* GC_RC */
-  v.instance->cls = cls;
 
   return v;
 }
@@ -121,9 +141,9 @@ mrbc_value mrbc_instance_new(struct VM *vm, mrbc_class *cls, int size)
 void mrbc_instance_delete(mrbc_value *v)
 {
   mrbc_kv_delete_data( &v->instance->ivar );
-#ifndef RC_RELEASE_STOP
+#ifndef RC_OPERATION_ONLY
   mrbc_raw_free( v->instance );
-#endif /* RC_RELEASE_STOP */
+#endif /* RC_OPERATION_ONLY */
 }
 #endif /* GC_RC */
 
@@ -245,7 +265,12 @@ mrbc_class * mrbc_define_class(struct VM *vm, const char *name, mrbc_class *supe
 
   // create a new class?
   if( obj == NULL ) {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     mrbc_class *cls = mrbc_alloc( 0, sizeof(mrbc_class) );
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    mrbc_class *cls = mrbc_alloc (0, sizeof(mrbc_class), BT_CLASS);
+#endif /* GC_MS_OR_BM */
     if( !cls ) return cls;	// ENOMEM
 
     cls->sym_id = sym_id;
@@ -255,8 +280,14 @@ mrbc_class * mrbc_define_class(struct VM *vm, const char *name, mrbc_class *supe
     cls->super = super;
     cls->procs = 0;
 
+#ifdef GC_MS_OR_BM
+    push_root_stack((mrbc_instance *)cls);
+#endif /* GC_MS_OR_BM */
     // register to global constant.
     mrbc_set_const( sym_id, &(mrb_value){.tt = MRBC_TT_CLASS, .cls = cls} );
+#ifdef GC_MS_OR_BM
+    pop_root_stack();
+#endif /* GC_MS_OR_BM */
     return cls;
   }
 
@@ -268,6 +299,7 @@ mrbc_class * mrbc_define_class(struct VM *vm, const char *name, mrbc_class *supe
   // error.
   // raise TypeError.
   assert( !"TypeError" );
+  return NULL;
 }
 
 
@@ -296,6 +328,7 @@ mrbc_class * mrbc_get_class_by_name( const char *name )
   @param  cls		pointer to class.
   @param  name		method name.
   @param  cfunc		pointer to function.
+  gc trigger
 */
 void mrbc_define_method(struct VM *vm, mrbc_class *cls, const char *name, mrbc_func_t cfunc)
 {
@@ -320,6 +353,7 @@ void mrbc_define_method(struct VM *vm, mrbc_class *cls, const char *name, mrbc_f
   @param  name		method name
   @param  v		receiver and params
   @param  argc		num of params
+  gc trigger
 */
 void mrbc_funcall(struct VM *vm, const char *name, mrbc_value *v, int argc)
 {
@@ -328,7 +362,12 @@ void mrbc_funcall(struct VM *vm, const char *name, mrbc_value *v, int argc)
 
   if( m==0 ) return;   // no method
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_callinfo *callinfo = mrbc_alloc(vm, sizeof(mrbc_callinfo));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_callinfo *callinfo = mrbc_alloc(vm, sizeof(mrbc_callinfo), BT_CALLINFO);
+#endif /* GC_MS_OR_BM */
   callinfo->current_regs = vm->current_regs;
   callinfo->pc_irep = vm->pc_irep;
   callinfo->pc = vm->pc;
@@ -367,6 +406,7 @@ void mrbc_funcall(struct VM *vm, const char *name, mrbc_value *v, int argc)
     mrbc_value ret = mrbc_send( vm, v, argc, recv, "to_s", 1, &arg1 );
     SET_RETURN(ret);
   }
+  gc trigger
  */
 mrbc_value mrbc_send( struct VM *vm, mrbc_value *v, int reg_ofs,
 		     mrbc_value *recv, const char *method, int argc, ... )
@@ -445,9 +485,9 @@ int mrbc_p_sub(mrbc_value *v)
     int i;
     for( i = 0; i < mrbc_string_size(v); i++ ) {
       if( s[i] < ' ' || 0x7f <= s[i] ) {	// tiny isprint()
-	console_printf("\\x%02X", s[i]);
+	      console_printf("\\x%02X", s[i]);
       } else {
-	console_putchar(s[i]);
+	      console_putchar(s[i]);
       }
     }
     console_putchar('"');
@@ -586,6 +626,7 @@ int mrbc_puts_sub(mrbc_value *v)
 /*! (method) alias_method
 
   note: using the 'alias' keyword, this method will be called.
+  gc trigger
 */
 static void c_object_alias_method(struct VM *vm, mrbc_value v[], int argc)
 {
@@ -601,7 +642,13 @@ static void c_object_alias_method(struct VM *vm, mrbc_value v[], int argc)
   }
 
   // copy the Proc object
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_proc *proc_alias = mrbc_alloc(0, sizeof(mrbc_proc));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_proc *proc_alias = mrbc_alloc(0, sizeof(mrbc_proc), BT_PROC);
+#endif /* GC_MS_OR_BM */
+
   if( !proc_alias ) return;		// ENOMEM
   memcpy( proc_alias, proc, sizeof(mrbc_proc) );
 
@@ -714,7 +761,9 @@ static void c_object_class(struct VM *vm, mrbc_value v[], int argc)
 
 
 
-// Object.new
+/* Object.new
+*  gc_trigger
+*/
 static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value new_obj = mrbc_instance_new(vm, v->cls, 0);
@@ -782,7 +831,13 @@ static void c_object_setiv(struct VM *vm, mrbc_value v[], int argc)
 {
   const char *name = mrbc_get_callee_name(vm);
 
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   char *namebuf = mrbc_alloc(vm, strlen(name));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  char *namebuf = mrbc_alloc(vm, strlen(name), BT_NAME);
+#endif /* GC_MS_OR_BM */
+
   if( !namebuf ) return;
   strcpy(namebuf, name);
   namebuf[strlen(name)-1] = '\0';	// delete '='
@@ -824,7 +879,13 @@ static void c_object_attr_accessor(struct VM *vm, mrbc_value v[], int argc)
     mrbc_define_method(vm, v[0].cls, name, c_object_getiv);
 
     // make string "....=" and define writer method.
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     char *namebuf = mrbc_alloc(vm, strlen(name)+2);
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+    char *namebuf = mrbc_alloc(vm, strlen(name)+2, BT_NAME);
+#endif /* GC_MS_OR_BM */
+
     if( !namebuf ) return;
     strcpy(namebuf, name);
     strcat(namebuf, "=");
@@ -1137,7 +1198,6 @@ void c_ineffect(struct VM *vm, mrbc_value v[], int argc)
 static void mrbc_run_mrblib(void)
 {
   extern const uint8_t mrblib_bytecode[];
-
   mrbc_vm vm;
   mrbc_vm_open(&vm);
   mrbc_load_mrb(&vm, mrblib_bytecode);

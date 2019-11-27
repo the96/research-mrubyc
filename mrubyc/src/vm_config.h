@@ -14,18 +14,7 @@
 
 /* custom config for research */
 #define HEAP_EXPAND
-#ifdef HEAP_EXPAND
-
-#define MRBC_ALLOC_FLI_BIT_WIDTH 25
-#define MRBC_ALLOC_SLI_BIT_WIDTH 3
-#define MRBC_ALLOC_IGNORE_LSBS	  4
-#define MRBC_ALLOC_MEMSIZE_T     uint32_t
-
-#define MAX_REGS_SIZE 2000
-#define MAX_CALLINFO_SIZE 500
-#define MAX_OBJECT_COUNT 2000
-#endif
-
+#define BENCHMARK_MODE
 
 /* GC_MODE */
 #define REFERENCE_COUNT 0
@@ -34,7 +23,23 @@
 #define MARKSWEEP_DEBUG 3
 #define BITMAP_MARKING_DEBUG 4
 
-#define GC_MODE (MARKSWEEP)
+#define GC_MODE (MARKSWEEP_DEBUG)
+
+/* *************************** */
+
+#ifdef HEAP_EXPAND
+
+#define MRBC_ALLOC_FLI_BIT_WIDTH 25
+#define MRBC_ALLOC_SLI_BIT_WIDTH 3
+#define MRBC_ALLOC_IGNORE_LSBS	 4
+#define MRBC_ALLOC_MEMSIZE_T     uint32_t
+
+#define MAX_REGS_SIZE 2000
+#define MAX_CALLINFO_SIZE 500
+#define MAX_OBJECT_COUNT 2000
+#endif
+
+/* GC_MODE DETAIL */
 
 #if (GC_MODE == REFERENCE_COUNT)
 #define GC_RC
@@ -42,41 +47,49 @@
 
 #if (GC_MODE == MARKSWEEP)
 #define GC_MS
+#define GC_COUNT
 #define GC_MS_OR_BM
 #endif
 
 #if (GC_MODE == BITMAP_MARKING)
 #define GC_BM
+#define GC_COUNT
 #define GC_MS_OR_BM
 #endif
 
 #if (GC_MODE == MARKSWEEP_DEBUG)
 #define GC_MS
 #define GC_RC
-#define RC_RELEASE_STOP
+#define GC_COUNT
+#define RC_OPERATION_ONLY
 #define GC_MS_OR_BM
 #define GC_MS_DEBUG
+#define GC_DEBUG
 #endif
 
 #if (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_BM
 #define GC_RC
-#define RC_RELEASE_STOP
+#define GC_COUNT
+#define RC_OPERATION_ONLY
 #define GC_MS_OR_BM
 #define GC_BM_DEBUG
+#define GC_DEBUG
 #endif
 
 #ifdef GC_MS_OR_BM
 #define MARK_STACK_SIZE 500000
 #endif
 
-/* custom config for research */
-
-#define BENCHMARK_MODE
-
 #ifndef BENCHMARK_MODE
 #define MRBC_DEBUG
 #endif
+
+#ifdef GC_DEBUG
+// #define HEAP_DUMP
+#endif
+/* custom config for research */
+
 
 
 #ifndef MRBC_SRC_VM_CONFIG_H_

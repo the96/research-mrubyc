@@ -110,7 +110,13 @@ static void not_supported(void)
 */
 mrbc_irep *mrbc_irep_alloc(struct VM *vm)
 {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_irep *p = (mrbc_irep *)mrbc_alloc(vm, sizeof(mrbc_irep));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_irep *p = (mrbc_irep *)mrbc_alloc(vm, sizeof(mrbc_irep), BT_IREP);
+#endif /* GC_MS_OR_BM */
+
   if( p )
     memset(p, 0, sizeof(mrbc_irep));	// caution: assume NULL is zero.
   return p;
@@ -148,7 +154,13 @@ void mrbc_irep_free(mrbc_irep *irep)
 */
 void mrbc_push_callinfo( struct VM *vm, mrbc_sym mid, int n_args )
 {
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
   mrbc_callinfo *callinfo = mrbc_alloc(vm, sizeof(mrbc_callinfo));
+#endif /* GC_RC and !RC_OPERATION_ONLY */
+#ifdef GC_MS_OR_BM
+  mrbc_callinfo *callinfo = mrbc_alloc(vm, sizeof(mrbc_callinfo), BT_CALLINFO);
+#endif /* GC_MS_OR_BM */
+
   if( !callinfo ) return;
 
   callinfo->current_regs = vm->current_regs;
@@ -783,7 +795,7 @@ static inline int op_send( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
     while( release_reg <= bidx ) {
 #ifdef GC_RC
       mrbc_release(&regs[release_reg]);
-#endif GC_RC
+#endif /* GC_RC */
       release_reg++;
     }
     return 0;
@@ -981,9 +993,11 @@ static inline int op_return( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 #endif /* GC_RC */
   *regs0 = regs[ra];
   regs[ra].tt = MRBC_TT_EMPTY;
-    
+
+#ifdef GC_RC
   // nregs to release
   int nregs = vm->pc_irep->nregs;
+#endif /* GC_RC */
 
   // restore irep,pc,regs
   mrbc_callinfo *callinfo = vm->callinfo_tail;
@@ -1835,13 +1849,13 @@ static inline int op_method( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
     if( p ) {
       // found it.
       *((mrbc_proc**)pp) = p->next;
+#ifdef GC_RC
       if( !p->c_func ) {
         mrbc_value v = {.tt = MRBC_TT_PROC};
         v.proc = p;
-#ifdef GC_RC
         mrbc_release(&v);
-#endif /* GC_RC */
       }
+#endif /* GC_RC */
     }
 
     // add proc to class
@@ -1923,12 +1937,18 @@ static inline int op_stop( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   @return	Pointer to mrbc_vm.
   @retval NULL	error.
 */
+#include <stdio.h>
 mrbc_vm *mrbc_vm_open( struct VM *vm_arg )
 {
   mrbc_vm *vm;
   if( (vm = vm_arg) == NULL ) {
     // allocate memory.
+#if defined(GC_RC) && !defined(RC_OPERATION_ONLY)
     vm = (mrbc_vm *)mrbc_raw_alloc( sizeof(mrbc_vm) );
+#endif
+#ifdef GC_MS_OR_BM
+    vm = (mrbc_vm *)mrbc_alloc( NULL, sizeof(mrbc_vm), BT_VM);
+#endif
     if( vm == NULL ) return NULL;
   }
 
@@ -1953,7 +1973,7 @@ mrbc_vm *mrbc_vm_open( struct VM *vm_arg )
   if( vm_arg == NULL ) vm->flag_need_memfree = 1;
   vm->vm_id = vm_id;
 #ifdef GC_MS_OR_BM
-  add_vm_set(vm);
+    add_vm_set(vm);
 #endif /* GC_MS_OR_BM */
 
   return vm;
@@ -2021,6 +2041,7 @@ void mrbc_vm_begin( struct VM *vm )
 
   @param  vm  Pointer to VM
 */
+#include <stdio.h>
 void mrbc_vm_end( struct VM *vm )
 {
 #ifdef GC_MS_OR_BM

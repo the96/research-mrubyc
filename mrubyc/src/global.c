@@ -38,6 +38,7 @@ void  mrbc_init_global(void)
   @param  sym_id	symbol ID.
   @param  v		pointer to mrbc_value.
   @return		mrbc_error_code.
+  gc trigger
 */
 int mrbc_set_const( mrbc_sym sym_id, mrbc_value *v )
 {
@@ -113,6 +114,7 @@ void mrbc_global_clear_vm_id(void)
 mrbc_kv_handle * get_const_handle() {
   return &handle_const;
 }
+
 mrbc_kv_handle * get_global_handle() {
   return &handle_global;
 }

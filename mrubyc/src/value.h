@@ -132,6 +132,7 @@ typedef struct RObject mrbc_value;
 
 
 // for C call
+#ifdef GC_RC
 #define SET_RETURN(n)		do { mrbc_value nnn = (n); \
     mrbc_dec_ref_counter(v); v[0] = nnn; } while(0)
 #define SET_NIL_RETURN()	do { \
@@ -146,6 +147,15 @@ typedef struct RObject mrbc_value;
     mrbc_dec_ref_counter(v); v[0].tt = MRBC_TT_FIXNUM; v[0].i = nnn; } while(0)
 #define SET_FLOAT_RETURN(n)	do { mrbc_float nnn = (n); \
     mrbc_dec_ref_counter(v); v[0].tt = MRBC_TT_FLOAT; v[0].d = nnn; } while(0)
+#else /* GC_RC */
+#define SET_RETURN(n)		do { mrbc_value nnn = (n); v[0] = nnn; } while(0)
+#define SET_NIL_RETURN()	do { v[0].tt = MRBC_TT_NIL; } while(0)
+#define SET_FALSE_RETURN()	do { v[0].tt = MRBC_TT_FALSE; } while(0)
+#define SET_TRUE_RETURN()	do { v[0].tt = MRBC_TT_TRUE; } while(0)
+#define SET_BOOL_RETURN(n)	do { v[0].tt = (n)?MRBC_TT_TRUE:MRBC_TT_FALSE; } while(0)
+#define SET_INT_RETURN(n)	do { mrbc_int nnn = (n); v[0].tt = MRBC_TT_FIXNUM; v[0].i = nnn; } while(0)
+#define SET_FLOAT_RETURN(n)	do { mrbc_float nnn = (n); v[0].tt = MRBC_TT_FLOAT; v[0].d = nnn; } while(0)
+#endif
 
 #define GET_TT_ARG(n)		(v[(n)].tt)
 #define GET_INT_ARG(n)		(v[(n)].i)
