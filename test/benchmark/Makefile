@@ -7,6 +7,8 @@ clean:
 	rm marksweep bitmap-marking refcount
 mrubyc:
 	make -C ../../mrubyc all-vm
+mrubyc-m32:
+	make -C ../../mrubyc all-m32
 
 ln:
 	ln -s ../../mrubyc/sample_c/marksweep
