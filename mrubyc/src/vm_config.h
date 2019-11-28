@@ -36,7 +36,7 @@
 #define MRBC_ALLOC_IGNORE_LSBS	 4
 #define MRBC_ALLOC_MEMSIZE_T     uint32_t
 
-#define MAX_REGS_SIZE 2000
+#define MAX_REGS_SIZE 1000
 #define MAX_CALLINFO_SIZE 500
 #define MAX_OBJECT_COUNT 2000
 #endif

@@ -9,5 +9,6 @@
     "value.h": "c",
     "vm_config.h": "c",
     "keyvalue.h": "c"
-  }
+  },
+  "C_Cpp.dimInactiveRegions": false
 }

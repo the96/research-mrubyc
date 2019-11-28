@@ -53,12 +53,10 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
 
   vm = mrbc_vm_open(NULL);
   if( vm == 0 ) {
-    fprintf(stderr, "Error: Can't open VM.\n");
     return;
   }
 
   if( mrbc_load_mrb(vm, mrbbuf) != 0 ) {
-    fprintf(stderr, "Error: Illegal bytecode.\n");
     return;
   }
 
@@ -67,6 +65,7 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
   mrbc_vm_run(vm);
   clock_gettime(CLOCK_MONOTONIC_RAW, &vm_end);
   double vm_time = (double)(vm_end.tv_sec - vm_start.tv_sec) + (double)(vm_end.tv_nsec - vm_start.tv_nsec) * 1.0E-9;
+  printf("size %ld\n", memory_pool_size);
   printf("vm time %.9lf\n", vm_time);
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);
