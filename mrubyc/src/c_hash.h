@@ -28,8 +28,11 @@ extern "C" {
 typedef struct RHash {
   // (NOTE)
   //  Needs to be same members and order as RArray.
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
+#endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
 #endif
 
   uint16_t data_size;	//!< data buffer size.

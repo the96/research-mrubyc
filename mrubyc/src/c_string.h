@@ -27,9 +27,13 @@ extern "C" {
   Define String handle.
 */
 typedef struct RString {
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
 #endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
+#endif
+
 
   uint16_t size;	//!< string length.
   uint8_t *data;	//!< pointer to allocated buffer.

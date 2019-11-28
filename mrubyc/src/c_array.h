@@ -25,9 +25,13 @@ extern "C" {
   Define Array handle.
 */
 typedef struct RArray {
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
 #endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
+#endif
+
 
   uint16_t data_size;	//!< data buffer size.
   uint16_t n_stored;	//!< # of stored.

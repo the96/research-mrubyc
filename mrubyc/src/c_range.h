@@ -26,9 +26,13 @@ extern "C" {
   Define Range object (same the handles of other objects)
 */
 typedef struct RRange {
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
 #endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
+#endif
+
 
   uint8_t flag_exclude;	// true: exclude the end object, otherwise include.
   mrbc_value first;

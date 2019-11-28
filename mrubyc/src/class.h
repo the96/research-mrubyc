@@ -42,9 +42,13 @@ typedef struct RClass mrb_class;
 /*! mruby/c instance object.
 */
 typedef struct RInstance {
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
 #endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
+#endif
+
 
   struct RClass *cls;
   struct RKeyValueHandle ivar;
@@ -58,9 +62,13 @@ typedef struct RInstance mrb_instance;
 /*! mruby/c proc object.
 */
 typedef struct RProc {
-#ifdef GC_RC
+#if defined(GC_RC) || defined(ORIGINAL_OBJECT_HEADER)
   MRBC_OBJECT_HEADER;
 #endif
+#if defined(MARKBIT_IN_OBJECT_HEADER) || defined(ORIGINAL_OBJECT_HEADER)
+  MRBC_OBJECT_HEADER_MARKBIT;
+#endif
+
 
   unsigned int c_func : 1;	// 0:IREP, 1:C Func
   mrbc_sym sym_id;
