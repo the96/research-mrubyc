@@ -1,5 +1,7 @@
 mrubyc/sample_c/**/mrubyc*
-test/**/mrubyc*
+test/**/bitmap-marking
+test/**/marksweep
+test/**/refcount
 mrubyc/src/hal
 **/*.a
 **/*.o
