@@ -18,6 +18,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "vm.h"
 #include "alloc.h"
 #include "console.h"
@@ -32,8 +33,8 @@
 #include "class.h"
 #endif /* GC_MS_OR_BM */
 
-#include <stdio.h>
 #ifdef GC_DEBUG
+#include <stdio.h>
 #endif /* GC_DEBUG */
 
 // Layer 1st(f) and 2nd(s) model
@@ -872,9 +873,6 @@ void init_mark_stack()
 
 void push_root_stack(mrbc_instance *obj)
 {
-  if ((uint8_t *) obj < memory_pool || (uint8_t *) obj >= memory_pool + memory_pool_size) {
-    printf("[push_root_stack] obj->tt %d\n", obj->tt);
-  }
   if (root_stack_top < MARK_STACK_SIZE) {
     root_stack[root_stack_top++] = obj;
   } else {
@@ -1139,11 +1137,6 @@ void mrbc_sweep()
 }
 
 #endif /* GC_MS_OR_BM */
-
-#ifdef GC_DEBUG
-
-char* block_type_to_name(uint8_t bt);
-
 void print_heap_summary()
 {
   printf("==[heap summary]========\n");
@@ -1174,6 +1167,11 @@ void print_heap_summary()
   printf("HEAP_SIZE : %d bytes\n", memory_pool_size);
   printf("======================\n");
 }
+
+#ifdef GC_DEBUG
+
+char* block_type_to_name(uint8_t bt);
+
 
 void heap_dump()
 {

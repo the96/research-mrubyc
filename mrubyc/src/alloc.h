@@ -116,11 +116,11 @@ void add_vm_set(struct VM *vm);
 void remove_vm_set(struct VM *vm);
 void mrbc_mark();
 void mrbc_sweep();
+void print_heap_summary();
 #endif
 
 #if defined(GC_MS_DEBUG) || defined (GC_BM_DEBUG)
 void heap_dump();
-void print_heap_summary();
 #endif /* GC_MS_DEBUG or GC_BM_DEBUG */
 
 #ifdef __cplusplus

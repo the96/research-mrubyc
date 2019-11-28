@@ -7,12 +7,34 @@
 #  This file is distributed under BSD 3-Clause License.
 #
 
+
+marksweep:
+	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/" all
+
+bitmap-marking:
+	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" all
+
+refcount:
+	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" all
+
+marksweep-m32: 
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/"
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/" m32
+
+bitmap-marking-m32:
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" m32
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" m32
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" m32
+
+refcount-m32:
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m32
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m32
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m32
+
+all-vm: marksweep bitmap-marking refcount
+
 all: mrubyc_lib mrubyc_ext mrubyc_bin
-benchmark: 
-	cd mrblib ; $(MAKE)
-	cd src ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
-	cd ext ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
-	cd sample_c ; $(MAKE) BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG" all
 
 mrubyc_lib:
 	cd mrblib ; $(MAKE) all

@@ -12,10 +12,10 @@
   </pre>
 */
 
-#include "vm_config.h"
 #include <string.h>
 #include <assert.h>
 
+#include "vm_config.h"
 #include "value.h"
 #include "vm.h"
 #include "alloc.h"

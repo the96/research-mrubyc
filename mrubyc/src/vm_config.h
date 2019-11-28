@@ -23,7 +23,9 @@
 #define MARKSWEEP_DEBUG 3
 #define BITMAP_MARKING_DEBUG 4
 
-#define GC_MODE (BITMAP_MARKING_DEBUG)
+#ifndef GC_MODE
+#define GC_MODE (MARKSWEEP_DEBUG)
+#endif
 
 /* *************************** */
 
