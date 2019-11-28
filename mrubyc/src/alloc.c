@@ -37,6 +37,16 @@
 #include <stdio.h>
 #endif /* GC_DEBUG */
 
+#if defined(EARLY_GC) || defined (GC_PROF)
+long long total_alloc = 0;
+long long total_alloc_last_gc = 0;
+#define EARLY_GC_CYCLE (memory_pool_size >> 2)
+#endif /* EARLY_GC || GC_PROF */
+
+#ifdef GC_PROF
+long long internal_fragmentation = 0;
+#endif /* GC_PROF */
+
 // Layer 1st(f) and 2nd(s) model
 // last 4bit is ignored
 // f : size
@@ -312,8 +322,13 @@ static void remove_index(FREE_BLOCK *target)
 */
 static inline FREE_BLOCK* split_block(FREE_BLOCK *target, unsigned int size)
 {
-  if( target->size < (size + sizeof(FREE_BLOCK)
-                      + (1 << MRBC_ALLOC_IGNORE_LSBS)) ) return NULL;
+  if (target->size < (size + sizeof(FREE_BLOCK)
+                      + (1 << MRBC_ALLOC_IGNORE_LSBS)) ) {
+#ifdef GC_PROF
+    internal_fragmentation += target->size - size;
+#endif /* GC_PROF */
+    return NULL;
+  }
 
   // split block, free
   FREE_BLOCK *split = (FREE_BLOCK *)((uint8_t *)target + size);
@@ -475,6 +490,10 @@ void * mrbc_raw_alloc(unsigned int size)
     add_free_block(release);
   }
 
+#if defined(EARLY_GC) || defined(GC_PROF)
+  total_alloc += target->size;
+#endif /* EARLY_GC || GC_PROF */
+
 #ifdef MRBC_DEBUG
   memset( (uint8_t *)target + sizeof(USED_BLOCK), 0xaa,
           target->size - sizeof(USED_BLOCK) );
@@ -579,6 +598,10 @@ void * mrbc_raw_realloc(void *ptr, unsigned int size)
 
   mrbc_raw_free(ptr);
 
+#if defined(EARLY_GC) || defined(GC_PROF)
+  total_alloc += ((USED_BLOCK *) new_ptr)->size;
+#endif /* EARLY_GC || GC_PROF */
+
   return new_ptr;
 }
 
@@ -638,6 +661,12 @@ void * mrbc_realloc(void *ptr, unsigned int size)
 */
 void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_type)
 {
+#ifdef EARLY_GC
+  if (total_alloc - total_alloc_last_gc > EARLY_GC_CYCLE) {
+    mrbc_mark_sweep();
+    total_alloc_last_gc = total_alloc;
+  }
+#endif /* EARLY_GC */
   uint8_t *ptr = mrbc_raw_alloc(size);
   if( ptr == NULL ) {
 #ifdef GC_COUNT
@@ -650,8 +679,10 @@ void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_typ
     heap_dump();
 #endif /* HEAP_DUMP */
 #endif /* GC_DEBUG */
-    mrbc_mark();
-    mrbc_sweep();
+    mrbc_mark_sweep();
+#ifdef EARLY_GC
+    total_alloc_last_gc = total_alloc;
+#endif /* EARLY_GC */
     ptr = mrbc_raw_alloc(size);
     if (ptr == NULL) {
       print_heap_summary();
@@ -677,6 +708,12 @@ void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_typ
 */
 void * mrbc_realloc(void *ptr, unsigned int size)
 {
+#ifdef EARLY_GC
+  if (total_alloc - total_alloc_last_gc > EARLY_GC_CYCLE) {
+    mrbc_mark_sweep();
+    total_alloc_last_gc = total_alloc;
+  }
+#endif /* EARLY_GC */
   USED_BLOCK *header = (USED_BLOCK *)((uint8_t *)ptr - sizeof(USED_BLOCK));
   int block_type = header->bt;
   uint8_t *new_ptr = mrbc_raw_realloc(ptr, size);
@@ -690,8 +727,10 @@ void * mrbc_realloc(void *ptr, unsigned int size)
     heap_dump();
 #endif /* HEAP_DUMP */
 #endif /* GC_DEBUG */
-    mrbc_mark();
-    mrbc_sweep();
+    mrbc_mark_sweep();
+#ifdef EARLY_GC
+    total_alloc_last_gc = total_alloc;
+#endif /* EARLY_GC */
     new_ptr = mrbc_raw_realloc(ptr, size);
     if (new_ptr == NULL) {
       print_heap_summary();
@@ -947,6 +986,12 @@ void reverse_mark_flag()
 
 void push_vm();
 void mark_from_stack();
+
+void mrbc_mark_sweep()
+{
+  mrbc_mark();
+  mrbc_sweep();
+}
 
 void mrbc_mark()
 {

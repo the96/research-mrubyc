@@ -1998,6 +1998,15 @@ void mrbc_vm_close( struct VM *vm )
   // free irep and vm
   mrbc_irep_free( vm->irep );
   if( vm->flag_need_memfree ) mrbc_raw_free(vm);
+#ifdef GC_PROF
+  {
+    extern long long internal_fragmentation;
+    extern long long total_alloc;
+    console_printf("internal fragmentation %f\n",
+		   ((float) ((internal_fragmentation * 1000) / total_alloc)) / 10);
+  }
+#endif /* GC_PROF */
+
 }
 
 

@@ -114,6 +114,7 @@ mrbc_instance * pop_root_stack();
 void push_mrbc_value_for_root_stack(mrbc_value *obj);
 void add_vm_set(struct VM *vm);
 void remove_vm_set(struct VM *vm);
+void mrbc_mark_sweep();
 void mrbc_mark();
 void mrbc_sweep();
 void print_heap_summary();

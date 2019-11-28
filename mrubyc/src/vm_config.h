@@ -81,6 +81,7 @@
 
 #ifdef GC_MS_OR_BM
 #define MARK_STACK_SIZE 500000
+// #define GC_PROF
 #endif
 
 #ifndef BENCHMARK_MODE

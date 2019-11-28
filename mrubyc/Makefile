@@ -17,6 +17,16 @@ bitmap-marking:
 refcount:
 	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" all
 
+marksweep-earlygc: 
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/"
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/" earlygc
+
+bitmap-marking-earlygc:
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/"
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/" earlygc
+
 marksweep-m32: 
 	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/"
 	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/"
@@ -32,7 +42,21 @@ refcount-m32:
 	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m32
 	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m32
 
-all-vm: marksweep bitmap-marking refcount
+marksweep-earlygc-m32: 
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/"
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/" earlygc-m32
+
+bitmap-marking-earlygc-m32:
+	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/"
+	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/" earlygc-m32
+
+
+all-vm: all-normal all-early
+all-normal: marksweep bitmap-marking refcount
+all-early: marksweep-earlygc bitmap-marking-earlygc
+all-m32: marksweep-m32 bitmap-marking-m32 refcount-m32 marksweep-earlygc-m32 bitmap-marking-earlygc-m32
 
 all: mrubyc_lib mrubyc_ext mrubyc_bin
 
