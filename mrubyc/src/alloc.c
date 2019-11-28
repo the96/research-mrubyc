@@ -112,7 +112,47 @@ int mark_stack_top;
 int root_stack_top;
 struct VM **vms;
 int vm_count;
+#define GET_BLOCK_HEADER(obj) ((USED_BLOCK *)((uint8_t *)obj - sizeof(USED_BLOCK)))
 #endif /* GC_MS_OR_BM */
+
+#ifdef GC_BM
+int mark_bitmap_size;
+uint8_t *mark_bitmap;
+
+#define GET_OFFSET(ptr)       (((uint8_t *) ptr - memory_pool) >> 2)
+#define TOP_INDEX(offset)     (offset >> 3)
+#define BOTTOM_INDEX(offset)  (offset & 7)
+#define RESET_MARK_BITMAP()   (memset(mark_bitmap, 0, mark_bitmap_size))
+#define MARKED 1
+#define UNMARK 0
+#define OUT_OF_BITMAP 2
+
+void init_mark_bitmap()
+{
+  // memory alignment : 4 = 2^2
+  // uint8_t          : 8 = 2^3
+  // sum              : 3+2 = 5
+  // round            : 1
+  mark_bitmap_size = ((memory_pool_size >> 5 ) + 1) * sizeof(uint8_t);
+  mark_bitmap = malloc(mark_bitmap_size);
+}
+
+#define reset_bitmap() (memset(mark_bitmap, UNMARK, mark_bitmap_size))
+
+static inline void mark_on_bitmap(USED_BLOCK *ptr)
+{
+  assert ( (uint8_t *) ptr + ptr->size <= memory_pool + memory_pool_size && (uint8_t *) ptr >= memory_pool );
+  int offset = GET_OFFSET(ptr);
+  mark_bitmap[TOP_INDEX(offset)] |= 1 << BOTTOM_INDEX(offset);
+}
+
+static inline int isMarked_from_bitmap(USED_BLOCK *ptr)
+{
+  assert ( (uint8_t *) ptr + ptr->size <= memory_pool + memory_pool_size && (uint8_t *) ptr >= memory_pool );
+  int offset = GET_OFFSET(ptr);
+  return MARKED & mark_bitmap[TOP_INDEX(offset)] >> BOTTOM_INDEX(offset);
+}
+#endif /* GC_BM */
 
 #ifdef GC_COUNT
 int gc_count;
@@ -336,6 +376,9 @@ void mrbc_init_alloc(void *ptr, unsigned int size)
   block->prev_offset = 0;
 
   add_free_block(block);
+#ifdef GC_BM
+  init_mark_bitmap();
+#endif /* GC_BM */
 }
 
 
@@ -907,7 +950,6 @@ void reverse_mark_flag()
 void push_vm();
 void mark_from_stack();
 
-#include "symbol.h"
 void mrbc_mark()
 {
   int i;
@@ -916,13 +958,9 @@ void mrbc_mark()
   mrbc_kv_handle *const_h = get_const_handle();
   mrbc_kv_handle *global_h = get_global_handle();
   if (const_h->data_size > 0) {
-    if ((uint8_t *)const_h->data < memory_pool || (uint8_t *)const_h->data >= memory_pool + memory_pool_size)
-      printf("aaaaa\n");
     push_mark_stack((mrbc_instance *) const_h->data);
   }
   if (global_h->data_size > 0) {
-    if ((uint8_t *)global_h->data < memory_pool || (uint8_t *)global_h->data >= memory_pool + memory_pool_size)
-      printf("bbbb\n");
     push_mark_stack((mrbc_instance *) global_h->data);
   }
   for (i = 0; i < const_h->n_stored ; i++) {
@@ -962,8 +1000,6 @@ void push_vm(struct VM *vm) {
   }
 }
 
-#define GET_BLOCK_HEADER(obj) (USED_BLOCK *)((uint8_t *)obj - sizeof(USED_BLOCK))
-
 #ifdef GC_MS
 static inline void mark(USED_BLOCK *block) {
   block->m = marked_flag;
@@ -972,6 +1008,7 @@ static inline void mark(USED_BLOCK *block) {
 #ifdef GC_BM
 static inline void mark(USED_BLOCK *block) {
 // TODO
+  mark_on_bitmap(block);
 }
 #endif
 
@@ -983,6 +1020,7 @@ static inline int is_marked(USED_BLOCK *block) {
 #ifdef GC_BM
 static inline int is_marked(USED_BLOCK *block) {
 // TODO
+  return isMarked_from_bitmap(block);
 }
 #endif
 
@@ -1095,6 +1133,9 @@ void mrbc_sweep()
     block = next;
     next = (USED_BLOCK *) PHYS_NEXT(block);
   }
+#ifdef GC_BM
+  reset_bitmap();
+#endif /*GC_BM */
 }
 
 #endif /* GC_MS_OR_BM */
