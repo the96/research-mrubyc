@@ -1237,4 +1237,16 @@ void mrbc_init_class(void)
   mrbc_init_class_hash(0);
 
   mrbc_run_mrblib();
+
+#ifdef PRINT_OBJ_SIZE
+  printf("sizeof(mrbc_obejct) = %ld\n", sizeof(mrbc_object));
+  printf("sizeof(mrbc_class) = %ld\n", sizeof(mrbc_class));
+  printf("sizeof(mrbc_proc) = %ld\n", sizeof(mrbc_proc));
+  printf("sizeof(mrbc_instance) = %ld\n", sizeof(mrbc_instance));
+  printf("sizeof(mrbc_array) = %ld\n", sizeof(mrbc_array));
+  printf("sizeof(mrbc_hash) = %ld\n", sizeof(mrbc_hash));
+  printf("sizeof(mrbc_range) = %ld\n", sizeof(mrbc_range));
+  printf("sizeof(mrbc_string) = %ld\n", sizeof(mrbc_string));
+  printf("sizeof(mrbc_vm) = %ld\n", sizeof(mrbc_vm));
+#endif /* PRINT_OBJ_SIZE */
 }

@@ -91,6 +91,7 @@
 
 #ifndef BENCHMARK_MODE
 #define MRBC_DEBUG
+#define PRINT_OBJ_SIZE
 #endif
 
 #ifdef GC_DEBUG

@@ -9,13 +9,25 @@
 
 
 marksweep:
-	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/" all
+	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=MARKSWEEP" OUT="marksweep/" all
 
 bitmap-marking:
-	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" all
+	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" all
 
 refcount:
-	$(MAKE) -B BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" all
+	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" all
+
+marksweep-bench:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP" OUT="marksweep/" bench
+
+bitmap-marking-bench:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" 
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING" OUT="bitmap-marking/" bench
+
+refcount-bench:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" bench
 
 marksweep-earlygc: 
 	$(MAKE) -B mrubyc_lib BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=MARKSWEEP -DEARLY_GC" OUT="marksweep/"
@@ -53,9 +65,9 @@ bitmap-marking-earlygc-m32:
 	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP-MARKING -DEARLY_GC" OUT="bitmap-marking/" earlygc-m32
 
 
-all-vm: all-normal all-early
+all-vm: all-normal all-bench
 all-normal: marksweep bitmap-marking refcount
-all-early: marksweep-earlygc bitmap-marking-earlygc
+all-bench: marksweep-bench bitmap-marking-bench refcount-bench marksweep-earlygc bitmap-marking-earlygc
 all-m32: marksweep-m32 bitmap-marking-m32 refcount-m32 marksweep-earlygc-m32 bitmap-marking-earlygc-m32
 
 all: mrubyc_lib mrubyc_ext mrubyc_bin

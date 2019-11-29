@@ -7,7 +7,8 @@
 #  This file is distributed under BSD 3-Clause License.
 #
 
-TARGETS = mrubyc mrubyc-bench # mrubyc_sample mrubyc_concurrent mrubyc_myclass 
+TARGETS = mrubyc # mrubyc_sample mrubyc_concurrent mrubyc_myclass 
+BENCH =  mrubyc-bench
 EARLY_GC = mrubyc-earlygc mrubyc-bench-earlygc
 M32 = mrubyc-m32 mrubyc-bench-m32
 M32_EARLY_GC = mrubyc-earlygc-m32 mrubyc-bench-earlygc-m32
@@ -17,6 +18,7 @@ LIBMRUBYC = ../src/libmrubyc.a ../ext/libmrubyc_ext.a -lm
 OUT = ./
 
 all: $(TARGETS)
+bench: $(BENCH)
 earlygc: $(EARLY_GC)
 m32: $(M32)
 earlygc-m32: $(M32_EARLY_GC)
