@@ -19,13 +19,17 @@ TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
 
 marksweep = "marksweep"
 earlygc = "marksweep-early"
+marksweep_m32 = "marksweep-m32"
+earlygc_m32 = "marksweep-early-m32"
 refcnt = "refcount"
+refcnt_m32 = "refcnt-m32"
 
 marksweep_bin = "marksweep/mrubyc-bench"
 earlygc_bin = "marksweep/mrubyc-bench-earlygc"
 marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
 earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
 refcnt_bin = "refcount/mrubyc-bench"
+refcnt_m32_bin = "refcount/mrubyc-bench-m32"
 
 def benchmark(test_name, test_path, binary_name, binary_path):
   # result file and output file open
@@ -79,3 +83,6 @@ test_name = benchmark_path[0:-4]
 benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
 benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
+benchmark(test_name, benchmark_path, marksweep_m32, marksweep_bin_m32)
+benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_bin_m32  )
+benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_bin_m32   )
