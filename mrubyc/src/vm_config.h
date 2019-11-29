@@ -95,7 +95,7 @@
 #endif
 
 #ifdef GC_DEBUG
-// #define HEAP_DUMP
+#define HEAP_DUMP
 #endif
 /* custom config for research */
 

@@ -9,10 +9,10 @@
 
 
 marksweep:
-	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=MARKSWEEP" OUT="marksweep/" all
+	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=MARKSWEEP_DEBUG" OUT="marksweep/" all
 
 bitmap-marking:
-	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=BITMAP_MARKING" OUT="bitmap-marking/" all
+	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=BITMAP_MARKING_DEBUG" OUT="bitmap-marking/" all
 
 refcount:
 	$(MAKE) -B BENCHMARK="-DPRINT_OBJ_SIZE -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" all

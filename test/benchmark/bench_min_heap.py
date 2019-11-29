@@ -6,10 +6,9 @@ import os
 import os.path
 import datetime
 
-DEF_MIN_SIZE = 1024 * 32
-DEF_MAX_SIZE = 1024 * 64
+DEF_MIN_SIZE = 1024 * 20
 min_size = DEF_MIN_SIZE
-max_size = DEF_MAX_SIZE
+max_size = min_size * 128
 
 # output format
 # size %d
@@ -33,8 +32,6 @@ refcnt_m32_bin = "refcount/mrubyc-bench-m32"
 
 def benchmark(test_name, test_path, binary_name, binary_path):
   # result file and output file open
-  file_header = test_name + " " + binary_name + " min size " + str(min_size)
-  print(file_header)
   heap_size = min_size
   while heap_size <= max_size:
     stdout = subprocess.run([binary_path, "-m", str(heap_size) , test_path], stdout=subprocess.PIPE).stdout.decode('UTF-8')
@@ -44,13 +41,14 @@ def benchmark(test_name, test_path, binary_name, binary_path):
     if size_matches and time_matches:
       size_result = size_matches.groups()[0]
       time_result = time_matches.groups()[0]
-      print("success size " + str(heap_size))
+      text = binary_name + " min size " + str(heap_size)
+      print(text)
       return
   # increment size
     prev_size = heap_size
-    heap_size = int(heap_size * 1.1)
-    heap_size = heap_size + (128 - heap_size % 128)
-  print("failed max size " + str(prev_size))
+    heap_size = int(heap_size * 1.05)
+    heap_size = heap_size + (32 - heap_size % 32)
+  print(binary_name + " failed max size " + str(prev_size))
 
 # main
 if len(sys.argv) == 0:
@@ -80,9 +78,10 @@ if benchmark_path == None:
   sys.exit("Invalit input")
 
 test_name = benchmark_path[0:-4]
+print("== " + test_name + " ==")
 benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
 benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
-benchmark(test_name, benchmark_path, marksweep_m32, marksweep_bin_m32)
-benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_bin_m32  )
-benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_bin_m32   )
+benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
+benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
+benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_m32_bin   )

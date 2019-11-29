@@ -35,6 +35,9 @@
 #include "c_string.h"
 #include "c_range.h"
 
+#ifdef PRINT_OBJ_SIZE
+#include <stdio.h>
+#endif /* PRINT_OBJ_SIZE */
 
 
 //================================================================

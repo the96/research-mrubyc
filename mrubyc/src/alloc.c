@@ -152,6 +152,7 @@ void init_mark_bitmap()
 
 static inline void mark_on_bitmap(USED_BLOCK *ptr)
 {
+  if ( (((uint8_t *) ptr - memory_pool) & 3) != 0 ) printf("abort!\n");
   assert ( (uint8_t *) ptr + ptr->size <= memory_pool + memory_pool_size && (uint8_t *) ptr >= memory_pool );
   int offset = GET_OFFSET(ptr);
   mark_bitmap[TOP_INDEX(offset)] |= 1 << BOTTOM_INDEX(offset);
@@ -159,6 +160,7 @@ static inline void mark_on_bitmap(USED_BLOCK *ptr)
 
 static inline int isMarked_from_bitmap(USED_BLOCK *ptr)
 {
+  if ( (((uint8_t *) ptr - memory_pool) & 3) != 0 ) printf("abort!\n");
   assert ( (uint8_t *) ptr + ptr->size <= memory_pool + memory_pool_size && (uint8_t *) ptr >= memory_pool );
   int offset = GET_OFFSET(ptr);
   return MARKED & mark_bitmap[TOP_INDEX(offset)] >> BOTTOM_INDEX(offset);
@@ -676,16 +678,20 @@ void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_typ
     printf("Triggered GC count %d\n", gc_count);
 #ifdef HEAP_DUMP
     printf("allocation size: %d\n", size);
-    heap_dump();
 #endif /* HEAP_DUMP */
 #endif /* GC_DEBUG */
     mrbc_mark_sweep();
+
 #ifdef EARLY_GC
     total_alloc_last_gc = total_alloc;
 #endif /* EARLY_GC */
     ptr = mrbc_raw_alloc(size);
     if (ptr == NULL) {
+#ifdef GC_DEBUG
+      heap_dump();
+#else
       print_heap_summary();
+#endif
       printf("allocation size: %d gc_count %d\n", size, gc_count);
       console_printf("Fatal error: Out of memory.\n");
       exit(1);	// ENOMEM
@@ -724,7 +730,7 @@ void * mrbc_realloc(void *ptr, unsigned int size)
 #ifdef GC_DEBUG
     printf("Triggered GC count %d\n", gc_count);
 #ifdef HEAP_DUMP
-    heap_dump();
+    printf("allocation size: %d\n", size);
 #endif /* HEAP_DUMP */
 #endif /* GC_DEBUG */
     mrbc_mark_sweep();
@@ -990,7 +996,16 @@ void mark_from_stack();
 void mrbc_mark_sweep()
 {
   mrbc_mark();
+#ifdef HEAP_DUMP
+  heap_dump();
+#endif /* HEAP_DUMP */
   mrbc_sweep();
+#ifdef HEAP_DUMP
+  heap_dump();
+#endif /* HEAP_DUMP */
+#ifdef GC_MS
+  reverse_mark_flag();
+#endif /* GC_MS */
 }
 
 void mrbc_mark()
@@ -1156,29 +1171,22 @@ void mark_from_stack() {
 void mrbc_sweep()
 {
   USED_BLOCK *block = (USED_BLOCK *) memory_pool;
-  while (block->f == FLAG_FREE_BLOCK || block->bt < BT_INSTANCE || block->bt > BT_KV_HANDLE || is_marked(block)) {
-    if ((uint8_t *)block >= memory_pool + memory_pool_size)
-      return;
-    block = (USED_BLOCK *) PHYS_NEXT(block);
-  }
   USED_BLOCK *next = (USED_BLOCK *)PHYS_NEXT(block);
-  if ((uint8_t *)next >= memory_pool + memory_pool_size) {
-    next = NULL;
-  }
   while (1) {
-    while (next->f == FLAG_FREE_BLOCK || next->bt < BT_INSTANCE || next->bt > BT_KV_HANDLE || is_marked(next)) {
-      if ((uint8_t *)next >= memory_pool + memory_pool_size)
-        return;
+    while ((uint8_t *) next < memory_pool + memory_pool_size && next->f == FLAG_FREE_BLOCK) {
       next = (USED_BLOCK *) PHYS_NEXT(next);
     }
-    mrbc_raw_free((uint8_t *)block + sizeof(USED_BLOCK));
-    if (next == NULL) return;
+    if (block->f != FLAG_FREE_BLOCK  && block->bt >= BT_INSTANCE && block->bt <= BT_KV_HANDLE && !is_marked(block)) {
+      mrbc_raw_free((uint8_t *)block + sizeof(USED_BLOCK));
+    }
+    if ((uint8_t *) next >= memory_pool + memory_pool_size) break;
     block = next;
     next = (USED_BLOCK *) PHYS_NEXT(block);
   }
 #ifdef GC_BM
   reset_bitmap();
 #endif /*GC_BM */
+  ;
 }
 
 #endif /* GC_MS_OR_BM */
@@ -1224,7 +1232,7 @@ void heap_dump()
   FREE_BLOCK *block = (FREE_BLOCK *) memory_pool;
   FREE_BLOCK *heap_end = (FREE_BLOCK *) (memory_pool + memory_pool_size);
   int block_count, free_count, used_count;
-  uint32_t used_size, free_size;
+  uint32_t used_size, free_size, max_free_size;
   block_count = free_count =  used_count = 0;
   used_size = free_size = 0;
   while (1) {
@@ -1233,6 +1241,7 @@ void heap_dump()
       printf("[%4d]FREE_BLOCK(%4d) size: %8d(0x%6x) offset: %8d(0x%6x) (%p)\n", 
              block_count++, free_count++, block->size, block->size, block->prev_offset, block->prev_offset, block);
       free_size += block->size;
+      if (max_free_size < block->size) max_free_size = block->size;
     } else {
       printf("[%4d]USED_BLOCK(%4d) size: %8d(0x%6x) offset: %8d(0x%6x) (%p) type: %s mark: %d vm_id: %d\n", 
              block_count++, used_count++, block->size, block->size, block->prev_offset, block->prev_offset, block, block_type_to_name(block->bt), is_marked((USED_BLOCK *)block), block->vm_id);
@@ -1241,8 +1250,9 @@ void heap_dump()
     block = (FREE_BLOCK *) PHYS_NEXT(block);
   }
   printf("==[heap summary]=====\n");
-  printf("FREE_BLOCK: %d bytes (%d) " , free_size, free_count);
-  printf("USED_BLOCK: %d bytes (%d) " , used_size, used_count);
+  printf("MAX_FREE_SIZE: %d bytes\n", max_free_size);
+  printf("FREE_BLOCK: %d bytes (%d)\n" , free_size, free_count);
+  printf("USED_BLOCK: %d bytes (%d)\n" , used_size, used_count);
   printf("HEAP_SIZE : %d\n", memory_pool_size);
   printf("======================\n");
 }

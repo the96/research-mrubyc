@@ -120,6 +120,7 @@ void mrbc_sweep();
 void print_heap_summary();
 #endif
 
+
 #if defined(GC_MS_DEBUG) || defined (GC_BM_DEBUG)
 void heap_dump();
 #endif /* GC_MS_DEBUG or GC_BM_DEBUG */

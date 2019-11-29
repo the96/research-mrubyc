@@ -1,0 +1,14 @@
+testable/bm_app_fib.mrb
+testable/bm_app_fib_big.mrb
+testable/bm_app_tak.mrb
+testable/bm_app_tarai.mrb
+testable/bm_fannkuch.mrb
+testable/bm_fractal.mrb
+testable/bm_mergesort_hongli.mrb
+testable/bm_partial_sums.mrb
+testable/bm_so_lists_small.mrb
+testable/bm_so_matrix.mrb
+testable/bm_so_object.mrb
+testable/bm_spectral_norm.mrb
+testable/string_concat.mrb
+testable/bm_app_pentomino.mrb
