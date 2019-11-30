@@ -18,6 +18,8 @@ TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
 
 marksweep = "marksweep"
 earlygc = "marksweep-early"
+bitmap = "bitmap-marking"
+bitmap_earlygc = "bitmap-marking-early"
 marksweep_m32 = "marksweep-m32"
 earlygc_m32 = "marksweep-early-m32"
 refcnt = "refcount"
@@ -25,6 +27,8 @@ refcnt_m32 = "refcnt-m32"
 
 marksweep_bin = "marksweep/mrubyc-bench"
 earlygc_bin = "marksweep/mrubyc-bench-earlygc"
+bitmap_bin = "bitmap-marking/mrubyc-bench"
+bitmap_earlygc_bin = "bitmap-marking/mrubyc-bench-earlygc"
 marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
 earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
 refcnt_bin = "refcount/mrubyc-bench"
@@ -81,6 +85,8 @@ test_name = benchmark_path[0:-4]
 print("== " + test_name + " ==")
 benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
 benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
+benchmark(test_name, benchmark_path, bitmap,    bitmap_bin  )
+benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
 benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
 benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
