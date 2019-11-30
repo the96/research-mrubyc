@@ -84,10 +84,10 @@ if benchmark_path == None:
 test_name = benchmark_path[0:-4]
 print("== " + test_name + " ==")
 benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
-benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
 benchmark(test_name, benchmark_path, bitmap,    bitmap_bin  )
-benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
+#benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
+#benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
 benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
 benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
 benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_m32_bin   )

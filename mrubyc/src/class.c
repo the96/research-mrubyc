@@ -1243,6 +1243,19 @@ void mrbc_init_class(void)
   mrbc_run_mrblib();
 
 #ifdef PRINT_OBJ_SIZE
+#ifdef __code_model_32__
+  printf("sizeof(mrbc_obejct) = %d\n", sizeof(mrbc_object));
+  printf("sizeof(mrbc_class) = %d\n", sizeof(mrbc_class));
+  printf("sizeof(mrbc_proc) = %d\n", sizeof(mrbc_proc));
+  printf("sizeof(mrbc_instance) = %d\n", sizeof(mrbc_instance));
+  printf("sizeof(mrbc_array) = %d\n", sizeof(mrbc_array));
+  printf("sizeof(mrbc_hash) = %d\n", sizeof(mrbc_hash));
+  printf("sizeof(mrbc_range) = %d\n", sizeof(mrbc_range));
+  printf("sizeof(mrbc_string) = %d\n", sizeof(mrbc_string));
+  printf("sizeof(mrbc_vm) = %d\n", sizeof(mrbc_vm));
+  printf("sizeof(USED_BLOCK) = %d\n", sizeof(USED_BLOCK));
+  printf("sizeof(FREE_BLOCK) = %d\n", sizeof(FREE_BLOCK));
+#else
   printf("sizeof(mrbc_obejct) = %ld\n", sizeof(mrbc_object));
   printf("sizeof(mrbc_class) = %ld\n", sizeof(mrbc_class));
   printf("sizeof(mrbc_proc) = %ld\n", sizeof(mrbc_proc));
@@ -1252,5 +1265,8 @@ void mrbc_init_class(void)
   printf("sizeof(mrbc_range) = %ld\n", sizeof(mrbc_range));
   printf("sizeof(mrbc_string) = %ld\n", sizeof(mrbc_string));
   printf("sizeof(mrbc_vm) = %ld\n", sizeof(mrbc_vm));
+  printf("sizeof(USED_BLOCK) = %ld\n", sizeof(USED_BLOCK));
+  printf("sizeof(FREE_BLOCK) = %ld\n", sizeof(FREE_BLOCK));
+#endif /* 32bit or 64bit */
 #endif /* PRINT_OBJ_SIZE */
 }
