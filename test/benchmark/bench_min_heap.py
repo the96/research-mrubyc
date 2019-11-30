@@ -46,8 +46,8 @@ def benchmark(test_name, test_path, binary_name, binary_path):
       return
   # increment size
     prev_size = heap_size
-    heap_size = int(heap_size * 1.05)
-    heap_size = heap_size + (32 - heap_size % 32)
+    heap_size = int(heap_size * 1.00025)
+    heap_size += int(64 - heap_size % 64)
   print(binary_name + " failed max size " + str(prev_size))
 
 # main
