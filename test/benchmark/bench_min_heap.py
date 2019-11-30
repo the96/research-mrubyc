@@ -6,9 +6,9 @@ import os
 import os.path
 import datetime
 
-DEF_MIN_SIZE = 1024 * 20
+DEF_MIN_SIZE = 1024 * 30
 min_size = DEF_MIN_SIZE
-max_size = min_size * 128
+max_size = min_size * 1024 * 256
 
 # output format
 # size %d
@@ -22,6 +22,7 @@ bitmap = "bitmap-marking"
 bitmap_earlygc = "bitmap-marking-early"
 marksweep_m32 = "marksweep-m32"
 earlygc_m32 = "marksweep-early-m32"
+bitmap_earlygc_m32 = "bitmap-marking-early-m32"
 refcnt = "refcount"
 refcnt_m32 = "refcnt-m32"
 
@@ -31,12 +32,13 @@ bitmap_bin = "bitmap-marking/mrubyc-bench"
 bitmap_earlygc_bin = "bitmap-marking/mrubyc-bench-earlygc"
 marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
 earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
+bitmap_earlygc_m32_bin = "bitmap-marking/mrubyc-bench-earlygc-m32"
 refcnt_bin = "refcount/mrubyc-bench"
 refcnt_m32_bin = "refcount/mrubyc-bench-m32"
 
 def benchmark(test_name, test_path, binary_name, binary_path):
   # result file and output file open
-  heap_size = min_size
+  heap_size = min_size + (4 - min_size % 4)
   while heap_size <= max_size:
     stdout = subprocess.run([binary_path, "-m", str(heap_size) , test_path], stdout=subprocess.PIPE).stdout.decode('UTF-8')
 
@@ -50,8 +52,7 @@ def benchmark(test_name, test_path, binary_name, binary_path):
       return
   # increment size
     prev_size = heap_size
-    heap_size = int(heap_size * 1.00025)
-    heap_size += int(64 - heap_size % 64)
+    heap_size += 4
   print(binary_name + " failed max size " + str(prev_size))
 
 # main
@@ -84,10 +85,12 @@ if benchmark_path == None:
 test_name = benchmark_path[0:-4]
 print("== " + test_name + " ==")
 benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
-benchmark(test_name, benchmark_path, bitmap,    bitmap_bin  )
+# benchmark(test_name, benchmark_path, bitmap,    bitmap_bin  )
+benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
+# benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
-#benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
-#benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
+min_size -= 10000
 benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
 benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
+# benchmark(test_name, benchmark_path, bitmap_earlygc_m32,   bitmap_earlygc_m32_bin  )
 benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_m32_bin   )

@@ -1906,10 +1906,11 @@ mrbc_vm *mrbc_vm_open( struct VM *vm_arg )
 
   // initialize attributes.
   memset(vm, 0, sizeof(mrbc_vm));	// caution: assume NULL is zero.
+  vm->current_regs = vm->regs;
   if( vm_arg == NULL ) vm->flag_need_memfree = 1;
   vm->vm_id = vm_id;
 #ifdef GC_MS_OR_BM
-    add_vm_set(vm);
+  add_vm_set(vm);
 #endif /* GC_MS_OR_BM */
 
   return vm;
@@ -1955,6 +1956,7 @@ void mrbc_vm_close( struct VM *vm )
 */
 void mrbc_vm_begin( struct VM *vm )
 {
+  printf("begin\n");
   vm->pc_irep = vm->irep;
   vm->pc = 0;
   vm->current_regs = vm->regs;

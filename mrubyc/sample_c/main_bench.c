@@ -65,7 +65,11 @@ void mrubyc(uint8_t *mrbbuf, uint8_t *memory_pool, size_t memory_pool_size)
   mrbc_vm_run(vm);
   clock_gettime(CLOCK_MONOTONIC_RAW, &vm_end);
   double vm_time = (double)(vm_end.tv_sec - vm_start.tv_sec) + (double)(vm_end.tv_nsec - vm_start.tv_nsec) * 1.0E-9;
+#ifdef __code_model_32__
+  printf("size %d\n", memory_pool_size);
+#else
   printf("size %ld\n", memory_pool_size);
+#endif /* __code_mode_32__ */
   printf("vm time %.9lf\n", vm_time);
   mrbc_vm_end(vm);
   mrbc_vm_close(vm);

@@ -145,7 +145,7 @@ uint8_t *mark_bitmap;
 #define GET_OFFSET(ptr)       (((uint8_t *) ptr - memory_pool) >> 2)
 #define TOP_INDEX(offset)     (offset >> 3)
 #define BOTTOM_INDEX(offset)  (offset & 7)
-#define RESET_MARK_BITMAP()   (memset(mark_bitmap, 0, mark_bitmap_size))
+#define reset_bitmap() (memset(mark_bitmap, UNMARK, mark_bitmap_size))
 #define MARKED 1
 #define UNMARK 0
 #define OUT_OF_BITMAP 2
@@ -158,9 +158,9 @@ void init_mark_bitmap()
   // round            : 1
   mark_bitmap_size = ((memory_pool_size >> 5 ) + 1) * sizeof(uint8_t);
   mark_bitmap = malloc(mark_bitmap_size);
+  reset_bitmap();
 }
 
-#define reset_bitmap() (memset(mark_bitmap, UNMARK, mark_bitmap_size))
 
 static inline void mark_on_bitmap(USED_BLOCK *ptr)
 {
@@ -1051,8 +1051,10 @@ void mrbc_mark()
 
 void push_vm(struct VM *vm) {
   int i;
-  for (i = 0; vm->regs + i < vm->current_regs + vm->pc_irep->nregs && i < MAX_REGS_SIZE; i++) {
-    push_mrbc_value_for_mark_stack(vm->regs + i);
+  if (vm->pc_irep != NULL) {
+    for (i = 0; vm->regs + i < vm->current_regs + vm->pc_irep->nregs && i < MAX_REGS_SIZE; i++) {
+      push_mrbc_value_for_mark_stack(vm->regs + i);
+    }
   }
 
   if (vm->target_class != NULL) {
