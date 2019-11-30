@@ -137,7 +137,7 @@ void mrbc_dup(mrbc_value *v)
     break;
   }
 }
-
+#endif /* GC_RC */
 
 //================================================================
 /*!@brief
@@ -147,11 +147,14 @@ void mrbc_dup(mrbc_value *v)
 */
 void mrbc_release(mrbc_value *v)
 {
+#ifdef GC_RC
   mrbc_dec_ref_counter(v);
+#endif /* GC_RC */
   v->tt = MRBC_TT_EMPTY;
 }
 
 
+#ifdef GC_RC
 //================================================================
 /*!@brief
   Decrement reference counter

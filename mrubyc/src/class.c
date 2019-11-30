@@ -428,8 +428,8 @@ mrbc_value mrbc_send( struct VM *vm, mrbc_value *v, int reg_ofs,
 
   // create call stack.
   mrbc_value *regs = v + reg_ofs + 2;
-#ifdef GC_RC
   mrbc_release( &regs[0] );
+#ifdef GC_RC
   mrbc_dup(recv);
 #endif /* GC_RC */
   regs[0] = *recv;
@@ -438,14 +438,10 @@ mrbc_value mrbc_send( struct VM *vm, mrbc_value *v, int reg_ofs,
   va_start(ap, argc);
   int i;
   for( i = 1; i <= argc; i++ ) {
-#ifdef GC_RC
     mrbc_release( &regs[i] );
-#endif /* GC_RC */
     regs[i] = *va_arg(ap, mrbc_value *);
   }
-#ifdef GC_RC
   mrbc_release( &regs[i] );
-#endif /* GC_RC */
   regs[i] = mrbc_nil_value();
   va_end(ap);
 
@@ -794,8 +790,8 @@ static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
     NULL,  // reps
   };
 
-#ifdef GC_RC
   mrbc_release(&v[0]);
+#ifdef GC_RC
   mrbc_dup(&new_obj);
 #endif /* GC_RC */
   v[0] = new_obj;

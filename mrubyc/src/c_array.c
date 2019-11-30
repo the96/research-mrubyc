@@ -678,8 +678,8 @@ static void c_array_add(struct VM *vm, mrbc_value v[], int argc)
     mrbc_dup(p1++);
   }
 
-  mrbc_release(v+1);
 #endif /* GC_RC */
+  mrbc_release(v+1);
   SET_RETURN(value);
 }
 
@@ -703,9 +703,7 @@ static void c_array_sub(struct VM *vm, mrbc_value v[], int argc)
     mrbc_array_delete_value(&array, value->data + i);
   }
 
-#ifdef GC_RC
   mrbc_release(v+1);
-#endif /* GC_RC */
   SET_RETURN(array);
 }
 
@@ -742,8 +740,8 @@ static void c_array_mul(struct VM *vm, mrbc_value v[], int argc)
   while( p1 < p2 ) {
     mrbc_dup(p1++);
   }
-  mrbc_release(v+1);
 #endif /* GC_RC */
+  mrbc_release(v+1);
   SET_RETURN(value);
 }
 
@@ -863,9 +861,7 @@ static void c_array_include(struct VM *vm, mrbc_value v[], int argc)
     if( mrbc_compare(&data[i], value) == 0 ) break;
   }
 
-#ifdef GC_RC
   mrbc_release(v+1);
-#endif /* GC_RC */
   if( i < n ) {
     SET_BOOL_RETURN(1);
   } else {
@@ -913,9 +909,7 @@ static void c_array_delete(struct VM *vm, mrbc_value v[], int argc)
     }
     idx++;
   }
-#ifdef GC_RC
   mrbc_release(v+1);
-#endif /* GC_RC */
   if (i == idx) {
     // v[0].tt = MRBC_TT_NIL;
     SET_NIL_RETURN();
@@ -1181,9 +1175,7 @@ static void c_array_replace(struct VM *vm, mrbc_value v[], int argc)
   v->array->data_size = src.array->data_size;
   v->array->n_stored = src.array->n_stored;
   mrbc_raw_free(src.array);
-#ifdef GC_RC
   mrbc_release(v+1);
-#endif /* GC_RC */
 }
 
 

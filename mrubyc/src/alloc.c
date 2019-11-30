@@ -35,6 +35,7 @@
 
 #ifdef GC_DEBUG
 #include <stdio.h>
+#include "symbol.h"
 #endif /* GC_DEBUG */
 
 #if defined(EARLY_GC) || defined (GC_PROF)
@@ -115,8 +116,19 @@ static FREE_BLOCK *free_blocks[SIZE_FREE_BLOCKS + 1];
 static uint32_t free_fli_bitmap;
 static uint16_t free_sli_bitmap[MRBC_ALLOC_FLI_BIT_WIDTH + 2]; // + sentinel
 
-#ifdef GC_MS_OR_BM
+#ifdef GC_MS
 uint8_t marked_flag;
+static inline uint8_t get_unmarked_flag()
+{
+  return !marked_flag & 1;
+}
+void reverse_mark_flag()
+{
+  marked_flag = get_unmarked_flag();
+}
+#endif /* GC_MS */
+
+#ifdef GC_MS_OR_BM
 mrbc_instance **mark_stack;
 mrbc_instance **root_stack;
 int mark_stack_top;
@@ -501,6 +513,9 @@ void * mrbc_raw_alloc(unsigned int size)
           target->size - sizeof(USED_BLOCK) );
 #endif
   target->vm_id = 0;
+#ifdef GC_MS
+  target->m = get_unmarked_flag();
+#endif /* GC_MS */
 
   return (uint8_t *)target + sizeof(USED_BLOCK);
 }
@@ -895,7 +910,9 @@ void ready_marksweep_static()
   root_stack_top = 0;
   vms = (struct VM **) malloc(sizeof(struct VM *) * MAX_VM_COUNT);
   vm_count = 0;
+#ifdef GC_MS
   marked_flag = 1;
+#endif /* GC_MS */
 #ifdef GC_COUNT
   gc_count = 0;
 #endif /* GC_COUNT */
@@ -988,13 +1005,6 @@ void remove_vm_set(struct VM *vm)
   console_print("Error: VM is not found from vms.\n");
 }
 
-#ifdef GC_MS
-void reverse_mark_flag()
-{
-  marked_flag = !marked_flag & 1;
-}
-#endif /* GC_MS */
-
 void push_vm();
 void mark_from_stack();
 
@@ -1041,10 +1051,9 @@ void mrbc_mark()
 
 void push_vm(struct VM *vm) {
   int i;
-  if (vm->pc_irep != NULL)
-    for (i = 0; vm->regs + i < vm->current_regs + vm->pc_irep->nregs && i < MAX_REGS_SIZE; i++) {
-      push_mrbc_value_for_mark_stack(vm->regs + i);
-    }
+  for (i = 0; vm->regs + i < vm->current_regs + vm->pc_irep->nregs && i < MAX_REGS_SIZE; i++) {
+    push_mrbc_value_for_mark_stack(vm->regs + i);
+  }
 
   if (vm->target_class != NULL) {
     push_mark_stack((mrbc_instance *)vm->target_class);

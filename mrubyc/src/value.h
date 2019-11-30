@@ -176,9 +176,9 @@ typedef struct RObject mrbc_value;
 #define mrbc_bool_value(n)	((mrbc_value){.tt = (n)?MRBC_TT_TRUE:MRBC_TT_FALSE})
 
 int mrbc_compare(const mrbc_value *v1, const mrbc_value *v2);
+void mrbc_release(mrbc_value *v);
 #ifdef GC_RC
 void mrbc_dup(mrbc_value *v);
-void mrbc_release(mrbc_value *v);
 void mrbc_dec_ref_counter(mrbc_value *v);
 #endif /* GC_RC */
 void mrbc_clear_vm_id(mrbc_value *v);

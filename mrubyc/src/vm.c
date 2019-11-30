@@ -226,8 +226,8 @@ static inline int op_move( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   int ra = GETARG_A(code);
   int rb = GETARG_B(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
+#ifdef GC_RC
   mrbc_dup(&regs[rb]);
 #endif /* GC_RC */
   regs[ra] = regs[rb];
@@ -252,9 +252,7 @@ static inline int op_loadl( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   int ra = GETARG_A(code);
   int rb = GETARG_Bx(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
 
   // regs[ra] = vm->pc_irep->pools[rb];
 
@@ -280,9 +278,7 @@ static inline int op_loadi( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_FIXNUM;
   regs[ra].i = GETARG_sBx(code);
 
@@ -308,9 +304,7 @@ static inline int op_loadsym( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   const char *sym_name = mrbc_get_irep_symbol(vm->pc_irep->ptr_to_sym, rb);
   mrbc_sym sym_id = str_to_symid(sym_name);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_SYMBOL;
   regs[ra].i = sym_id;
 
@@ -333,9 +327,7 @@ static inline int op_loadnil( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_NIL;
 
   return 0;
@@ -357,8 +349,8 @@ static inline int op_loadself( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
+#ifdef GC_RC
   mrbc_dup(&regs[0]);
 #endif /* GC_RC */
   regs[ra] = regs[0];
@@ -382,9 +374,7 @@ static inline int op_loadt( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_TRUE;
 
   return 0;
@@ -406,9 +396,7 @@ static inline int op_loadf( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_FALSE;
 
   return 0;
@@ -433,9 +421,7 @@ static inline int op_getglobal( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   const char *sym_name = mrbc_get_irep_symbol(vm->pc_irep->ptr_to_sym, rb);
   mrbc_sym sym_id = str_to_symid(sym_name);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   mrbc_value *v = mrbc_get_global(sym_id);
   if( v == NULL ) {
     regs[ra] = mrbc_nil_value();
@@ -497,9 +483,7 @@ static inline int op_getiv( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   mrbc_value val = mrbc_instance_getiv(&regs[0], sym_id);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = val;
 
   return 0;
@@ -549,9 +533,7 @@ static inline int op_getconst( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   const char *sym_name = mrbc_get_irep_symbol(vm->pc_irep->ptr_to_sym, rb);
   mrbc_sym sym_id = str_to_symid(sym_name);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   mrbc_value *v = mrbc_get_const(sym_id);
   if( v == NULL ) {		// raise?
     console_printf( "NameError: uninitialized constant %s\n",
@@ -622,8 +604,8 @@ static inline int op_getupvar( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   mrbc_value *up_regs = callinfo->current_regs;
 
-#ifdef GC_RC
   mrbc_release( &regs[ra] );
+#ifdef GC_RC
   mrbc_dup( &up_regs[rb] );
 #endif /* GC_RC */
   regs[ra] = up_regs[rb];
@@ -660,8 +642,8 @@ static inline int op_setupvar( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   mrbc_value *up_regs = callinfo->current_regs;
 
-#ifdef GC_RC
   mrbc_release( &up_regs[rb] );
+#ifdef GC_RC
   mrbc_dup( &regs[ra] );
 #endif /* GC_RC */
   up_regs[rb] = regs[ra];
@@ -753,9 +735,7 @@ static inline int op_send( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   switch( GET_OPCODE(code) ) {
   case OP_SEND:
     // set nil
-#ifdef GC_RC
     mrbc_release( &regs[bidx] );
-#endif /* GC_RC */
     regs[bidx].tt = MRBC_TT_NIL;
     break;
 
@@ -793,9 +773,7 @@ static inline int op_send( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
     int release_reg = ra+1;
     while( release_reg <= bidx ) {
-#ifdef GC_RC
       mrbc_release(&regs[release_reg]);
-#endif /* GC_RC */
       release_reg++;
     }
     return 0;
@@ -858,8 +836,8 @@ inline static int op_super( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   int rc = GETARG_C(code);  // number of params
 
   // copy self, same as LOADSELF
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
+#ifdef GC_RC
   mrbc_dup(&regs[0]);
 #endif /* GC_RC */
   regs[ra] = regs[0];
@@ -899,9 +877,7 @@ inline static int op_super( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
     int release_reg = ra+1;
     while( release_reg <= ra+rc+1 ) {
-#ifdef GC_RC
       mrbc_release(&regs[release_reg]);
-#endif /* GC_RC */
       release_reg++;
     }
     return 0;
@@ -988,16 +964,12 @@ static inline int op_return( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   if( ci && ci->current_regs[1].tt == MRBC_TT_PROC ){
     regs0 = regs - 2;
   }
-#ifdef GC_RC
   mrbc_release(regs0);
-#endif /* GC_RC */
   *regs0 = regs[ra];
   regs[ra].tt = MRBC_TT_EMPTY;
 
-#ifdef GC_RC
   // nregs to release
   int nregs = vm->pc_irep->nregs;
-#endif /* GC_RC */
 
   // restore irep,pc,regs
   mrbc_callinfo *callinfo = vm->callinfo_tail;
@@ -1008,12 +980,10 @@ static inline int op_return( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   vm->target_class = callinfo->target_class;
 
   // clear stacked arguments
-#ifdef GC_RC
   int i;
   for( i = 1; i < nregs; i++ ) {
     mrbc_release( &regs[i] );
   }
-#endif /* GC_RC */
 
   // release callinfo
   mrbc_free(vm, callinfo);
@@ -1043,8 +1013,8 @@ static inline int op_blkpush( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
     return -1;  // EYIELD
   }
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
+#ifdef GC_RC
   mrbc_dup( stack );
 #endif /* GC_RC */
   regs[ra] = stack[0];
@@ -1172,9 +1142,7 @@ static inline int op_sub( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 }
 
@@ -1252,9 +1220,7 @@ static inline int op_mul( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 }
 
@@ -1300,9 +1266,7 @@ static inline int op_div( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 }
 
@@ -1323,10 +1287,8 @@ static inline int op_eq( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   int ra = GETARG_A(code);
   int result = mrbc_compare(&regs[ra], &regs[ra+1]);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = result ? MRBC_TT_FALSE : MRBC_TT_TRUE;
 
   return 0;
@@ -1374,9 +1336,7 @@ static inline int op_lt( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 
 DONE:
@@ -1426,9 +1386,7 @@ static inline int op_le( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 
 DONE:
@@ -1478,9 +1436,7 @@ static inline int op_gt( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 
 DONE:
@@ -1530,9 +1486,7 @@ static inline int op_ge( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 
   // other case
   op_send(vm, code, regs);
-#ifdef GC_RC
   mrbc_release(&regs[ra+1]);
-#endif /* GC_RC */
   return 0;
 
 DONE:
@@ -1565,9 +1519,7 @@ static inline int op_array( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   memset( &regs[rb], 0, sizeof(mrbc_value) * rc );
   value.array->n_stored = rc;
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = value;
 
   return 0;
@@ -1597,9 +1549,7 @@ static inline int op_string( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   mrbc_value value = mrbc_string_new(vm, pool_obj->str, len);
   if( value.string == NULL ) return -1;		// ENOMEM
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = value;
 
 #else
@@ -1634,9 +1584,7 @@ static inline int op_strcat( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   }
 
   mrbc_value v = mrbc_string_add(vm, &regs[ra], &regs[rb]);
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = v;
 
 #else
@@ -1671,9 +1619,7 @@ static inline int op_hash( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   memset( &regs[rb], 0, sizeof(mrbc_value) * rc );
   value.hash->n_stored = rc;
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = value;
 
   return 0;
@@ -1701,9 +1647,7 @@ static inline int op_lambda( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   proc->c_func = 0;
   proc->irep = vm->pc_irep->reps[rb];
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_PROC;
   regs[ra].proc = proc;
 
@@ -1736,9 +1680,7 @@ static inline int op_range( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
   mrbc_value value = mrbc_range_new(vm, &regs[rb], &regs[rb+1], rc);
   if( value.range == NULL ) return -1;		// ENOMEM
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra] = value;
 
   return 0;
@@ -1849,13 +1791,11 @@ static inline int op_method( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
     if( p ) {
       // found it.
       *((mrbc_proc**)pp) = p->next;
-#ifdef GC_RC
       if( !p->c_func ) {
         mrbc_value v = {.tt = MRBC_TT_PROC};
         v.proc = p;
         mrbc_release(&v);
       }
-#endif /* GC_RC */
     }
 
     // add proc to class
@@ -1890,9 +1830,7 @@ static inline int op_tclass( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
   int ra = GETARG_A(code);
 
-#ifdef GC_RC
   mrbc_release(&regs[ra]);
-#endif /* GC_RC */
   regs[ra].tt = MRBC_TT_CLASS;
   regs[ra].cls = vm->target_class;
 
@@ -1914,14 +1852,12 @@ static inline int op_tclass( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 */
 static inline int op_stop( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
 {
-#ifdef GC_RC
   if( GET_OPCODE(code) == OP_STOP ) {
     int i;
     for( i = 0; i < MAX_REGS_SIZE; i++ ) {
       mrbc_release(&vm->regs[i]);
     }
   }
-#endif /* GC_RC */
 
   vm->flag_preemption = 1;
 
