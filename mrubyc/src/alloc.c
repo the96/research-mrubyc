@@ -1063,29 +1063,45 @@ void push_vm(struct VM *vm) {
   }
 }
 
+#ifndef CHECK_MARK
 #ifdef GC_MS
 static inline void mark(USED_BLOCK *block) {
   block->m = marked_flag;
 }
-#endif
+#endif /* GC_MS */
+
 #ifdef GC_BM
 static inline void mark(USED_BLOCK *block) {
 // TODO
   mark_on_bitmap(block);
 }
-#endif
+#endif /* GC_BM */
 
 #ifdef GC_MS
 static inline int is_marked(USED_BLOCK *block) {
   return block->m == marked_flag;
 }
-#endif
+#endif /* GC_MS */
+
 #ifdef GC_BM
 static inline int is_marked(USED_BLOCK *block) {
 // TODO
   return isMarked_from_bitmap(block);
 }
-#endif
+#endif /* GC_BM */
+#endif /* CHECK_MARK */
+
+#ifdef CHECK_MARK
+static inline void mark(USED_BLOCK *block) {
+  block->m = marked_flag;
+  mark_on_bitmap(block);
+}
+
+static inline int is_marked(USED_BLOCK *block) {
+  assert((block->m == marked_flag) == isMarked_from_bitmap(block));
+  return isMarked_from_bitmap(block);
+}
+#endif /* CHECK_MARK */
 
 void mark_from_stack() {
 
@@ -1191,7 +1207,6 @@ void mrbc_sweep()
 #ifdef GC_BM
   reset_bitmap();
 #endif /*GC_BM */
-  ;
 }
 
 #endif /* GC_MS_OR_BM */

@@ -72,11 +72,13 @@
 #if (GC_MODE == BITMAP_MARKING_DEBUG)
 #define GC_BM
 #define GC_RC
+#define GC_MS
 #define GC_COUNT
 #define RC_OPERATION_ONLY
 #define GC_MS_OR_BM
 #define GC_BM_DEBUG
 #define GC_DEBUG
+#define CHECK_MARK
 #endif
 
 #ifdef GC_MS_OR_BM
