@@ -770,6 +770,9 @@ static void c_object_class(struct VM *vm, mrbc_value v[], int argc)
 static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
 {
   mrbc_value new_obj = mrbc_instance_new(vm, v->cls, 0);
+#ifdef GC_MS_OR_BM
+  push_root_stack(new_obj.instance);
+#endif /* GC_MS_OR_BM */
 
   char syms[]="______initialize";
   uint32_to_bin( 1,(uint8_t*)&syms[0]);
@@ -810,7 +813,9 @@ static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
   vm->pc = org_pc;
   vm->pc_irep = org_pc_irep;
   vm->current_regs = org_regs;
-
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN(new_obj);
 }
 

@@ -681,6 +681,9 @@ void * mrbc_alloc(const struct VM *vm, unsigned int size, unsigned int block_typ
 #endif /* HEAP_DUMP */
 #endif /* GC_DEBUG */
     mrbc_mark_sweep();
+#ifdef GC_DEBUG
+    printf("GC end\n");
+#endif /* GC_DEBUG */
 
 #ifdef EARLY_GC
     total_alloc_last_gc = total_alloc;
@@ -936,11 +939,13 @@ mrbc_instance * pop_root_stack()
   }
 }
 
-void push_mrbc_value_for_root_stack(mrbc_value *obj)
+int push_mrbc_value_for_root_stack(mrbc_value *obj)
 {
   if ((obj->tt >= MRBC_TT_OBJECT && obj->tt <= MRBC_TT_HASH) || obj->tt == MRBC_TT_CLASS) {
     push_root_stack(obj->instance);
+    return 1;
   }
+  return 0;
 }
 
 static inline void push_mark_stack(mrbc_instance *obj)

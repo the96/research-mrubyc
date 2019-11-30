@@ -688,6 +688,9 @@ static void c_string_inspect(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value ret = mrbc_string_new_cstr(vm, "\"");
   const unsigned char *s = (const unsigned char *)mrbc_string_cstr(v);
   int i;
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   for( i = 0; i < mrbc_string_size(v); i++ ) {
     if( s[i] < ' ' || 0x7f <= s[i] ) {	// tiny isprint()
       buf[2] = "0123456789ABCDEF"[s[i] >> 4];
@@ -699,7 +702,9 @@ static void c_string_inspect(struct VM *vm, mrbc_value v[], int argc)
     }
   }
   mrbc_string_append_cstr(&ret, "\"");
-
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   SET_RETURN( ret );
 }
 
@@ -732,10 +737,16 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
     }
     limit = v[2].i;
     if( limit == 1 ) {
+#ifdef GC_MS_OR_BM
+      push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
       mrbc_array_push( &ret, &v[0] );
 #ifdef GC_RC
       mrbc_dup( &v[0] );
 #endif /* GC_RC */
+#ifdef GC_MS_OR_BM
+      pop_root_stack();
+#endif /* GC_MS_OR_BM */
       goto DONE;
     }
   }
@@ -813,9 +824,13 @@ static void c_string_split(struct VM *vm, mrbc_value v[], int argc)
 #endif /* GC_MS_OR_BM */
     mrb_value v1 = mrbc_string_new(vm, mrbc_string_cstr(&v[0]) + offset, len);
 #ifdef GC_MS_OR_BM
-    pop_root_stack();
+    pop_root_stack(v1.string);
 #endif /* GC_MS_OR_BM */
     mrbc_array_push( &ret, &v1 );
+#ifdef GC_MS_OR_BM
+    pop_root_stack();
+    pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
     if( pos < 0 ) break;
     offset = pos + sep_len;
@@ -1269,7 +1284,13 @@ static void c_string_tr(struct VM *vm, mrbc_value v[], int argc)
 {
   mrb_value ret = mrbc_string_dup( vm, &v[0] );
   SET_RETURN( ret );
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.string);
+#endif /* GC_MS_OR_BM */
   tr_main(vm, v, argc);
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 }
 
 

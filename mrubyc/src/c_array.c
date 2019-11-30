@@ -564,6 +564,9 @@ mrbc_value mrbc_array_reverse (struct VM *vm, mrbc_value *array)
   int i;
   mrbc_value *data = array->array->data;
   int n_stored = array->array->n_stored;
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *) ret.array);
+#endif /* GC_MS_OR_BM */
   for (i = 0; i < n_stored; i++) {
     mrbc_value val = data[n_stored - i - 1];
 #ifdef GC_RC
@@ -571,6 +574,9 @@ mrbc_value mrbc_array_reverse (struct VM *vm, mrbc_value *array)
 #endif /* GC_RC */
     mrbc_array_push(&ret, &val);
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
   return ret;
 }
 
@@ -1144,8 +1150,14 @@ static void c_array_minmax(struct VM *vm, mrbc_value v[], int argc)
   mrbc_dup(p_min_value);
   mrbc_dup(p_max_value);
 #endif /* GC_RC */
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)ret.array);
+#endif /* GC_MS_OR_BM */
   mrbc_array_set(&ret, 0, p_min_value);
   mrbc_array_set(&ret, 1, p_max_value);
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   SET_RETURN(ret);
 }
@@ -1272,7 +1284,13 @@ static void c_array_inspect(struct VM *vm, mrbc_value v[], int argc)
 
     mrbc_value v1 = mrbc_array_get(v, i);
     mrbc_value s1 = mrbc_send( vm, v, argc, &v1, "inspect", 0 );
+#ifdef GC_MS_OR_BM
+    int f = push_mrbc_value_for_root_stack(&s1);
+#endif /* GC_MS_OR_BM */
     mrbc_string_append( &ret, &s1 );
+#ifdef GC_MS_OR_BM
+    if (f) pop_root_stack();
+#endif /* GC_MS_OR_BM */
 #ifdef GC_RC
     mrbc_string_delete( &s1 );
 #endif /* GC_RC */
@@ -1305,7 +1323,13 @@ static void c_array_join_1(struct VM *vm, mrbc_value v[], int argc,
       c_array_join_1(vm, v, argc, &src->array->data[i], ret, separator);
     } else {
       mrbc_value v1 = mrbc_send( vm, v, argc, &src->array->data[i], "to_s", 0 );
+#ifdef GC_MS_OR_BM
+      int f = push_mrbc_value_for_root_stack(&v1);
+#endif /* GC_MS_OR_BM */
       flag_error |= mrbc_string_append( ret, &v1 );
+#ifdef GC_MS_OR_BM
+      if (f) pop_root_stack();
+#endif /* GC_MS_OR_BM */
 #ifdef GC_RC
       mrbc_dec_ref_counter(&v1);
 #endif /* GC_RC */
@@ -1326,11 +1350,16 @@ static void c_array_join(struct VM *vm, mrbc_value v[], int argc)
   mrbc_value separator = (argc == 0) ? mrbc_string_new_cstr(vm, "") :
     mrbc_send( vm, v, argc, &v[1], "to_s", 0 );
 
+#ifdef GC_MS_OR_BM
+  int f = push_mrbc_value_for_root_stack(&separator);
+#endif /* GC_MS_OR_BM */
+
   c_array_join_1(vm, v, argc, &v[0], &ret, &separator );
 #ifdef GC_RC
   mrbc_dec_ref_counter(&separator);
 #endif /* GC_RC */
 #ifdef GC_MS_OR_BM
+  if (f) pop_root_stack();
   pop_root_stack();
 #endif /* GC_MS_OR_BM */
   SET_RETURN(ret);

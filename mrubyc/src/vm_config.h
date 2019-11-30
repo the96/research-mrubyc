@@ -31,8 +31,8 @@
 
 #ifdef HEAP_EXPAND
 
-#define MRBC_ALLOC_FLI_BIT_WIDTH 25
-#define MRBC_ALLOC_SLI_BIT_WIDTH 3
+#define MRBC_ALLOC_FLI_BIT_WIDTH 24
+#define MRBC_ALLOC_SLI_BIT_WIDTH 4
 #define MRBC_ALLOC_IGNORE_LSBS	 4
 #define MRBC_ALLOC_MEMSIZE_T     uint32_t
 
@@ -95,7 +95,7 @@
 #endif
 
 #ifdef GC_DEBUG
-#define HEAP_DUMP
+// #define HEAP_DUMP
 #endif
 /* custom config for research */
 

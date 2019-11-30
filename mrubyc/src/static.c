@@ -43,4 +43,20 @@ void init_static(void)
   mrbc_init_global();
 
   mrbc_init_class();
+
+#ifdef GC_MS_OR_BM
+  push_root_stack((mrbc_instance *)mrbc_class_object);
+  push_root_stack((mrbc_instance *)mrbc_class_proc);
+  push_root_stack((mrbc_instance *)mrbc_class_false);
+  push_root_stack((mrbc_instance *)mrbc_class_true);
+  push_root_stack((mrbc_instance *)mrbc_class_nil);
+  push_root_stack((mrbc_instance *)mrbc_class_array);
+  push_root_stack((mrbc_instance *)mrbc_class_fixnum);
+  push_root_stack((mrbc_instance *)mrbc_class_symbol);
+  push_root_stack((mrbc_instance *)mrbc_class_float);
+  push_root_stack((mrbc_instance *)mrbc_class_math);
+  push_root_stack((mrbc_instance *)mrbc_class_string);
+  push_root_stack((mrbc_instance *)mrbc_class_range);
+  push_root_stack((mrbc_instance *)mrbc_class_hash);
+#endif /* GC_MS_OR_BM */
 }

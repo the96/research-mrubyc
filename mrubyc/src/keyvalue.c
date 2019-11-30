@@ -80,6 +80,9 @@ mrbc_kv_handle * mrbc_kv_new(struct VM *vm, int size)
     mrbc_raw_free( kvh );
     return NULL;
   }
+#ifdef GC_MS_OR_BM
+  pop_root_stack();
+#endif /* GC_MS_OR_BM */
 
   return kvh;
 }

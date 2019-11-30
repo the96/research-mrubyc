@@ -212,10 +212,16 @@ static void c_range_inspect(struct VM *vm, mrbc_value v[], int argc)
     if( i != 0 ) mrbc_string_append_cstr( &ret, ".." );
     mrbc_value v1 = (i == 0) ? mrbc_range_first(v) : mrbc_range_last(v);
     mrbc_value s1 = mrbc_send( vm, v, argc, &v1, "inspect", 0 );
+#ifdef GC_MS_OR_BM
+    int f = push_mrbc_value_for_root_stack(&s1);
+#endif /* GC_MS_OR_BM */
     mrbc_string_append( &ret, &s1 );
 #ifdef GC_RC
     mrbc_string_delete( &s1 );
 #endif /* GC_RC */
+#ifdef GC_MS_OR_BM
+    if (f) pop_root_stack();
+#endif /* GC_MS_OR_BM */
   }
 #ifdef GC_MS_OR_BM
   pop_root_stack();

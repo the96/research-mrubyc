@@ -579,6 +579,9 @@ static void c_hash_inspect(struct VM *vm, mrbc_value v[], int argc)
     mrbc_value *kv = mrbc_hash_i_next(&ite);
 
     mrbc_value s1 = mrbc_send( vm, v, argc, &kv[0], "inspect", 0 );
+#ifdef GC_MS_OR_BM
+    int f = push_mrbc_value_for_root_stack(&s1);
+#endif /* GC_MS_OR_BM */
     mrbc_string_append( &ret, &s1 );
 #ifdef GC_RC
     mrbc_string_delete( &s1 );
@@ -586,11 +589,21 @@ static void c_hash_inspect(struct VM *vm, mrbc_value v[], int argc)
 
     mrbc_string_append_cstr( &ret, "=>" );
 
+#ifdef GC_MS_OR_BM
+    if (f) pop_root_stack();
+#endif /* GC_MS_OR_BM */
+
     s1 = mrbc_send( vm, v, argc, &kv[1], "inspect", 0 );
+#ifdef GC_MS_OR_BM
+    f = push_mrbc_value_for_root_stack(&s1);
+#endif /* GC_MS_OR_BM */
     mrbc_string_append( &ret, &s1 );
 #ifdef GC_RC
     mrbc_string_delete( &s1 );
 #endif /* GC_RC */
+#ifdef GC_MS_OR_BM
+    if (f) pop_root_stack();
+#endif /* GC_MS_OR_BM */
   }
 
   mrbc_string_append_cstr( &ret, "}" );

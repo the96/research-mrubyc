@@ -111,7 +111,7 @@ void ready_marksweep_static();
 void end_marksweep_static();
 void push_root_stack(mrbc_instance *obj);
 mrbc_instance * pop_root_stack();
-void push_mrbc_value_for_root_stack(mrbc_value *obj);
+int push_mrbc_value_for_root_stack(mrbc_value *obj);
 void add_vm_set(struct VM *vm);
 void remove_vm_set(struct VM *vm);
 void mrbc_mark_sweep();
