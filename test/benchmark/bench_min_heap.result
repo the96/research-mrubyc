@@ -1,0 +1,93 @@
+== testable/bm_app_fib ==
+marksweep min size 33176
+marksweep-early min size 33176
+refcount min size 33176
+marksweep-m32 min size 21864
+marksweep-early-m32 min size 21864
+refcnt-m32 min size 22620
+== testable/bm_app_fib_big ==
+marksweep min size 33528
+marksweep-early min size 33528
+refcount min size 33528
+marksweep-m32 min size 22056
+marksweep-early-m32 min size 22056
+refcnt-m32 min size 22812
+== testable/bm_app_tak ==
+marksweep min size 32840
+marksweep-early min size 32840
+refcount min size 32840
+marksweep-m32 min size 21684
+marksweep-early-m32 min size 21684
+refcnt-m32 min size 22440
+== testable/bm_app_tarai ==
+marksweep min size 36008
+marksweep-early min size 36008
+refcount min size 36008
+marksweep-m32 min size 23412
+marksweep-early-m32 min size 23412
+refcnt-m32 min size 24168
+== testable/bm_fannkuch ==
+marksweep min size 32144
+marksweep-early min size 32144
+refcount min size 32288
+marksweep-m32 min size 21580
+marksweep-early-m32 min size 21580
+refcnt-m32 min size 22472
+== testable/bm_fractal ==
+marksweep min size 32428
+marksweep-early min size 32428
+refcount min size 32296
+marksweep-m32 min size 21604
+marksweep-early-m32 min size 21604
+refcnt-m32 min size 22256
+== testable/bm_mergesort_hongli ==
+marksweep min size 48168
+marksweep-early min size 48116
+refcount min size 44584
+marksweep-m32 min size 32960
+marksweep-early-m32 min size 30576
+refcnt-m32 min size 30792
+== testable/bm_partial_sums ==
+marksweep min size 31168
+marksweep-early min size 31168
+refcount min size 31168
+marksweep-m32 min size 20848
+marksweep-early-m32 min size 20848
+refcnt-m32 min size 21608
+== testable/bm_so_lists_small ==
+marksweep min size 191184
+marksweep-early min size 191080
+refcount min size 159928
+marksweep-m32 min size 140484
+marksweep-early-m32 min size 140448
+refcnt-m32 min size 118128
+== testable/bm_so_matrix ==
+marksweep min size 123312
+marksweep-early min size 110152
+refcount min size 106904
+marksweep-m32 min size 88332
+marksweep-early-m32 min size 76864
+refcnt-m32 min size 75436
+== testable/bm_so_object ==
+marksweep min size 34456
+marksweep-early min size 34456
+refcount min size 34192
+marksweep-m32 min size 22692
+marksweep-early-m32 min size 22692
+refcnt-m32 min size 23400
+== testable/bm_spectral_norm ==
+marksweep min size 42832
+marksweep-early min size 41448
+refcount min size 41240
+marksweep-m32 min size 29776
+marksweep-early-m32 min size 29208
+refcnt-m32 min size 29640
+== testable/string_concat ==
+marksweep min size 178788
+marksweep-early min size 67108
+refcount min size 62280
+marksweep-m32 min size 159240
+marksweep-early-m32 min size 56752
+refcnt-m32 min size 52216
+== testable/bm_app_pentomino ==
+marksweep min size 538304
