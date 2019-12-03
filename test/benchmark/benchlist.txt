@@ -11,4 +11,3 @@ testable/bm_so_matrix.mrb
 testable/bm_so_object.mrb
 testable/bm_spectral_norm.mrb
 testable/string_concat.mrb
-testable/bm_app_pentomino.mrb

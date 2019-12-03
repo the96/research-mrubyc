@@ -51,6 +51,7 @@
 #define GC_MS
 #define GC_COUNT
 #define GC_MS_OR_BM
+#define REGENERATE_FREELIST
 #endif
 
 #if (GC_MODE == BITMAP_MARKING)

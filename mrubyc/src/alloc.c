@@ -326,6 +326,14 @@ static void remove_index(FREE_BLOCK *target)
 }
 
 
+#ifdef REGENERATE_FREELIST
+static void reset_free_list() {
+  memset(free_blocks, 0, sizeof(FREE_BLOCK *) * (SIZE_FREE_BLOCKS + 1));
+  memset(free_sli_bitmap, 0, sizeof(free_sli_bitmap));
+}
+#endif 
+
+
 //================================================================
 /*! Split block by size
 
@@ -1202,19 +1210,58 @@ void mark_from_stack() {
 
 void mrbc_sweep()
 {
+#ifdef REGENERATE_FREELIST
+  USED_BLOCK *end = (USED_BLOCK *)(memory_pool + memory_pool_size);
+  USED_BLOCK *block = (USED_BLOCK *) memory_pool;
+  FREE_BLOCK *prev_free = NULL;
+  reset_free_list();
+  if (block->f == FLAG_FREE_BLOCK) {
+    prev_free = (FREE_BLOCK *) block;
+    block = (USED_BLOCK *) PHYS_NEXT(block);
+  }
+  while(1) {
+    if (block->f == FLAG_FREE_BLOCK || (!is_marked(block) && block->bt >= BT_INSTANCE && block->bt <= BT_KV_HANDLE)) {
+      // release block
+      if (prev_free == NULL) {
+        // set prev_free
+        prev_free = (FREE_BLOCK *)block;
+        block = (USED_BLOCK *) PHYS_NEXT(block);
+      } else if (prev_free == (FREE_BLOCK *) PHYS_PREV(block)) {
+        // merge block to prev_free
+        USED_BLOCK *next = (USED_BLOCK *) PHYS_NEXT(block);
+        next->prev_offset += prev_free->size;
+        prev_free->size += block->size;
+        prev_free->t = block->t;
+        block = next;
+      } else {
+        // add free
+        add_free_block(prev_free);
+        prev_free = (FREE_BLOCK *) block;
+        block = (USED_BLOCK *) PHYS_NEXT(block);
+      }
+    } else {
+      // seek block
+      block = (USED_BLOCK *) PHYS_NEXT(block);
+    }
+    if (block >= end) break;
+  }
+  add_free_block(prev_free);
+#else /* REGENERATE_FREELIST */
+  USED_BLOCK *end = (USED_BLOCK *)(memory_pool + memory_pool_size);
   USED_BLOCK *block = (USED_BLOCK *) memory_pool;
   USED_BLOCK *next = (USED_BLOCK *)PHYS_NEXT(block);
   while (1) {
-    while ((uint8_t *) next < memory_pool + memory_pool_size && next->f == FLAG_FREE_BLOCK) {
+    while (next < end && next->f == FLAG_FREE_BLOCK) {
       next = (USED_BLOCK *) PHYS_NEXT(next);
     }
     if (block->f != FLAG_FREE_BLOCK  && block->bt >= BT_INSTANCE && block->bt <= BT_KV_HANDLE && !is_marked(block)) {
       mrbc_raw_free((uint8_t *)block + sizeof(USED_BLOCK));
     }
-    if ((uint8_t *) next >= memory_pool + memory_pool_size) break;
+    if (next >= end) break;
     block = next;
     next = (USED_BLOCK *) PHYS_NEXT(block);
   }
+#endif /* REGENERATE_FREELIST */
 #ifdef GC_BM
   reset_bitmap();
 #endif /*GC_BM */
