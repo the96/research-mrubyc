@@ -58,6 +58,7 @@
 #define GC_BM
 #define GC_COUNT
 #define GC_MS_OR_BM
+#define REGENERATE_FREELIST
 #endif
 
 #if (GC_MODE == MARKSWEEP_DEBUG)
@@ -68,6 +69,8 @@
 #define GC_MS_OR_BM
 #define GC_MS_DEBUG
 #define GC_DEBUG
+#define REGENERATE_FREELIST
+
 #endif
 
 #if (GC_MODE == BITMAP_MARKING_DEBUG)

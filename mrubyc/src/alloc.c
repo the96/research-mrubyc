@@ -328,8 +328,16 @@ static void remove_index(FREE_BLOCK *target)
 
 #ifdef REGENERATE_FREELIST
 static void reset_free_list() {
-  memset(free_blocks, 0, sizeof(FREE_BLOCK *) * (SIZE_FREE_BLOCKS + 1));
+  memset(free_blocks, 0, sizeof(free_blocks));
   memset(free_sli_bitmap, 0, sizeof(free_sli_bitmap));
+  // int i;
+  // for (i = 0; i < SIZE_FREE_BLOCKS + 1; i++) {
+  //   free_blocks[i] = NULL;
+  // }
+  // for (i = 0; i < MRBC_ALLOC_FLI_BIT_WIDTH + 2; i++) {
+  //   free_sli_bitmap[i] = 0;
+  // }
+  // free_fli_bitmap = 0;
 }
 #endif 
 
@@ -1004,7 +1012,11 @@ void remove_vm_set(struct VM *vm)
 {
   int i;
   for (i = 0; i < vm_count; i++) {
-    if (vms[i]->vm_id == vm->vm_id) {
+    if (vms[i] == vm) {
+      if (i == vm_count - 1) {
+        vm_count--;
+        return;
+      }
       memmove(vms + i, vms + i + 1, sizeof(struct VM *) * (vm_count - i));
       vm_count--;
       return;
@@ -1215,34 +1227,27 @@ void mrbc_sweep()
   USED_BLOCK *block = (USED_BLOCK *) memory_pool;
   FREE_BLOCK *prev_free = NULL;
   reset_free_list();
-  if (block->f == FLAG_FREE_BLOCK) {
-    prev_free = (FREE_BLOCK *) block;
-    block = (USED_BLOCK *) PHYS_NEXT(block);
-  }
   while(1) {
+    USED_BLOCK *next = (USED_BLOCK *)PHYS_NEXT(block);
     if (block->f == FLAG_FREE_BLOCK || (!is_marked(block) && block->bt >= BT_INSTANCE && block->bt <= BT_KV_HANDLE)) {
       // release block
       if (prev_free == NULL) {
         // set prev_free
         prev_free = (FREE_BLOCK *)block;
-        block = (USED_BLOCK *) PHYS_NEXT(block);
       } else if (prev_free == (FREE_BLOCK *) PHYS_PREV(block)) {
         // merge block to prev_free
-        USED_BLOCK *next = (USED_BLOCK *) PHYS_NEXT(block);
-        next->prev_offset += prev_free->size;
+        if (next < end)
+          SET_PHYS_PREV(prev_free, next);
         prev_free->size += block->size;
         prev_free->t = block->t;
-        block = next;
       } else {
         // add free
         add_free_block(prev_free);
         prev_free = (FREE_BLOCK *) block;
-        block = (USED_BLOCK *) PHYS_NEXT(block);
       }
-    } else {
-      // seek block
-      block = (USED_BLOCK *) PHYS_NEXT(block);
     }
+    // seek block
+    block = next;
     if (block >= end) break;
   }
   add_free_block(prev_free);
