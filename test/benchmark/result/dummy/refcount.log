@@ -1,0 +1,17 @@
+test_name: dummy vm_name: refcount
+heap_size 32620 failed
+heap_size 35620 total_time 0.139391944
+heap_size 35620 total_time 0.151121684
+heap_size 35620 total_time 0.152402833
+heap_size 35620 total_time 0.153493467
+heap_size 35620 total_time 0.150279586
+heap_size 38620 total_time 0.145175143
+heap_size 38620 total_time 0.152986130
+heap_size 38620 total_time 0.133133407
+heap_size 38620 total_time 0.152159444
+heap_size 38620 total_time 0.151485276
+heap_size 41620 total_time 0.149704390
+heap_size 41620 total_time 0.151069021
+heap_size 41620 total_time 0.155316453
+heap_size 41620 total_time 0.149579977
+heap_size 41620 total_time 0.150319390

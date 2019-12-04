@@ -40,10 +40,10 @@ def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size
   TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
   # result file and output file open
   outfile = open(outpath, mode='w')
-  outfile.write("test_name: " + test_name + "\n")
+  outfile.write("test_name: " + test_name + " vm_name: " + binary_name + "\n")
   heap_size = min_size
   cnt=0
-  for cnt in range(20):
+  while heap_size <= max_size:
     if cnt == 0:
       print(heap_size, end="", flush=True)
     else:
@@ -56,12 +56,12 @@ def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size
       if size_matches and time_matches:
         size_result = size_matches.groups()[0]
         time_result = time_matches.groups()[0]
-        text = binary_name + " heap_size " + str(heap_size) + " total_time " + str(time_result) + "\n"
+        text = "heap_size " + str(heap_size) + " total_time " + str(time_result) + "\n"
         outfile.write(text)
       else:
-        text = binary_name + " heap_size " + str(heap_size) + " failed" + "\n"
+        text = "heap_size " + str(heap_size) + " failed" + "\n"
         outfile.write(text)
-        i = times
+        break
     # increment size
     heap_size += inc_size
     cnt+=1
@@ -147,7 +147,7 @@ for line in config:
     elif vm_name == bitmap:
       vm_path = bitmap_bin
     elif vm_name == bitmap_earlygc:
-      vm_path = bitmap_earlygc_m32
+      vm_path = bitmap_earlygc_m32_bin
     elif vm_name == bitmap_m32:
       vm_path = bitmap_m32_bin
     elif vm_name == bitmap_earlygc_m32:

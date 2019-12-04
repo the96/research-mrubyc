@@ -1,0 +1,17 @@
+test_name: dummy vm_name: marksweep
+heap_size 32620 failed
+heap_size 35620 total_time 0.135909252
+heap_size 35620 total_time 0.138776369
+heap_size 35620 total_time 0.118350506
+heap_size 35620 total_time 0.119750973
+heap_size 35620 total_time 0.139411634
+heap_size 38620 total_time 0.138594074
+heap_size 38620 total_time 0.138901000
+heap_size 38620 total_time 0.136490656
+heap_size 38620 total_time 0.138248680
+heap_size 38620 total_time 0.135759283
+heap_size 41620 total_time 0.136816136
+heap_size 41620 total_time 0.137702136
+heap_size 41620 total_time 0.135327142
+heap_size 41620 total_time 0.140473544
+heap_size 41620 total_time 0.135573140

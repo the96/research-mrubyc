@@ -1,0 +1,17 @@
+test_name: dummy vm_name: bitmap-marking
+heap_size 32620 failed
+heap_size 35620 total_time 0.118113088
+heap_size 35620 total_time 0.136974285
+heap_size 35620 total_time 0.135111484
+heap_size 35620 total_time 0.113622316
+heap_size 35620 total_time 0.133506787
+heap_size 38620 total_time 0.133075504
+heap_size 38620 total_time 0.135320279
+heap_size 38620 total_time 0.131800578
+heap_size 38620 total_time 0.136208332
+heap_size 38620 total_time 0.131442757
+heap_size 41620 total_time 0.133311122
+heap_size 41620 total_time 0.129684266
+heap_size 41620 total_time 0.112471177
+heap_size 41620 total_time 0.127303572
+heap_size 41620 total_time 0.127677407
