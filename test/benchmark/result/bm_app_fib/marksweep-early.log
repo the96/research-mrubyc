@@ -1,0 +1,201 @@
+test_name: bm_app_fib
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 22620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 23620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 24620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 25620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 26620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 27620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 28620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 29620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 30620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 31620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 32620 failed
+marksweep-early heap_size 33620 total_time 0.152845403
+marksweep-early heap_size 33620 total_time 0.133492077
+marksweep-early heap_size 33620 total_time 0.154409911
+marksweep-early heap_size 33620 total_time 0.151076713
+marksweep-early heap_size 33620 total_time 0.148924294
+marksweep-early heap_size 33620 total_time 0.149294599
+marksweep-early heap_size 33620 total_time 0.151720814
+marksweep-early heap_size 33620 total_time 0.150458546
+marksweep-early heap_size 33620 total_time 0.152949051
+marksweep-early heap_size 33620 total_time 0.150472077
+marksweep-early heap_size 34620 total_time 0.145657701
+marksweep-early heap_size 34620 total_time 0.146285294
+marksweep-early heap_size 34620 total_time 0.147894877
+marksweep-early heap_size 34620 total_time 0.148516500
+marksweep-early heap_size 34620 total_time 0.149919364
+marksweep-early heap_size 34620 total_time 0.149074417
+marksweep-early heap_size 34620 total_time 0.148092416
+marksweep-early heap_size 34620 total_time 0.150896038
+marksweep-early heap_size 34620 total_time 0.152852334
+marksweep-early heap_size 34620 total_time 0.145971652
+marksweep-early heap_size 35620 total_time 0.147950951
+marksweep-early heap_size 35620 total_time 0.148839269
+marksweep-early heap_size 35620 total_time 0.149986764
+marksweep-early heap_size 35620 total_time 0.147323843
+marksweep-early heap_size 35620 total_time 0.148877276
+marksweep-early heap_size 35620 total_time 0.148579193
+marksweep-early heap_size 35620 total_time 0.148968566
+marksweep-early heap_size 35620 total_time 0.150009411
+marksweep-early heap_size 35620 total_time 0.148816960
+marksweep-early heap_size 35620 total_time 0.147964726
+marksweep-early heap_size 36620 total_time 0.147435451
+marksweep-early heap_size 36620 total_time 0.151130390
+marksweep-early heap_size 36620 total_time 0.148370798
+marksweep-early heap_size 36620 total_time 0.149289240
+marksweep-early heap_size 36620 total_time 0.148960595
+marksweep-early heap_size 36620 total_time 0.149435248
+marksweep-early heap_size 36620 total_time 0.146802305
+marksweep-early heap_size 36620 total_time 0.148712672
+marksweep-early heap_size 36620 total_time 0.148727961
+marksweep-early heap_size 36620 total_time 0.149678119
+marksweep-early heap_size 37620 total_time 0.145556376
+marksweep-early heap_size 37620 total_time 0.145597855
+marksweep-early heap_size 37620 total_time 0.144650891
+marksweep-early heap_size 37620 total_time 0.149407928
+marksweep-early heap_size 37620 total_time 0.146269007
+marksweep-early heap_size 37620 total_time 0.146817759
+marksweep-early heap_size 37620 total_time 0.144402109
+marksweep-early heap_size 37620 total_time 0.146211216
+marksweep-early heap_size 37620 total_time 0.148109169
+marksweep-early heap_size 37620 total_time 0.147629364
+marksweep-early heap_size 38620 total_time 0.143519707
+marksweep-early heap_size 38620 total_time 0.144813497
+marksweep-early heap_size 38620 total_time 0.147481490
+marksweep-early heap_size 38620 total_time 0.144266226
+marksweep-early heap_size 38620 total_time 0.144778788
+marksweep-early heap_size 38620 total_time 0.146133751
+marksweep-early heap_size 38620 total_time 0.125315549
+marksweep-early heap_size 38620 total_time 0.144697920
+marksweep-early heap_size 38620 total_time 0.144430236
+marksweep-early heap_size 38620 total_time 0.125050156
+marksweep-early heap_size 39620 total_time 0.145784641
+marksweep-early heap_size 39620 total_time 0.142178012
+marksweep-early heap_size 39620 total_time 0.147158761
+marksweep-early heap_size 39620 total_time 0.146585033
+marksweep-early heap_size 39620 total_time 0.130090912
+marksweep-early heap_size 39620 total_time 0.141827663
+marksweep-early heap_size 39620 total_time 0.146666624
+marksweep-early heap_size 39620 total_time 0.141781531
+marksweep-early heap_size 39620 total_time 0.147486196
+marksweep-early heap_size 39620 total_time 0.146722895
+marksweep-early heap_size 40620 total_time 0.144892803
+marksweep-early heap_size 40620 total_time 0.145087988
+marksweep-early heap_size 40620 total_time 0.145265014
+marksweep-early heap_size 40620 total_time 0.125558943
+marksweep-early heap_size 40620 total_time 0.147219437
+marksweep-early heap_size 40620 total_time 0.148792147
+marksweep-early heap_size 40620 total_time 0.149767388
+marksweep-early heap_size 40620 total_time 0.147547546
+marksweep-early heap_size 40620 total_time 0.148987163
+marksweep-early heap_size 40620 total_time 0.149847155
+marksweep-early heap_size 41620 total_time 0.126147045
+marksweep-early heap_size 41620 total_time 0.145076727
+marksweep-early heap_size 41620 total_time 0.145392478
+marksweep-early heap_size 41620 total_time 0.146897008
+marksweep-early heap_size 41620 total_time 0.146435236
+marksweep-early heap_size 41620 total_time 0.142005912
+marksweep-early heap_size 41620 total_time 0.147794735
+marksweep-early heap_size 41620 total_time 0.148048386
+marksweep-early heap_size 41620 total_time 0.147517834
+marksweep-early heap_size 41620 total_time 0.148211324

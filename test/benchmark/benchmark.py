@@ -42,9 +42,8 @@ def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size
   outfile = open(outpath, mode='w')
   outfile.write("test_name: " + test_name + "\n")
   heap_size = min_size
-  inc_size = int((max_size - min_size) / 10)
   cnt=0
-  for cnt in range(10):
+  for cnt in range(20):
     if cnt == 0:
       print(heap_size, end="", flush=True)
     else:
@@ -96,30 +95,42 @@ while i < len(sys.argv):
 if config_file_path == None:
   sys.exit("please input benchmark config file (-c path)")
 
-BENCHMARK_PATTERN = re.compile('(.+\.mrb) times (\d+)')
-CONFIG_VM_PATTERN = re.compile('(.+) min (\d+) max (\d+)')
+BENCHMARK_PATTERN = re.compile('(.+\.mrb) times (\d+) min (\d+) max (\d+) inc (\d+)')
+TESTNAME_PATTERN = re.compile('test_name \"(.+)\"')
+CONFIG_VM_PATTERN = re.compile('(.+)')
 config_file = open(config_file_path, 'r')
 config = config_file.readlines()
 config_file.close()
+flag = False
 for line in config:
   bench_match = BENCHMARK_PATTERN.search(line)
+  testname_match = TESTNAME_PATTERN.search(line)
   conf_vm_match = CONFIG_VM_PATTERN.search(line)
   if bench_match:
     match_strings = bench_match.groups()
     benchmark_path = match_strings[0]
     times = int(match_strings[1])
+    min_heap = int(match_strings[2])
+    max_heap = int(match_strings[3])
+    inc_size = int(match_strings[4])
     test_name = benchmark_path[0:-4]
-    print ("== " + test_name + " ==")
     print ("times: " + str(times))
     continue
+  if testname_match:
+    match_strings = testname_match.groups()
+    test_name = match_strings[0]
+    continue
   if conf_vm_match:
+    if not flag:
+      print ("== " + test_name + " ==")
+      flag = True
     if benchmark_path == None:
       print("please input benchmark file(***.mrb)")
       sys.exit("Invalit input")
+    if inc_size == None:
+      inc_size = int((max_heap - min_heap) / 10)
     matched_strings = conf_vm_match.groups()
     vm_name = matched_strings[0]
-    min_heap = matched_strings[1]
-    max_heap = matched_strings[2]
     vm_path = None
     if vm_name == marksweep:
       vm_path = marksweep_bin

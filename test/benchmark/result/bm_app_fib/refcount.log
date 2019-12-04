@@ -1,0 +1,201 @@
+test_name: bm_app_fib
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 22620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 23620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 24620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 25620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 26620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 27620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 28620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 29620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 30620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 31620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 32620 failed
+refcount heap_size 33620 total_time 0.154644711
+refcount heap_size 33620 total_time 0.156945002
+refcount heap_size 33620 total_time 0.157956023
+refcount heap_size 33620 total_time 0.153144995
+refcount heap_size 33620 total_time 0.156311733
+refcount heap_size 33620 total_time 0.156692841
+refcount heap_size 33620 total_time 0.154674608
+refcount heap_size 33620 total_time 0.162305391
+refcount heap_size 33620 total_time 0.153691385
+refcount heap_size 33620 total_time 0.157483883
+refcount heap_size 34620 total_time 0.134444435
+refcount heap_size 34620 total_time 0.152530657
+refcount heap_size 34620 total_time 0.153703266
+refcount heap_size 34620 total_time 0.152326389
+refcount heap_size 34620 total_time 0.150098475
+refcount heap_size 34620 total_time 0.153333427
+refcount heap_size 34620 total_time 0.153742391
+refcount heap_size 34620 total_time 0.134543977
+refcount heap_size 34620 total_time 0.153966357
+refcount heap_size 34620 total_time 0.150699529
+refcount heap_size 35620 total_time 0.133508356
+refcount heap_size 35620 total_time 0.152371245
+refcount heap_size 35620 total_time 0.150745597
+refcount heap_size 35620 total_time 0.150507096
+refcount heap_size 35620 total_time 0.154265387
+refcount heap_size 35620 total_time 0.151634060
+refcount heap_size 35620 total_time 0.153526961
+refcount heap_size 35620 total_time 0.155065322
+refcount heap_size 35620 total_time 0.150628311
+refcount heap_size 35620 total_time 0.154285629
+refcount heap_size 36620 total_time 0.154484710
+refcount heap_size 36620 total_time 0.161656433
+refcount heap_size 36620 total_time 0.154750037
+refcount heap_size 36620 total_time 0.143836899
+refcount heap_size 36620 total_time 0.154681045
+refcount heap_size 36620 total_time 0.157981657
+refcount heap_size 36620 total_time 0.156480047
+refcount heap_size 36620 total_time 0.157546077
+refcount heap_size 36620 total_time 0.137450507
+refcount heap_size 36620 total_time 0.156416808
+refcount heap_size 37620 total_time 0.153020379
+refcount heap_size 37620 total_time 0.151347005
+refcount heap_size 37620 total_time 0.152383856
+refcount heap_size 37620 total_time 0.133461285
+refcount heap_size 37620 total_time 0.151713193
+refcount heap_size 37620 total_time 0.150271340
+refcount heap_size 37620 total_time 0.151658732
+refcount heap_size 37620 total_time 0.147757268
+refcount heap_size 37620 total_time 0.133771526
+refcount heap_size 37620 total_time 0.153543413
+refcount heap_size 38620 total_time 0.148748546
+refcount heap_size 38620 total_time 0.150629916
+refcount heap_size 38620 total_time 0.152374389
+refcount heap_size 38620 total_time 0.154684375
+refcount heap_size 38620 total_time 0.150273705
+refcount heap_size 38620 total_time 0.151970976
+refcount heap_size 38620 total_time 0.152480853
+refcount heap_size 38620 total_time 0.150591036
+refcount heap_size 38620 total_time 0.149672227
+refcount heap_size 38620 total_time 0.149699163
+refcount heap_size 39620 total_time 0.150013970
+refcount heap_size 39620 total_time 0.152172531
+refcount heap_size 39620 total_time 0.154087779
+refcount heap_size 39620 total_time 0.150811785
+refcount heap_size 39620 total_time 0.153149841
+refcount heap_size 39620 total_time 0.152422767
+refcount heap_size 39620 total_time 0.150339562
+refcount heap_size 39620 total_time 0.134496615
+refcount heap_size 39620 total_time 0.154132538
+refcount heap_size 39620 total_time 0.151907815
+refcount heap_size 40620 total_time 0.153927335
+refcount heap_size 40620 total_time 0.149374418
+refcount heap_size 40620 total_time 0.149606079
+refcount heap_size 40620 total_time 0.148464481
+refcount heap_size 40620 total_time 0.150017833
+refcount heap_size 40620 total_time 0.150875849
+refcount heap_size 40620 total_time 0.156573099
+refcount heap_size 40620 total_time 0.149290821
+refcount heap_size 40620 total_time 0.151141312
+refcount heap_size 40620 total_time 0.153913524
+refcount heap_size 41620 total_time 0.134203669
+refcount heap_size 41620 total_time 0.153847705
+refcount heap_size 41620 total_time 0.159418399
+refcount heap_size 41620 total_time 0.151008031
+refcount heap_size 41620 total_time 0.145766516
+refcount heap_size 41620 total_time 0.150703569
+refcount heap_size 41620 total_time 0.149950095
+refcount heap_size 41620 total_time 0.149145635
+refcount heap_size 41620 total_time 0.151367984
+refcount heap_size 41620 total_time 0.153841621
