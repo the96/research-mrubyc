@@ -330,14 +330,7 @@ static void remove_index(FREE_BLOCK *target)
 static void reset_free_list() {
   memset(free_blocks, 0, sizeof(free_blocks));
   memset(free_sli_bitmap, 0, sizeof(free_sli_bitmap));
-  // int i;
-  // for (i = 0; i < SIZE_FREE_BLOCKS + 1; i++) {
-  //   free_blocks[i] = NULL;
-  // }
-  // for (i = 0; i < MRBC_ALLOC_FLI_BIT_WIDTH + 2; i++) {
-  //   free_sli_bitmap[i] = 0;
-  // }
-  // free_fli_bitmap = 0;
+  free_fli_bitmap = 0;
 }
 #endif 
 
@@ -1234,6 +1227,8 @@ void mrbc_sweep()
       if (prev_free == NULL) {
         // set prev_free
         prev_free = (FREE_BLOCK *)block;
+        prev_free->prev_free = NULL;
+        prev_free->next_free = NULL;
       } else if (prev_free == (FREE_BLOCK *) PHYS_PREV(block)) {
         // merge block to prev_free
         if (next < end)
@@ -1244,13 +1239,16 @@ void mrbc_sweep()
         // add free
         add_free_block(prev_free);
         prev_free = (FREE_BLOCK *) block;
+        prev_free->prev_free = NULL;
+        prev_free->next_free = NULL;
       }
     }
     // seek block
     block = next;
     if (block >= end) break;
   }
-  add_free_block(prev_free);
+  if (prev_free != NULL)
+    add_free_block(prev_free);
 #else /* REGENERATE_FREELIST */
   USED_BLOCK *end = (USED_BLOCK *)(memory_pool + memory_pool_size);
   USED_BLOCK *block = (USED_BLOCK *) memory_pool;
