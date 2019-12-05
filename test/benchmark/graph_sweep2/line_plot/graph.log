@@ -1,0 +1,160 @@
+This is e-pTeX, Version 3.14159265-p3.7.1-161114-2.6 (utf8.euc) (TeX Live 2017/Debian) (preloaded format=platex 2018.11.20)  5 DEC 2019 21:36
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**graph.tex
+(./graph.tex
+pLaTeX2e <2017/10/28>+4 (based on LaTeX2e <2017-04-15>)
+Babel <3.18> and hyphenation patterns for 26 language(s) loaded.
+(/usr/share/texlive/texmf-dist/tex/platex/base/jarticle.cls
+Document Class: jarticle 2017/09/19 v1.7g Standard pLaTeX class
+\c@@paper=\count82
+(/usr/share/texlive/texmf-dist/tex/platex/base/jsize10.clo
+File: jsize10.clo 2017/09/19 v1.7g Standard pLaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\symmincho=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `mincho' in version `bold'
+(Font)                  JY1/mc/m/n --> JY1/gt/m/n on input line 613.
+\toclineskip=\dimen118
+\@lnumwidth=\dimen119
+\bibindent=\dimen120
+\heisei=\count91
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 99.
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+))
+\Gin@req@height=\dimen121
+\Gin@req@width=\dimen122
+)
+No file graph.aux.
+\openout1 = `graph.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 4.
+LaTeX Font Info:    ... okay on input line 4.
+File: bm_app_fib_total_time.png Graphic file (type eps)
+<bm_app_fib_total_time.png>
+File: bm_app_tak_total_time.png Graphic file (type eps)
+ <bm_app_tak_total_time.png>
+File: bm_app_tarai_total_time.png Graphic file (type eps)
+
+<bm_app_tarai_total_time.png>
+File: bm_fannkuch_total_time.png Graphic file (type eps)
+ <bm_fannkuch_total_time.png>
+File: bm_fractal_total_time.png Graphic file (type eps)
+
+<bm_fractal_total_time.png>
+File: bm_mergesort_hongli_total_time.png Graphic file (type eps)
+ <bm_mergesort_hongli_total_time.png>
+File: bm_partial_sums_total_time.png Graphic file (type eps)
+
+<bm_partial_sums_total_time.png>
+File: bm_so_lists_large_heap_total_time.png Graphic file (type eps)
+ <bm_so_lists_large_heap_total_time.png>
+File: bm_so_lists_small_heap_total_time.png Graphic file (type eps)
+
+<bm_so_lists_small_heap_total_time.png>
+File: bm_so_matrix_large_heap_total_time.png Graphic file (type eps)
+
+<bm_so_matrix_large_heap_total_time.png>
+File: bm_so_matrix_small_heap_total_time.png Graphic file (type eps)
+
+<bm_so_matrix_small_heap_total_time.png>
+File: bm_so_object_total_time.png Graphic file (type eps)
+ <bm_so_object_total_time.png>
+File: bm_spectral_norm_total_time.png Graphic file (type eps)
+
+<bm_spectral_norm_total_time.png>
+File: string_concat_large_heap_total_time.png Graphic file (type eps)
+ <string_concat_large_heap_total_time.png>
+File: string_concat_small_heap_total_time.png Graphic file (type eps)
+
+<string_concat_small_heap_total_time.png>
+Overfull \hbox (11.84438pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+
+Overfull \hbox (2.22221pt too wide) in paragraph at lines 5--20
+[][] [] 
+ []
+
+[1
+
+] [2] (./graph.aux) ) 
+Here is how much of TeX's memory you used:
+ 636 strings out of 494735
+ 8180 string characters out of 6176125
+ 61892 words of memory out of 5000000
+ 4190 multiletter control sequences out of 15000+600000
+ 7511 words of font info for 31 fonts, out of 8000000 for 9000
+ 264 hyphenation exceptions out of 8191
+ 25i,4n,19p,258b,158s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on graph.dvi (2 pages, 1680 bytes).
