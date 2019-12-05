@@ -1,0 +1,112 @@
+test_name: bm_so_matrix_small_heap vm_name: bitmap-marking-m32
+heap_size 75436 failed
+heap_size 76936 failed
+heap_size 78436 failed
+heap_size 79936 failed
+heap_size 81436 failed
+heap_size 82936 failed
+heap_size 84436 failed
+heap_size 85936 failed
+heap_size 87436 failed
+heap_size 88936 failed
+heap_size 90436 failed
+heap_size 91936 total_time 0.752394513
+heap_size 91936 total_time 0.741624165
+heap_size 91936 total_time 0.742762597
+heap_size 91936 total_time 0.751673175
+heap_size 91936 total_time 0.743628543
+heap_size 91936 total_time 0.744366668
+heap_size 91936 total_time 0.753086815
+heap_size 91936 total_time 0.742212358
+heap_size 91936 total_time 0.733037824
+heap_size 91936 total_time 0.744120263
+heap_size 93436 total_time 0.771042169
+heap_size 93436 total_time 0.765859277
+heap_size 93436 total_time 0.755324194
+heap_size 93436 total_time 0.751073321
+heap_size 93436 total_time 0.733915425
+heap_size 93436 total_time 0.752754485
+heap_size 93436 total_time 0.759195325
+heap_size 93436 total_time 0.752903601
+heap_size 93436 total_time 0.754405553
+heap_size 93436 total_time 0.752821392
+heap_size 94936 total_time 0.743439577
+heap_size 94936 total_time 0.764849437
+heap_size 94936 total_time 0.744388551
+heap_size 94936 total_time 0.725895366
+heap_size 94936 total_time 0.746519688
+heap_size 94936 total_time 0.743587730
+heap_size 94936 total_time 0.743280598
+heap_size 94936 total_time 0.743671040
+heap_size 94936 total_time 0.741912963
+heap_size 94936 total_time 0.743894917
+heap_size 96436 total_time 0.742451767
+heap_size 96436 total_time 0.743220226
+heap_size 96436 total_time 0.731818550
+heap_size 96436 total_time 0.743113898
+heap_size 96436 total_time 0.752978712
+heap_size 96436 total_time 0.744988519
+heap_size 96436 total_time 0.751242785
+heap_size 96436 total_time 0.751591537
+heap_size 96436 total_time 0.743028529
+heap_size 96436 total_time 0.727720496
+heap_size 97936 total_time 0.747828807
+heap_size 97936 total_time 0.744424282
+heap_size 97936 total_time 0.755576421
+heap_size 97936 total_time 0.747634721
+heap_size 97936 total_time 0.744252583
+heap_size 97936 total_time 0.751850621
+heap_size 97936 total_time 0.743869714
+heap_size 97936 total_time 0.744700129
+heap_size 97936 total_time 0.746472506
+heap_size 97936 total_time 0.747413502
+heap_size 99436 total_time 0.730507976
+heap_size 99436 total_time 0.753541084
+heap_size 99436 total_time 0.745656471
+heap_size 99436 total_time 0.752223187
+heap_size 99436 total_time 0.745933832
+heap_size 99436 total_time 0.748870725
+heap_size 99436 total_time 0.745101964
+heap_size 99436 total_time 0.747517964
+heap_size 99436 total_time 0.754567764
+heap_size 99436 total_time 0.745452471
+heap_size 100936 total_time 0.751997928
+heap_size 100936 total_time 0.745326690
+heap_size 100936 total_time 0.750743207
+heap_size 100936 total_time 0.747874637
+heap_size 100936 total_time 0.746407976
+heap_size 100936 total_time 0.746718353
+heap_size 100936 total_time 0.748963533
+heap_size 100936 total_time 0.753386323
+heap_size 100936 total_time 0.748566901
+heap_size 100936 total_time 0.728461237
+heap_size 102436 total_time 0.756417586
+heap_size 102436 total_time 0.748354461
+heap_size 102436 total_time 0.748489526
+heap_size 102436 total_time 0.744353908
+heap_size 102436 total_time 0.743952403
+heap_size 102436 total_time 0.748087395
+heap_size 102436 total_time 0.773053129
+heap_size 102436 total_time 0.746578019
+heap_size 102436 total_time 0.748858887
+heap_size 102436 total_time 0.746548960
+heap_size 103936 total_time 0.748720945
+heap_size 103936 total_time 0.800554692
+heap_size 103936 total_time 0.740102751
+heap_size 103936 total_time 0.773506393
+heap_size 103936 total_time 0.750625776
+heap_size 103936 total_time 0.747945954
+heap_size 103936 total_time 0.748182652
+heap_size 103936 total_time 0.747806724
+heap_size 103936 total_time 0.748870984
+heap_size 103936 total_time 0.756227452
+heap_size 105436 total_time 0.750411926
+heap_size 105436 total_time 0.748264609
+heap_size 105436 total_time 0.756788568
+heap_size 105436 total_time 0.769596052
+heap_size 105436 total_time 0.745887100
+heap_size 105436 total_time 0.748398307
+heap_size 105436 total_time 0.747564712
+heap_size 105436 total_time 0.751561187
+heap_size 105436 total_time 0.749844895
+heap_size 105436 total_time 0.731067626

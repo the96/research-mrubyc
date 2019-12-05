@@ -1,0 +1,40 @@
+test_name: bm_mergesort_hongli vm_name: bitmap-marking
+heap_size 30576 failed
+heap_size 31576 failed
+heap_size 32576 failed
+heap_size 33576 failed
+heap_size 34576 failed
+heap_size 35576 failed
+heap_size 36576 failed
+heap_size 37576 failed
+heap_size 38576 failed
+heap_size 39576 failed
+heap_size 40576 failed
+heap_size 41576 failed
+heap_size 42576 failed
+heap_size 43576 failed
+heap_size 44576 failed
+heap_size 45576 failed
+heap_size 46576 failed
+heap_size 47576 failed
+heap_size 48576 failed
+heap_size 49576 total_time 0.343799471
+heap_size 49576 total_time 0.327940557
+heap_size 49576 total_time 0.345225954
+heap_size 49576 total_time 0.350943571
+heap_size 49576 total_time 0.350143478
+heap_size 49576 total_time 0.345368745
+heap_size 49576 total_time 0.342788987
+heap_size 49576 total_time 0.348098101
+heap_size 49576 total_time 0.344224895
+heap_size 49576 total_time 0.341218496
+heap_size 50576 total_time 0.339042633
+heap_size 50576 total_time 0.340622447
+heap_size 50576 total_time 0.341533446
+heap_size 50576 total_time 0.344097879
+heap_size 50576 total_time 0.348645952
+heap_size 50576 total_time 0.344015403
+heap_size 50576 total_time 0.342939362
+heap_size 50576 total_time 0.340328576
+heap_size 50576 total_time 0.326324220
+heap_size 50576 total_time 0.343110294

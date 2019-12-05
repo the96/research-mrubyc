@@ -1,0 +1,76 @@
+test_name: bm_mergesort_hongli vm_name: refcount
+heap_size 30576 failed
+heap_size 31576 failed
+heap_size 32576 failed
+heap_size 33576 failed
+heap_size 34576 failed
+heap_size 35576 failed
+heap_size 36576 failed
+heap_size 37576 failed
+heap_size 38576 failed
+heap_size 39576 failed
+heap_size 40576 failed
+heap_size 41576 failed
+heap_size 42576 failed
+heap_size 43576 failed
+heap_size 44576 failed
+heap_size 45576 total_time 0.372392066
+heap_size 45576 total_time 0.374065499
+heap_size 45576 total_time 0.374946553
+heap_size 45576 total_time 0.371307690
+heap_size 45576 total_time 0.357545798
+heap_size 45576 total_time 0.376202701
+heap_size 45576 total_time 0.370867853
+heap_size 45576 total_time 0.376701106
+heap_size 45576 total_time 0.371116435
+heap_size 45576 total_time 0.375543950
+heap_size 46576 total_time 0.370248707
+heap_size 46576 total_time 0.351314276
+heap_size 46576 total_time 0.368609231
+heap_size 46576 total_time 0.369930734
+heap_size 46576 total_time 0.370995359
+heap_size 46576 total_time 0.371650755
+heap_size 46576 total_time 0.368790097
+heap_size 46576 total_time 0.370997486
+heap_size 46576 total_time 0.371599746
+heap_size 46576 total_time 0.369358259
+heap_size 47576 total_time 0.376104155
+heap_size 47576 total_time 0.370368698
+heap_size 47576 total_time 0.370901769
+heap_size 47576 total_time 0.375118744
+heap_size 47576 total_time 0.369791789
+heap_size 47576 total_time 0.368393959
+heap_size 47576 total_time 0.369771256
+heap_size 47576 total_time 0.370455975
+heap_size 47576 total_time 0.370479550
+heap_size 47576 total_time 0.371466915
+heap_size 48576 total_time 0.369470188
+heap_size 48576 total_time 0.372248529
+heap_size 48576 total_time 0.371085257
+heap_size 48576 total_time 0.369193186
+heap_size 48576 total_time 0.351305141
+heap_size 48576 total_time 0.354460153
+heap_size 48576 total_time 0.353336870
+heap_size 48576 total_time 0.367511536
+heap_size 48576 total_time 0.370885142
+heap_size 48576 total_time 0.367719905
+heap_size 49576 total_time 0.375017532
+heap_size 49576 total_time 0.356944874
+heap_size 49576 total_time 0.372746843
+heap_size 49576 total_time 0.371987577
+heap_size 49576 total_time 0.373308322
+heap_size 49576 total_time 0.371414485
+heap_size 49576 total_time 0.375648192
+heap_size 49576 total_time 0.370550069
+heap_size 49576 total_time 0.375632591
+heap_size 49576 total_time 0.374570108
+heap_size 50576 total_time 0.371542525
+heap_size 50576 total_time 0.370705028
+heap_size 50576 total_time 0.372394915
+heap_size 50576 total_time 0.372055714
+heap_size 50576 total_time 0.362841026
+heap_size 50576 total_time 0.354854293
+heap_size 50576 total_time 0.354998623
+heap_size 50576 total_time 0.353869456
+heap_size 50576 total_time 0.377339085
+heap_size 50576 total_time 0.377833959

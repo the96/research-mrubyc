@@ -1,0 +1,22 @@
+test_name: string_concat_small_heap vm_name: marksweep-m32
+heap_size 56752 failed
+heap_size 57752 failed
+heap_size 58752 failed
+heap_size 59752 failed
+heap_size 60752 failed
+heap_size 61752 failed
+heap_size 62752 failed
+heap_size 63752 failed
+heap_size 64752 failed
+heap_size 65752 failed
+heap_size 66752 failed
+heap_size 67752 failed
+heap_size 68752 failed
+heap_size 69752 failed
+heap_size 70752 failed
+heap_size 71752 failed
+heap_size 72752 failed
+heap_size 73752 failed
+heap_size 74752 failed
+heap_size 75752 failed
+heap_size 76752 failed

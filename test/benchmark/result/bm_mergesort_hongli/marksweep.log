@@ -1,0 +1,40 @@
+test_name: bm_mergesort_hongli vm_name: marksweep
+heap_size 30576 failed
+heap_size 31576 failed
+heap_size 32576 failed
+heap_size 33576 failed
+heap_size 34576 failed
+heap_size 35576 failed
+heap_size 36576 failed
+heap_size 37576 failed
+heap_size 38576 failed
+heap_size 39576 failed
+heap_size 40576 failed
+heap_size 41576 failed
+heap_size 42576 failed
+heap_size 43576 failed
+heap_size 44576 failed
+heap_size 45576 failed
+heap_size 46576 failed
+heap_size 47576 failed
+heap_size 48576 failed
+heap_size 49576 total_time 0.346749074
+heap_size 49576 total_time 0.332016828
+heap_size 49576 total_time 0.350346810
+heap_size 49576 total_time 0.347788923
+heap_size 49576 total_time 0.330724009
+heap_size 49576 total_time 0.335054848
+heap_size 49576 total_time 0.330404828
+heap_size 49576 total_time 0.347075276
+heap_size 49576 total_time 0.349293921
+heap_size 49576 total_time 0.329532563
+heap_size 50576 total_time 0.348186436
+heap_size 50576 total_time 0.345611633
+heap_size 50576 total_time 0.347208929
+heap_size 50576 total_time 0.348018766
+heap_size 50576 total_time 0.335568883
+heap_size 50576 total_time 0.348165179
+heap_size 50576 total_time 0.348524437
+heap_size 50576 total_time 0.350088216
+heap_size 50576 total_time 0.346257300
+heap_size 50576 total_time 0.347373153

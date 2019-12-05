@@ -1,0 +1,94 @@
+test_name: bm_app_tarai vm_name: refcount
+heap_size 23412 failed
+heap_size 24412 failed
+heap_size 25412 failed
+heap_size 26412 failed
+heap_size 27412 failed
+heap_size 28412 failed
+heap_size 29412 failed
+heap_size 30412 failed
+heap_size 31412 failed
+heap_size 32412 failed
+heap_size 33412 failed
+heap_size 34412 failed
+heap_size 35412 failed
+heap_size 36412 total_time 0.494989116
+heap_size 36412 total_time 0.489272806
+heap_size 36412 total_time 0.489877688
+heap_size 36412 total_time 0.490685993
+heap_size 36412 total_time 0.491411534
+heap_size 36412 total_time 0.490850365
+heap_size 36412 total_time 0.491152268
+heap_size 36412 total_time 0.475010212
+heap_size 36412 total_time 0.468677783
+heap_size 36412 total_time 0.470077746
+heap_size 37412 total_time 0.469180449
+heap_size 37412 total_time 0.471237310
+heap_size 37412 total_time 0.471372629
+heap_size 37412 total_time 0.471590329
+heap_size 37412 total_time 0.468476096
+heap_size 37412 total_time 0.472130518
+heap_size 37412 total_time 0.451112775
+heap_size 37412 total_time 0.451250743
+heap_size 37412 total_time 0.474222965
+heap_size 37412 total_time 0.467421721
+heap_size 38412 total_time 0.461451019
+heap_size 38412 total_time 0.461463904
+heap_size 38412 total_time 0.462010875
+heap_size 38412 total_time 0.459752936
+heap_size 38412 total_time 0.460593088
+heap_size 38412 total_time 0.470068679
+heap_size 38412 total_time 0.461464080
+heap_size 38412 total_time 0.463293358
+heap_size 38412 total_time 0.461129813
+heap_size 38412 total_time 0.464816045
+heap_size 39412 total_time 0.458272407
+heap_size 39412 total_time 0.458698981
+heap_size 39412 total_time 0.460464439
+heap_size 39412 total_time 0.460190045
+heap_size 39412 total_time 0.461475252
+heap_size 39412 total_time 0.465964143
+heap_size 39412 total_time 0.462801229
+heap_size 39412 total_time 0.462708674
+heap_size 39412 total_time 0.445499947
+heap_size 39412 total_time 0.462232285
+heap_size 40412 total_time 0.460618358
+heap_size 40412 total_time 0.464573856
+heap_size 40412 total_time 0.459610212
+heap_size 40412 total_time 0.457755573
+heap_size 40412 total_time 0.463116230
+heap_size 40412 total_time 0.462444321
+heap_size 40412 total_time 0.441695286
+heap_size 40412 total_time 0.460404115
+heap_size 40412 total_time 0.459829375
+heap_size 40412 total_time 0.460796727
+heap_size 41412 total_time 0.460266306
+heap_size 41412 total_time 0.459819959
+heap_size 41412 total_time 0.459571408
+heap_size 41412 total_time 0.439772113
+heap_size 41412 total_time 0.456167008
+heap_size 41412 total_time 0.458479702
+heap_size 41412 total_time 0.460428710
+heap_size 41412 total_time 0.460114364
+heap_size 41412 total_time 0.463438952
+heap_size 41412 total_time 0.457286085
+heap_size 42412 total_time 0.461647034
+heap_size 42412 total_time 0.458961060
+heap_size 42412 total_time 0.456913498
+heap_size 42412 total_time 0.455106943
+heap_size 42412 total_time 0.459013547
+heap_size 42412 total_time 0.456247500
+heap_size 42412 total_time 0.456343283
+heap_size 42412 total_time 0.460465743
+heap_size 42412 total_time 0.459543859
+heap_size 42412 total_time 0.453866262
+heap_size 43412 total_time 0.452749608
+heap_size 43412 total_time 0.458988753
+heap_size 43412 total_time 0.455638919
+heap_size 43412 total_time 0.455152607
+heap_size 43412 total_time 0.455930636
+heap_size 43412 total_time 0.467441101
+heap_size 43412 total_time 0.458435453
+heap_size 43412 total_time 0.455601787
+heap_size 43412 total_time 0.458680209
+heap_size 43412 total_time 0.457332761
