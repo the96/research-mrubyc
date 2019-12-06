@@ -6,3 +6,4 @@ mrubyc/src/hal
 **/*.a
 **/*.o
 **/*.mrb
+**/bench.sh

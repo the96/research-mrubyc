@@ -1,0 +1,6 @@
+test_name: bm_fractal vm_name: refcount-measure-gc
+heap_size 20000 failed
+heap_size 40000 total_time 0.701101782
+gc_time 0.000001620
+heap_size 40000 total_time 0.701072692
+gc_time 0.000001596

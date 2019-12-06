@@ -42,7 +42,7 @@
 #include <time.h>
 #include <math.h>
 
-double gc_time;
+double mark_time, sweep_time;
 struct timespec gc_start_time, gc_end_time;
 #endif /* MEASURE_GC */
 
@@ -1035,22 +1035,32 @@ void mrbc_mark_sweep()
   clock_gettime(CLOCK_MONOTONIC_RAW, &gc_start_time);
 #endif /* MEASURE_GC */
   mrbc_mark();
+#ifdef MEASURE_GC
+  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
+  mark_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
+          + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
+#endif /* MEASURE_GC */
 #ifdef HEAP_DUMP
   heap_dump();
 #endif /* HEAP_DUMP */
+#ifdef MEASURE_GC
+  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_start_time);
+#endif /* MEASURE_GC */
   mrbc_sweep();
+#ifdef MEASURE_GC
+  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
+  sweep_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
+          + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
+  printf("mark_time %.9lf sweep_time %.9lf\n", mark_time, sweep_time);
+  fflush(stdout);
+#endif /* MEASURE_GC */
 #ifdef HEAP_DUMP
   heap_dump();
 #endif /* HEAP_DUMP */
 #ifdef GC_MS
   reverse_mark_flag();
 #endif /* GC_MS */
-#ifdef MEASURE_GC
-  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
-  gc_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
-          + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
-  printf("gc_time %.9lf\n", gc_time);
-#endif /* MEASURE_GC */
+
 }
 
 void mrbc_mark()

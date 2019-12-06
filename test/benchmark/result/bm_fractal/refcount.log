@@ -10,103 +10,13 @@ heap_size 28604 failed
 heap_size 29604 failed
 heap_size 30604 failed
 heap_size 31604 failed
-heap_size 32604 total_time 0.736448903
-heap_size 32604 total_time 0.735907441
-heap_size 32604 total_time 0.737343938
-heap_size 32604 total_time 0.730445301
-heap_size 32604 total_time 0.731692908
-heap_size 32604 total_time 0.730866114
-heap_size 32604 total_time 0.756981089
-heap_size 32604 total_time 0.732529338
-heap_size 32604 total_time 0.749721980
-heap_size 32604 total_time 0.770268022
-heap_size 33604 total_time 0.766563860
-heap_size 33604 total_time 0.719764982
-heap_size 33604 total_time 0.732590915
-heap_size 33604 total_time 0.716754696
-heap_size 33604 total_time 0.727295890
-heap_size 33604 total_time 0.731034610
-heap_size 33604 total_time 0.718532498
-heap_size 33604 total_time 0.730594843
-heap_size 33604 total_time 0.733917649
-heap_size 33604 total_time 0.731603295
-heap_size 34604 total_time 0.754446051
-heap_size 34604 total_time 0.725970476
-heap_size 34604 total_time 0.714580990
-heap_size 34604 total_time 0.737654450
-heap_size 34604 total_time 0.715583113
-heap_size 34604 total_time 0.716337532
-heap_size 34604 total_time 0.729521606
-heap_size 34604 total_time 0.734448836
-heap_size 34604 total_time 0.726034822
-heap_size 34604 total_time 0.734485237
-heap_size 35604 total_time 0.732214047
-heap_size 35604 total_time 0.729368960
-heap_size 35604 total_time 0.727582029
-heap_size 35604 total_time 0.730317486
-heap_size 35604 total_time 0.731638786
-heap_size 35604 total_time 0.712694424
-heap_size 35604 total_time 0.740505876
-heap_size 35604 total_time 0.722537290
-heap_size 35604 total_time 0.729316353
-heap_size 35604 total_time 0.739443167
-heap_size 36604 total_time 0.741771235
-heap_size 36604 total_time 0.716044196
-heap_size 36604 total_time 0.720123077
-heap_size 36604 total_time 0.727311131
-heap_size 36604 total_time 0.721933167
-heap_size 36604 total_time 0.733121198
-heap_size 36604 total_time 0.721954689
-heap_size 36604 total_time 0.715479169
-heap_size 36604 total_time 0.729286657
-heap_size 36604 total_time 0.731557224
-heap_size 37604 total_time 0.724348245
-heap_size 37604 total_time 0.729907634
-heap_size 37604 total_time 0.735257041
-heap_size 37604 total_time 0.734035099
-heap_size 37604 total_time 0.737117225
-heap_size 37604 total_time 0.712952082
-heap_size 37604 total_time 0.749444353
-heap_size 37604 total_time 0.720555000
-heap_size 37604 total_time 0.720804141
-heap_size 37604 total_time 0.728991884
-heap_size 38604 total_time 0.743457823
-heap_size 38604 total_time 0.735592624
-heap_size 38604 total_time 0.737913670
-heap_size 38604 total_time 0.767914508
-heap_size 38604 total_time 0.764951540
-heap_size 38604 total_time 0.763136655
-heap_size 38604 total_time 0.761378052
-heap_size 38604 total_time 0.733909893
-heap_size 38604 total_time 0.717474746
-heap_size 38604 total_time 0.715166893
-heap_size 39604 total_time 0.743752802
-heap_size 39604 total_time 0.734675685
-heap_size 39604 total_time 0.719536677
-heap_size 39604 total_time 0.734856034
-heap_size 39604 total_time 0.744591606
-heap_size 39604 total_time 0.742245532
-heap_size 39604 total_time 0.725435374
-heap_size 39604 total_time 0.717147518
-heap_size 39604 total_time 0.727984924
-heap_size 39604 total_time 0.713684938
-heap_size 40604 total_time 0.724833434
-heap_size 40604 total_time 0.727092309
-heap_size 40604 total_time 0.731377201
-heap_size 40604 total_time 0.735642578
-heap_size 40604 total_time 0.726019944
-heap_size 40604 total_time 0.731031792
-heap_size 40604 total_time 0.752306128
-heap_size 40604 total_time 0.743609129
-heap_size 40604 total_time 0.721564376
-heap_size 40604 total_time 0.727853938
-heap_size 41604 total_time 0.713391439
-heap_size 41604 total_time 0.723673085
-heap_size 41604 total_time 0.739689292
-heap_size 41604 total_time 0.727150222
-heap_size 41604 total_time 0.721275303
-heap_size 41604 total_time 0.716933499
-heap_size 41604 total_time 0.713485140
-heap_size 41604 total_time 0.723184253
-heap_size 41604 total_time 0.729470063
-heap_size 41604 total_time 0.720043438
+heap_size 32604 failed
+heap_size 33604 failed
+heap_size 34604 failed
+heap_size 35604 failed
+heap_size 36604 failed
+heap_size 37604 failed
+heap_size 38604 failed
+heap_size 39604 failed
+heap_size 40604 failed
+heap_size 41604 failed
