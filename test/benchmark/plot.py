@@ -109,8 +109,12 @@ for graph in graphs:
   if len(xtick) < len(graph.heap_sizes):
     xtick = graph.heap_sizes
 ax.set_ylim(ymin=0)
-ax.set_xticks(xtick)
-ax.set_xticklabels([])
+ax.set_xticks(xtick, minor=True)
+xticks_major = []
+for i in range(len(xtick)):
+  if i % 2 == 0:
+    xticks_major.append(xtick[i])
+ax.set_xticks(xticks_major, minor=False)
 ax.set_xlabel("heap_size[kB]")
 ax.set_ylabel("process time(sec)")
 ax.legend()
