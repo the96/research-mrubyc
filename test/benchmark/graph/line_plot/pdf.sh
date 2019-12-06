@@ -29,3 +29,4 @@ maketex > $TEX.tex
 platex $TEX.tex
 dvipdfmx $TEX.dvi
 
+rm graph.aux graph.dvi graph.log graph.tex
