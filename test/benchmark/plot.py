@@ -54,6 +54,10 @@ head_pat = re.compile('^test_name: (.+) vm_name: ' + vm_name + '$')
 success_pat = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat = re.compile('heap_size (\d+) failed')
 
+if len(sys.argv) == 0:
+  print("Please input .log file what recording total time of benchmark processing.")
+
+
 graphs = []
 for file_path in sys.argv:
   file = open(file_path, 'r')
