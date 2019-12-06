@@ -11,34 +11,33 @@ DEF_MAX_SIZE = DEF_MIN_SIZE * 10
 DEF_TIMES = 10
 
 marksweep = "marksweep"
-earlygc = "marksweep-early"
-bitmap = "bitmap-marking"
-bitmap_m32 = "bitmap-marking-m32"
-bitmap_earlygc = "bitmap-marking-early"
-marksweep_m32 = "marksweep-m32"
-earlygc_m32 = "marksweep-early-m32"
-bitmap_earlygc_m32 = "bitmap-marking-early-m32"
-refcnt = "refcount"
-refcnt_m32 = "refcnt-m32"
-marksweep_mgc = "marksweep-measure-gc"
-bitmap_mgc = "bitmap-marking-gc"
-refcnt_mgc = "refcount-measure-gc"
-vm_names = [marksweep, earlygc, bitmap, bitmap_m32, bitmap_earlygc, marksweep_m32, earlygc_m32, bitmap_earlygc_m32, refcnt, refcnt_m32, marksweep_mgc, bitmap_mgc, refcnt_mgc]
-
 marksweep_bin = "marksweep/mrubyc-bench"
+earlygc = "marksweep-early"
 earlygc_bin = "marksweep/mrubyc-bench-earlygc"
+bitmap = "bitmap-marking"
 bitmap_bin = "bitmap-marking/mrubyc-bench"
+bitmap_earlygc = "bitmap-marking-early"
 bitmap_earlygc_bin = "bitmap-marking/mrubyc-bench-earlygc"
-marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
-earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
-bitmap_earlygc_m32_bin = "bitmap-marking/mrubyc-bench-earlygc-m32"
-bitmap_m32_bin = "bitmap-marking/mrubyc-bench-m32"
+refcnt = "refcount"
 refcnt_bin = "refcount/mrubyc-bench"
+marksweep_m32 = "marksweep-m32"
+marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
+earlygc_m32 = "marksweep-early-m32"
+earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
+bitmap_m32 = "bitmap-marking-m32"
+bitmap_m32_bin = "bitmap-marking/mrubyc-bench-m32"
+bitmap_earlygc_m32 = "bitmap-marking-early-m32"
+bitmap_earlygc_m32_bin = "bitmap-marking/mrubyc-bench-earlygc-m32"
+refcnt_m32 = "refcnt-m32"
 refcnt_m32_bin = "refcount/mrubyc-bench-m32"
+marksweep_mgc = "marksweep-measure-gc"
 marksweep_mgc_bin = "marksweep/mrubyc-measure-gc"
+bitmap_mgc = "bitmap-marking-gc"
 bitmap_mgc_bin = "bitmap-marking/mrubyc-measure-gc"
+refcnt_mgc = "refcount-measure-gc"
 refcnt_mgc_bin = "refcount/mrubyc-measure-gc"
-vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, marksweep_m32_bin, earlygc_m32_bin, bitmap_earlygc_m32_bin, bitmap_m32_bin, refcnt_bin, refcnt_m32_bin, marksweep_mgc_bin, bitmap_mgc_bin, refcnt_mgc_bin]
+vm_names = [marksweep, earlygc, bitmap, bitmap_earlygc, refcnt, marksweep_m32, earlygc_m32, bitmap_m32, bitmap_earlygc_m32, refcnt_m32, marksweep_mgc, bitmap_mgc, refcnt_mgc]
+vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, refcnt_bin, marksweep_m32_bin, earlygc_m32_bin, bitmap_m32_bin, bitmap_earlygc_m32_bin, refcnt_m32_bin, marksweep_mgc_bin, bitmap_mgc_bin, refcnt_mgc_bin]
 
 def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size, outpath):  
   # output format
