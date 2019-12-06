@@ -101,16 +101,12 @@ max_size = DEF_MAX_SIZE
 times = DEF_TIMES
 i = 1
 while i < len(sys.argv):
-  if (sys.argv[i] == '-t'):
-    times = int(sys.argv[i+1])
-    i+=2
-    continue
-  if (sys.argv[i] == '-config' or sys.argv[i] == '-c'):
-    config_file_path = sys.argv[i+1]
-    i+=2
+  if (sys.argv[i].endswith(".conf")):
+    config_file_path = sys.argv[i]
+    i+=1
     continue
   else:
-    print("undefined option: " + sys.argv[i+1])
+    print("undefined option: " + sys.argv[i])
 
 # read config file
 if config_file_path == None:
