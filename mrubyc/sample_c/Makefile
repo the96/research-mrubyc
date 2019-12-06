@@ -12,6 +12,8 @@ BENCH =  mrubyc-bench
 EARLY_GC = mrubyc-earlygc mrubyc-bench-earlygc
 M32 = mrubyc-m32 mrubyc-bench-m32
 M32_EARLY_GC = mrubyc-earlygc-m32 mrubyc-bench-earlygc-m32
+M-GC = mrubyc-measure-gc
+M-VML = mrubyc-measure-vmloop
 CFLAGS += -g -I ../src -I ../ext -Wall -Wpointer-arith $(BENCHMARK)
 LDFLAGS += -L ../src
 LIBMRUBYC = ../src/libmrubyc.a ../ext/libmrubyc_ext.a -lm
@@ -22,6 +24,8 @@ bench: $(BENCH)
 earlygc: $(EARLY_GC)
 m32: $(M32)
 earlygc-m32: $(M32_EARLY_GC)
+m-gc: $(M-GC)
+m-vml: $(M-VML)
 
 mrubyc: main.c $(LIBMRUBYC)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT)$@ main.c $(LIBMRUBYC)
@@ -46,6 +50,12 @@ mrubyc-earlygc-m32: main.c $(LIBMRUBYC)
 
 mrubyc-bench-earlygc-m32: main_bench.c $(LIBMRUBYC)
 	$(CC) $(CFLAGS) -m32 $(LDFLAGS) -o $(OUT)$@ main_bench.c $(LIBMRUBYC)
+
+mrubyc-measure-gc: main_bench.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT)$@ main_bench.c $(LIBMRUBYC)
+
+mrubyc-measure-vmloop: main_bench.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT)$@ main_bench.c $(LIBMRUBYC)
 # mrubyc_sample: main_sample.c $(LIBMRUBYC)
 # 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT)$@ main_sample.c $(LIBMRUBYC)
 

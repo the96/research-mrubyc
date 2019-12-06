@@ -24,6 +24,19 @@
 #include "c_array.h"
 #include "c_hash.h"
 
+#if defined(MEASURE_GC) && defined(GC_RC)
+#include <time.h>
+#include <math.h>
+#include <stdio.h>
+
+#define MEASURE_OFF 0
+#define MEASURE_ON 1
+#define NOT_FIRST_CALL 0
+#define FIRST_CALL 1
+int measure_flag = MEASURE_OFF;
+double gc_time;
+struct timespec gc_start_time, gc_end_time;
+#endif /* MEASURE_GC && GC_RC */
 
 //================================================================
 /*! compare two mrbc_values
@@ -182,6 +195,15 @@ void mrbc_dec_ref_counter(mrbc_value *v)
   // release memory?
   if( v->instance->ref_count != 0 ) return;
 
+#ifdef MEASURE_GC
+  int first_call_flag = NOT_FIRST_CALL;
+  if (measure_flag == MEASURE_OFF){
+    first_call_flag = FIRST_CALL;
+    measure_flag = MEASURE_ON;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &gc_start_time);
+  }
+#endif /* MEASURE_GC */
+
   switch( v->tt ) {
   case MRBC_TT_OBJECT:	mrbc_instance_delete(v);	break;
   case MRBC_TT_PROC:
@@ -200,6 +222,14 @@ void mrbc_dec_ref_counter(mrbc_value *v)
     // Nothing
     break;
   }
+#ifdef MEASURE_GC
+  if (first_call_flag == FIRST_CALL) {
+    clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
+    gc_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
+            + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
+    printf("gc_time %.9lf\n", gc_time);
+  }
+#endif /* MEASURE_GC */
 }
 #endif /* GC_RC */
 

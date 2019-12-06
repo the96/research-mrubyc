@@ -38,6 +38,14 @@
 #include "symbol.h"
 #endif /* GC_DEBUG */
 
+#ifdef MEASURE_GC
+#include <time.h>
+#include <math.h>
+
+double gc_time;
+struct timespec gc_start_time, gc_end_time;
+#endif /* MEASURE_GC */
+
 #if defined(EARLY_GC) || defined (GC_PROF)
 long long total_alloc = 0;
 long long total_alloc_last_gc = 0;
@@ -1023,6 +1031,9 @@ void mark_from_stack();
 
 void mrbc_mark_sweep()
 {
+#ifdef MEASURE_GC
+  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_start_time);
+#endif /* MEASURE_GC */
   mrbc_mark();
 #ifdef HEAP_DUMP
   heap_dump();
@@ -1034,6 +1045,12 @@ void mrbc_mark_sweep()
 #ifdef GC_MS
   reverse_mark_flag();
 #endif /* GC_MS */
+#ifdef MEASURE_GC
+  clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
+  gc_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
+          + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
+  printf("gc_time %.9lf\n", gc_time);
+#endif /* MEASURE_GC */
 }
 
 void mrbc_mark()

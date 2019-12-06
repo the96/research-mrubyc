@@ -6,7 +6,11 @@ clean:
 	rm testable/*.mrb
 	rm marksweep bitmap-marking refcount
 mrubyc:
-	make -C ../../mrubyc all-vm
+	make -C ../../mrubyc all-normal
+mrubyc-bench:
+	make -C ../../mrubyc all-bench
+mrubyc-measure:
+	make -C ../../mrubyc all-measure
 mrubyc-m32:
 	make -C ../../mrubyc all-m32
 

@@ -32,6 +32,11 @@
 #include "c_array.h"
 #include "c_hash.h"
 
+#ifdef MEASURE_VMLOOP
+#include <time.h>
+#include <math.h>
+#endif
+
 
 static uint32_t free_vm_bitmap[MAX_VM_COUNT / 32 + 1];
 #define FREE_BITMAP_WIDTH 32
@@ -2010,7 +2015,14 @@ int mrbc_vm_run( struct VM *vm )
 {
   int ret = 0;
 
+#ifdef MEASURE_VMLOOP
+  struct timespec loop_start_time, loop_end_time;
+  double loop_time;
+#endif /* MEASURE_VMLOOP */
   do {
+#ifdef MEASURE_VMLOOP
+    clock_gettime(CLOCK_MONOTONIC_RAW, &loop_start_time);
+#endif /* MEASURE_VMLOOP */
     // get one bytecode
     uint32_t code = bin_to_uint32(vm->pc_irep->code + vm->pc * 4);
     vm->pc++;
@@ -2077,6 +2089,12 @@ int mrbc_vm_run( struct VM *vm )
       console_printf("Skip OP=%02x\n", GET_OPCODE(code));
       break;
     }
+#ifdef MEASURE_VMLOOP
+    clock_gettime(CLOCK_MONOTONIC_RAW, &loop_end_time);
+    loop_time = (double)(loop_end_time.tv_sec - loop_start_time.tv_sec) 
+              + (double)(loop_end_time.tv_nsec - loop_start_time.tv_nsec) * 1.0E-9;
+    printf("vm_loop_time %.9lf\n", loop_time);
+#endif /* MEASURE_VMLOOP */
   } while( !vm->flag_preemption );
 
   vm->flag_preemption = 0;

@@ -64,9 +64,34 @@ bitmap-marking-earlygc-m32:
 	$(MAKE) -B mrubyc_ext BENCHMARK="-O2 -m32 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP_MARKING -DEARLY_GC" OUT="bitmap-marking/"
 	$(MAKE) -BC sample_c BENCHMARK="-O2 -DNDEBUG -UDEBUG -UMRBC_DEBUG -DGC_MODE=BITMAP_MARKING -DEARLY_GC" OUT="bitmap-marking/" earlygc-m32
 
+marksweep-m-gc:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC -DGC_MODE=MARKSWEEP" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC -DGC_MODE=MARKSWEEP" OUT="marksweep/" m-gc
+
+bitmap-marking-m-gc:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC -DGC_MODE=BITMAP_MARKING" OUT="bitmap-marking/" 
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC  -DGC_MODE=BITMAP_MARKING" OUT="bitmap-marking/" m-gc
+
+refcount-m-gc:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC -DGC_MODE=REFERENCE_COUNT" OUT="refcount/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_GC  -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m-gc
+
+marksweep-m-vml:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=MARKSWEEP" OUT="marksweep/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=MARKSWEEP" OUT="marksweep/" m-vml
+
+bitmap-marking-m-vml:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=BITMAP_MARKING" OUT="bitmap-marking/" 
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=BITMAP_MARKING" OUT="bitmap-marking/" m-vml
+
+refcount-m-vml:
+	$(MAKE) -B mrubyc_lib mrubyc_ext BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=REFERENCE_COUNT" OUT="refcount/"
+	$(MAKE) -BC sample_c BENCHMARK="-O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG -DMEASURE_VMLOOP -DGC_MODE=REFERENCE_COUNT" OUT="refcount/" m-vml
+
 
 all-vm: all-normal all-bench
 all-normal: marksweep bitmap-marking refcount
+all-measure: marksweep-m-gc marksweep-m-vml bitmap-marking-m-gc bitmap-marking-m-vml refcount-m-gc refcount-m-vml
 all-bench: marksweep-bench bitmap-marking-bench refcount-bench marksweep-earlygc bitmap-marking-earlygc
 all-m32: marksweep-m32 bitmap-marking-m32 refcount-m32 marksweep-earlygc-m32 bitmap-marking-earlygc-m32
 

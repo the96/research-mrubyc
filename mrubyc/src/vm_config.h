@@ -51,6 +51,7 @@
 #define GC_MS
 #define GC_COUNT
 #define GC_MS_OR_BM
+// sweep method
 #define REGENERATE_FREELIST
 #endif
 
@@ -58,6 +59,7 @@
 #define GC_BM
 #define GC_COUNT
 #define GC_MS_OR_BM
+// sweep method
 #define REGENERATE_FREELIST
 #endif
 
@@ -69,6 +71,7 @@
 #define GC_MS_OR_BM
 #define GC_MS_DEBUG
 #define GC_DEBUG
+// sweep method
 #define REGENERATE_FREELIST
 
 #endif
@@ -82,8 +85,18 @@
 #define GC_MS_OR_BM
 #define GC_BM_DEBUG
 #define GC_DEBUG
+// markbit validity check
 #define CHECK_MARK
 #endif
+
+// measure vm loop time
+// #define MEASURE_VMLOOP
+// measure gc time
+// #define MEASURE_GC
+#if defined(MEASURE_GC) && defined(GC_RC)
+// count recursive release object
+#define COUNT_RECURSIVE
+#endif /* MEASURE_GC && GC_RC */
 
 #ifdef GC_MS_OR_BM
 #define MARK_STACK_SIZE 500000
