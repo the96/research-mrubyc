@@ -15,7 +15,7 @@ mrubyc-m32:
 	make -C ../../mrubyc all-m32
 
 pdf:
-	rm graph/all.pdf
+	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi
 	ls result/bm_app_fib/* | xargs python3 plot.py
 	ls result/bm_app_tak/* | xargs python3 plot.py
 	ls result/bm_app_tarai/* | xargs python3 plot.py
