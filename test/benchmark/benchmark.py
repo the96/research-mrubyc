@@ -34,7 +34,7 @@ marksweep_mgc = "marksweep-measure-gc"
 marksweep_mgc_bin = "marksweep/mrubyc-measure-gc"
 bitmap_mgc = "bitmap-marking-gc"
 bitmap_mgc_bin = "bitmap-marking/mrubyc-measure-gc"
-refcnt_mgc = "refcount-measure-gc"
+refcnt_mgc = "refcnt-measure-gc"
 refcnt_mgc_bin = "refcount/mrubyc-measure-gc"
 vm_names = [marksweep, earlygc, bitmap, bitmap_earlygc, refcnt, marksweep_m32, earlygc_m32, bitmap_m32, bitmap_earlygc_m32, refcnt_m32, marksweep_mgc, bitmap_mgc, refcnt_mgc]
 vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, refcnt_bin, marksweep_m32_bin, earlygc_m32_bin, bitmap_m32_bin, bitmap_earlygc_m32_bin, refcnt_m32_bin, marksweep_mgc_bin, bitmap_mgc_bin, refcnt_mgc_bin]
@@ -112,6 +112,7 @@ while i < len(sys.argv):
 if config_file_path == None:
   sys.exit("please input benchmark config file (-c path)")
 
+COMMENT_PATTERN = re.compile('^#')
 BENCHMARK_PATTERN = re.compile('(.+\.mrb) times (\d+) min (\d+) max (\d+) inc (\d+)')
 TESTNAME_PATTERN = re.compile('test_name \"(.+)\"')
 CONFIG_VM_PATTERN = re.compile('(.+)')
@@ -120,9 +121,12 @@ config = config_file.readlines()
 config_file.close()
 flag = False
 for line in config:
+  comment_match = COMMENT_PATTERN.search(line)
   bench_match = BENCHMARK_PATTERN.search(line)
   testname_match = TESTNAME_PATTERN.search(line)
   conf_vm_match = CONFIG_VM_PATTERN.search(line)
+  if comment_match:
+    continue
   if bench_match:
     match_strings = bench_match.groups()
     benchmark_path = match_strings[0]
