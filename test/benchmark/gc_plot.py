@@ -143,7 +143,7 @@ def scatter(ax, x, y, xtick):
   ax.set_yticks(np.arange(0, y_top, y_top/10), minor=False)
 
 def scatter_x_is_heap(ax, x, y, xtick, xticklabels):
-  scatter(ax,x,y,xtick,xticklabels)
+  scatter(ax,x,y,xtick)
   ax.set_xlabel("heap_size[kB]")
   ax.set_ylabel("process time(sec)")
   ax.set_xticklabels(xticklabels, minor=False)
@@ -151,13 +151,11 @@ def scatter_x_is_heap(ax, x, y, xtick, xticklabels):
 def int_to_x_tick(num):
   str_num = str(num)
   n = len(str_num)
-  if n >= 1:
-    n -= 1
-  top_num = (int(str_num[0]) + 1) * (10 ** (n - 1))
+  if n <= 1:
+    return range(0, int(str_num[0])+2, 1)
+  top_num = int((int(str_num[0]) + 0.5) * (10 ** (n-1)))
   if top_num > 10:
-    ticks = np.arange(0, top_num, top_num / 10)
-  else:
-    ticks = np.arange(0, top_num, 1)
+    return range(0, top_num, int(top_num / 8))
 
 # pop and discard 'gc_plot.py' from sys.argv
 sys.argv.pop(0)
@@ -166,7 +164,8 @@ test_name = None
 marksweep = "marksweep-measure-gc"
 bitmap = "bitmap-marking-gc"
 refcnt = "refcnt-measure-gc"
-vm_pat = '(' + marksweep + "|" + bitmap + "|" + refcnt + ')'
+refcnt_everytime = "refcnt-measure-gc-everytime"
+vm_pat = '(' + marksweep + "|" + bitmap + "|" + refcnt + "|" + refcnt_everytime + ')'
 vm_name = {marksweep: 'marksweep', bitmap: 'bitmap-marking', refcnt: 'refcount'}
 
 head_pat      = re.compile('^test_name: (.+) vm_name: ' + vm_pat + '$')
@@ -193,8 +192,9 @@ for file_path in sys.argv:
       vm_name = properties[1]
       if vm_name == marksweep or vm_name == bitmap:
         gc_result = MarkSweepGCResult(test_name, vm_name)
-        gc_flag = MARKSWEEP 
-      elif vm_name == refcnt:
+        gc_flag = MARKSWEEP
+        break
+      elif vm_name == refcnt or vm_name == refcnt_everytime:
         gc_result = RefCountGCResult(test_name, vm_name)
         gc_flag = REFCOUNT
       continue
@@ -247,15 +247,18 @@ for index in range(len(gc_results)):
   vm_name = gc_result.vm_name
 
   if type(gc_result) is MarkSweepGCResult:
+    pass
     heap_sizes, mark_times, sweep_times, gc_times = gc_result.getItemForPlot()
     xticks, xticklabels = gc_result.getXTicks()
 
     ax = fig.add_subplot(row, col, 1)
     scatter_x_is_heap(ax, heap_sizes, mark_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " mark time")
+    
     ax = fig.add_subplot(row, col, 2)
     scatter_x_is_heap(ax, heap_sizes, sweep_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " sweep time")
+    
     ax = fig.add_subplot(row, col, 3)
     scatter_x_is_heap(ax, heap_sizes, gc_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " gc time")
@@ -267,14 +270,24 @@ for index in range(len(gc_results)):
     ax = fig.add_subplot(row, col, 1)
     scatter_x_is_heap(ax, heap_sizes, gc_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " gc time")
+
+    ax = fig.add_subplot(row, col, 2)
     max_decref = max(rec_decrefs)
-    xtick = int_to_x_tick(max_decref)
-    scatter(ax, rec_decrefs, gc_times, xtick)
-    ax.set_title(test_name + " " + vm_name + " gc time / recursive func call")
+    xticks = int_to_x_tick(max_decref)
+    scatter(ax, rec_decrefs, gc_times, xticks)
+    ax.set_xticklabels(xticks, minor=False)
+    ax.set_xlabel("recursive dec_ref_counter times")
+    ax.set_ylabel("process time(sec)")
+    ax.set_title(test_name + "refcount gc time/func call")
+    
+    ax = fig.add_subplot(row, col, 3)
     max_free = max(rec_frees)
-    xtick = int_to_x_tick(max_free)
-    scatter(ax, rec_frees, gc_times, xtick)
-    ax.set_title(test_name + " " + vm_name + " gc time / recursive free")
+    xticks = int_to_x_tick(max_free)
+    scatter(ax, rec_frees, gc_times, xticks)
+    ax.set_xticklabels(xticks, minor=False)
+    ax.set_xlabel("recursive free times")
+    ax.set_ylabel("process time(sec)")
+    ax.set_title(test_name + "refcount gc time/free")
   pdf.savefig()
 
 pdf.close()

@@ -36,6 +36,8 @@ bitmap_mgc = "bitmap-marking-gc"
 bitmap_mgc_bin = "bitmap-marking/mrubyc-measure-gc"
 refcnt_mgc = "refcnt-measure-gc"
 refcnt_mgc_bin = "refcount/mrubyc-measure-gc"
+refcnt_mgc = "refcnt-measure-gc-everytime"
+refcnt_mgc_bin = "refcount/mrubyc-m-gc-everytime"
 vm_names = [marksweep, earlygc, bitmap, bitmap_earlygc, refcnt, marksweep_m32, earlygc_m32, bitmap_m32, bitmap_earlygc_m32, refcnt_m32, marksweep_mgc, bitmap_mgc, refcnt_mgc]
 vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, refcnt_bin, marksweep_m32_bin, earlygc_m32_bin, bitmap_m32_bin, bitmap_earlygc_m32_bin, refcnt_m32_bin, marksweep_mgc_bin, bitmap_mgc_bin, refcnt_mgc_bin]
 

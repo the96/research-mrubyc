@@ -95,7 +95,7 @@
 // #define MEASURE_GC
 #if defined(MEASURE_GC) && defined(GC_RC)
 // count recursive release object
-#define COUNT_RECURSIVE
+// #define COUNT_RECURSIVE
 #endif /* MEASURE_GC && GC_RC */
 
 #ifdef GC_MS_OR_BM
