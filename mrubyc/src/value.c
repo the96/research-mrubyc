@@ -33,6 +33,9 @@
 #define MEASURE_ON 1
 #define NOT_FIRST_CALL 0
 #define FIRST_CALL 1
+#ifdef COUNT_RECURSIVE
+int count_recursive_decref;
+#endif /* COUNT_RECURSIVE */
 int measure_flag = MEASURE_OFF;
 double gc_time;
 struct timespec gc_start_time, gc_end_time;
@@ -176,6 +179,9 @@ void mrbc_release(mrbc_value *v)
 */
 void mrbc_dec_ref_counter(mrbc_value *v)
 {
+#ifdef COUNT_RECURSIVE
+  count_recursive_decref++;
+#endif /* COUNT_RECURSIVE */
   switch( v->tt ){
   case MRBC_TT_OBJECT:
   case MRBC_TT_PROC:
@@ -200,6 +206,10 @@ void mrbc_dec_ref_counter(mrbc_value *v)
   if (measure_flag == MEASURE_OFF){
     first_call_flag = FIRST_CALL;
     measure_flag = MEASURE_ON;
+#ifdef COUNT_RECURSIVE
+    reset_count_recursive_free();
+    count_recursive_decref = 1;
+#endif /* COUNT_RECURSIVE */
     clock_gettime(CLOCK_MONOTONIC_RAW, &gc_start_time);
   }
 #endif /* MEASURE_GC */
@@ -227,7 +237,13 @@ void mrbc_dec_ref_counter(mrbc_value *v)
     clock_gettime(CLOCK_MONOTONIC_RAW, &gc_end_time);
     gc_time = (double)(gc_end_time.tv_sec  - gc_start_time.tv_sec) 
             + (double)(gc_end_time.tv_nsec - gc_start_time.tv_nsec) * 1.0E-9;
+#ifdef COUNT_RECURSIVE
+    int count_recursive_free = get_count_recursive_free();
+    printf("gc_time %.9lf rec_decref %d rec_free %d\n", gc_time, count_recursive_decref, count_recursive_free);
+#else
     printf("gc_time %.9lf\n", gc_time);
+#endif /* COUNT_RECURSIVE */
+    measure_flag = MEASURE_OFF;
   }
 #endif /* MEASURE_GC */
 }

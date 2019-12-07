@@ -7,4 +7,4 @@ mrubyc/src/hal
 **/*.o
 **/*.mrb
 **/bench.sh
-test/benchmark/result/
+test/benchmark/**/result*/

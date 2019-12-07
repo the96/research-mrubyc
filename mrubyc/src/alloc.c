@@ -46,6 +46,20 @@ double mark_time, sweep_time;
 struct timespec gc_start_time, gc_end_time;
 #endif /* MEASURE_GC */
 
+#ifdef COUNT_RECURSIVE
+int count_recursive_free = 0;
+
+void reset_count_recursive_free()
+{
+  count_recursive_free = 0;
+}
+
+int get_count_recursive_free()
+{
+  return count_recursive_free;
+}
+#endif /* COUNT_RECURSIVE */
+
 #if defined(EARLY_GC) || defined (GC_PROF)
 long long total_alloc = 0;
 long long total_alloc_last_gc = 0;
@@ -545,6 +559,9 @@ void * mrbc_raw_alloc(unsigned int size)
 */
 void mrbc_raw_free(void *ptr)
 {
+#ifdef COUNT_RECURSIVE
+  count_recursive_free++;
+#endif
   // get target block
   FREE_BLOCK *target = (FREE_BLOCK *)((uint8_t *)ptr - sizeof(USED_BLOCK));
 

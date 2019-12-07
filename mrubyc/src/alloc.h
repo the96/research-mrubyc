@@ -120,6 +120,11 @@ void mrbc_sweep();
 void print_heap_summary();
 #endif
 
+#ifdef COUNT_RECURSIVE
+void reset_count_recursive_free();
+int get_count_recursive_free();
+#endif /* COUNT_RECURSIVE */
+
 #if defined(GC_MS_DEBUG) || defined (GC_BM_DEBUG)
 void heap_dump();
 #endif /* GC_MS_DEBUG or GC_BM_DEBUG */

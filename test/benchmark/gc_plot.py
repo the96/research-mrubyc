@@ -69,28 +69,34 @@ class MarkSweepGCResult(GCResult):
       i+=1
     return (ticks, ticklabels)
 
+class RefCountGCData:
+  def __init__(self, gc_time, rec_decref, rec_free):
+    self.gc_time = gc_time
+    self.rec_decref = rec_decref
+    self.rec_free = rec_free
+
 class RefCountGCResult(GCResult):
   def __init__(self, test_name, vm_name):
     super().__init__(test_name, vm_name)
 # x
     self.heap_sizes = []
 # y
-    self.gc_times = {}
+    self.gc_data = {}
 
-  def addItem(self, heap_size, gc_time):
+  def addItem(self, heap_size, gc_time, rec_decref, rec_free):
     if not (heap_size in self.heap_sizes):
       self.heap_sizes.append(heap_size)
-      self.gc_times[heap_size] = []
-    self.gc_times[heap_size].append(gc_time)
+      self.gc_data[heap_size] = []
+    self.gc_data[heap_size].append(RefCountGCData(gc_time, rec_decref, rec_free))
 
   def getItemForPlot(self):
     heap_sizes = []
     gc_times = []
     for heap_size in self.heap_sizes:
-      gc_num = len(self.gc_times[heap_size])
+      gc_num = len(self.gc_data[heap_size])
       for index in range(gc_num):
         heap_sizes.append(heap_size)
-        gc_times.append(self.gc_times[heap_size][index])
+        gc_times.append(self.gc_data[heap_size][index].gc_time)
     return (heap_sizes, gc_times)
 
   def getXTicks(self):
@@ -148,7 +154,8 @@ head_pat      = re.compile('^test_name: (.+) vm_name: ' + vm_pat + '$')
 success_pat   = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat    = re.compile('heap_size (\d+) failed')
 marksweep_pat = re.compile('mark_time (\d+\.\d+) sweep_time (\d+\.\d+)')
-refcount_pat  = re.compile('gc_time (\d+\.\d+)')
+# gc_time 0.000018853 rec_decref 201 rec_free 402
+refcount_pat  = re.compile('gc_time (\d+\.\d+) ref_decref (\d+) rec_free (\d+)')
 
 if len(sys.argv) == 0:
   print("Please input .log file what recording gc time.")
@@ -194,8 +201,11 @@ for file_path in sys.argv:
     elif gc_flag == REFCOUNT:
       gc_time_match = refcount_pat.search(line)
       if gc_time_match:
-        gc_time = float(gc_time_match.groups()[0])
-        gc_result.addItem(heap_size, gc_time)
+        gc_info = gc_time_match.groups()
+        gc_time = float(gc_info[0])
+        rec_decref = int(gc_info[1])
+        rec_free = int(gc_info[2])
+        gc_result.addItem(heap_size, gc_time, rec_decref, rec_free)
   if not gc_result is None:
     gc_results.append(gc_result)
 
