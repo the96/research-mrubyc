@@ -3,6 +3,7 @@ import re
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 import os
 import os.path
 import datetime
@@ -106,11 +107,27 @@ class ManyTestNameException(Exception):
   pass
 
 def scatter(ax, x, y, xtick, xticklabels):
+  y_max = max(y)
+  str_y = str(y_max)
+  y_int = str_y.split('.')[0]
+  y_dec = str_y.split('.')[1]
+  if y_int == 0:
+    y_top = (int(y_int[0]) + 2) * len(y_int)
+  else:
+    for i in range(len(y_dec)):
+      n = int(y_dec[i])
+      if n == 0:
+        continue
+      y_top = (n + 2) / (10 ** i)
+      break
   ax.scatter(x,y)
   ax.set_xlabel("heap_size[kB]")
   ax.set_ylabel("process time(sec)")
   ax.set_xticks(xticks, minor=False)
   ax.set_xticklabels(xticklabels, minor=False)
+  ax.set_ylim(bottom=0)
+  yticks = list(np.arange(0, y_top, y_top / 10))
+  ax.set_yticks(yticks, minor=False)
 
 # pop and discard 'gc_plot.py' from sys.argv
 sys.argv.pop(0)
