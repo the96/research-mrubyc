@@ -92,12 +92,17 @@ class RefCountGCResult(GCResult):
   def getItemForPlot(self):
     heap_sizes = []
     gc_times = []
+    rec_decrefs = []
+    rec_frees = []
     for heap_size in self.heap_sizes:
       gc_num = len(self.gc_data[heap_size])
       for index in range(gc_num):
         heap_sizes.append(heap_size)
-        gc_times.append(self.gc_data[heap_size][index].gc_time)
-    return (heap_sizes, gc_times)
+        gc_data = self.gc_data[heap_size][index]
+        gc_times.append(gc_data.gc_time)
+        rec_decrefs.append(gc_data.rec_decref)
+        rec_frees.append(gc_data.rec_free)
+    return (heap_sizes, gc_times, rec_decrefs, rec_frees)
 
   def getXTicks(self):
     ticks = []
@@ -115,12 +120,9 @@ class ParseErrorException(Exception):
 class ManyTestNameException(Exception):
   pass
 
-def scatter(ax, x, y, xtick, xticklabels):
+def scatter(ax, x, y, xtick):
   ax.scatter(x,y)
-  ax.set_xlabel("heap_size[kB]")
-  ax.set_ylabel("process time(sec)")
   ax.set_xticks(xticks, minor=False)
-  ax.set_xticklabels(xticklabels, minor=False)
   ax.set_rasterized(True)
   if y is None or len(y) == 0:
     return
@@ -139,6 +141,23 @@ def scatter(ax, x, y, xtick, xticklabels):
       break
   ax.set_ylim(bottom=0, top=y_top)
   ax.set_yticks(np.arange(0, y_top, y_top/10), minor=False)
+
+def scatter_x_is_heap(ax, x, y, xtick, xticklabels):
+  scatter(ax,x,y,xtick,xticklabels)
+  ax.set_xlabel("heap_size[kB]")
+  ax.set_ylabel("process time(sec)")
+  ax.set_xticklabels(xticklabels, minor=False)
+
+def int_to_x_tick(num):
+  str_num = str(num)
+  n = len(str_num)
+  if n >= 1:
+    n -= 1
+  top_num = (int(str_num[0]) + 1) * (10 ** (n - 1))
+  if top_num > 10:
+    ticks = np.arange(0, top_num, top_num / 10)
+  else:
+    ticks = np.arange(0, top_num, 1)
 
 # pop and discard 'gc_plot.py' from sys.argv
 sys.argv.pop(0)
@@ -232,22 +251,30 @@ for index in range(len(gc_results)):
     xticks, xticklabels = gc_result.getXTicks()
 
     ax = fig.add_subplot(row, col, 1)
-    scatter(ax, heap_sizes, mark_times, xticks, xticklabels)
+    scatter_x_is_heap(ax, heap_sizes, mark_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " mark time")
     ax = fig.add_subplot(row, col, 2)
-    scatter(ax, heap_sizes, sweep_times, xticks, xticklabels)
+    scatter_x_is_heap(ax, heap_sizes, sweep_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " sweep time")
     ax = fig.add_subplot(row, col, 3)
-    scatter(ax, heap_sizes, gc_times, xticks, xticklabels)
+    scatter_x_is_heap(ax, heap_sizes, gc_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " gc time")
 
   elif type(gc_result) is RefCountGCResult:
-    heap_sizes, gc_times = gc_result.getItemForPlot()
+    heap_sizes, gc_times, rec_decrefs, rec_frees = gc_result.getItemForPlot()
     xticks, xticklabels = gc_result.getXTicks()
 
     ax = fig.add_subplot(row, col, 1)
-    scatter(ax, heap_sizes, gc_times, xticks, xticklabels)
+    scatter_x_is_heap(ax, heap_sizes, gc_times, xticks, xticklabels)
     ax.set_title(test_name + " " + vm_name + " gc time")
+    max_decref = max(rec_decrefs)
+    xtick = int_to_x_tick(max_decref)
+    scatter(ax, rec_decrefs, gc_times, xtick)
+    ax.set_title(test_name + " " + vm_name + " gc time / recursive func call")
+    max_free = max(rec_frees)
+    xtick = int_to_x_tick(max_free)
+    scatter(ax, rec_frees, gc_times, xtick)
+    ax.set_title(test_name + " " + vm_name + " gc time / recursive free")
   pdf.savefig()
 
 pdf.close()
