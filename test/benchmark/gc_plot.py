@@ -154,6 +154,7 @@ for file_path in sys.argv:
   lines = file.readlines()
   file.close()
 
+  gc_result = None
   for line in lines:
     head = head_pat.search(line)
     if head:
@@ -181,8 +182,27 @@ for file_path in sys.argv:
       continue
 
     if gc_flag == MARKSWEEP:
-  if test_name != None or gc_result.test_name != test_name:
->>>>>>> a4e5a08937dcc013cf56da19fde53e20c3513fda
+      gc_time_match = marksweep_pat.search(line)
+      if gc_time_match:
+        gc_time = gc_time_match.groups()
+        mark_time = gc_time[0]
+        sweep_time = gc_time[1]
+        gc_result.addItem(heap_size, mark_time, sweep_time)
+    elif gc_flag == REFCOUNT:
+      gc_time_match = refcount_pat.search(line)
+      if gc_time_match:
+        gc_time = gc_time_match.groups()[0]
+        gc_result.addItem(heap_size, gc_time)
+
+if gc_result != None:
+  gc_results.append(gc_result)
+
+out_dir = "graph/"
+os.makedirs(out_dir, exist_ok=True)
+test_name = None
+
+for gc_result in gc_results:
+  if test_name != None and gc_result.test_name != test_name:
     raise ManyTestNameException
   test_name = gc_result.test_name
 save_dest = out_dir + test_name + "_gc_result.pdf"
