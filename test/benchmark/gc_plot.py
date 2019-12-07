@@ -1,6 +1,7 @@
 import sys
 import re
 import matplotlib.pyplot as plt
+import matplotlib.image as mimage
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -17,6 +18,8 @@ class GCResult:
   def __init__(self, test_name, vm_name):
     self.test_name = test_name
     self.vm_name = vm_name
+  def __str__(self):
+    return self.test_name + " " + self.vm_name
 
 class MarkSweepGCResult(GCResult):
   def __init__(self, test_name, vm_name):
@@ -107,6 +110,14 @@ class ManyTestNameException(Exception):
   pass
 
 def scatter(ax, x, y, xtick, xticklabels):
+  ax.scatter(x,y)
+  ax.set_xlabel("heap_size[kB]")
+  ax.set_ylabel("process time(sec)")
+  ax.set_xticks(xticks, minor=False)
+  ax.set_xticklabels(xticklabels, minor=False)
+  ax.set_rasterized(True)
+  if y is None or len(y) == 0:
+    return
   y_max = max(y)
   str_y = str(y_max)
   y_int = str_y.split('.')[0]
@@ -120,11 +131,6 @@ def scatter(ax, x, y, xtick, xticklabels):
         continue
       y_top = (n + 2) / (10 ** i)
       break
-  ax.scatter(x,y)
-  ax.set_xlabel("heap_size[kB]")
-  ax.set_ylabel("process time(sec)")
-  ax.set_xticks(xticks, minor=False)
-  ax.set_xticklabels(xticklabels, minor=False)
   ax.set_ylim(bottom=0)
   yticks = list(np.arange(0, y_top, y_top / 10))
   ax.set_yticks(yticks, minor=False)
@@ -161,8 +167,6 @@ for file_path in sys.argv:
       properties = head.groups()
       test_name = properties[0]
       vm_name = properties[1]
-      if gc_result != None:
-        gc_results.append(gc_result)
       if vm_name == marksweep or vm_name == bitmap:
         gc_result = MarkSweepGCResult(test_name, vm_name)
         gc_flag = MARKSWEEP 
@@ -193,20 +197,19 @@ for file_path in sys.argv:
       if gc_time_match:
         gc_time = gc_time_match.groups()[0]
         gc_result.addItem(heap_size, gc_time)
+  if not gc_result is None:
+    gc_results.append(gc_result)
 
-if gc_result != None:
-  gc_results.append(gc_result)
-
-out_dir = "graph/"
-os.makedirs(out_dir, exist_ok=True)
+pdf_dir = "graph/"
+os.makedirs(pdf_dir, exist_ok=True)
 test_name = None
 
 for gc_result in gc_results:
   if test_name != None and gc_result.test_name != test_name:
     raise ManyTestNameException
   test_name = gc_result.test_name
-save_dest = out_dir + test_name + "_gc_result.pdf"
-pdf = PdfPages(save_dest)
+pdf_dest = pdf_dir + test_name + "_gc_result.pdf"
+pdf = PdfPages(pdf_dest)
 
 row = 2
 col = 2
@@ -240,4 +243,4 @@ for index in range(len(gc_results)):
   pdf.savefig()
 
 pdf.close()
-print("pdf -> " + save_dest)
+print("pdf -> " + pdf_dest)
