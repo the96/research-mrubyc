@@ -41,9 +41,11 @@ vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, refcnt_bi
 
 def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size, outpath):  
   # output format
+  # gc_time 0.000018853 rec_decref 201 rec_free 402(refcount)
+  # mark_time %.9lf sweep_time %.9lf
   # size %d
-  # time %lf
-  RC_GC_TIME_PATTERN = re.compile('gc_time (\d+\.\d+)')
+  # vm time %.9lf
+  RC_GC_TIME_PATTERN = re.compile('gc_time (\d+\.\d+) rec_decref (\d+) rec_free (\d+)')
   MS_GC_TIME_PATTERN = re.compile('mark_time (\d+\.\d+) sweep_time (\d+\.\d+)')
   SIZE_PATTERN = re.compile('size (\d+)')
   TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
@@ -76,8 +78,10 @@ def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size
           text = "mark_time " + str(mark_time) + " sweep_time " + str(sweep_time) + "\n"
           outfile.write(text)
         for rc_gctime_match in rc_gctime_matches:
-          gc_time = rc_gctime_match.groups()[0]
-          text = "gc_time " + str(gc_time) + "\n"
+          gc_time    = rc_gctime_match.groups()[0]
+          rec_decref = rc_gctime_match.groups()[1]
+          rec_free   = rc_gctime_match.groups()[2]
+          text = "gc_time " + str(gc_time) + " rec_decref " + str(rec_decref) + " rec_free " + str(rec_free) + "\n"
           outfile.write(text)
       else:
         text = "heap_size " + str(heap_size) + " failed" + "\n"

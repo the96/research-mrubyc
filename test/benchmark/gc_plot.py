@@ -154,8 +154,7 @@ head_pat      = re.compile('^test_name: (.+) vm_name: ' + vm_pat + '$')
 success_pat   = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat    = re.compile('heap_size (\d+) failed')
 marksweep_pat = re.compile('mark_time (\d+\.\d+) sweep_time (\d+\.\d+)')
-# gc_time 0.000018853 rec_decref 201 rec_free 402
-refcount_pat  = re.compile('gc_time (\d+\.\d+) ref_decref (\d+) rec_free (\d+)')
+refcount_pat  = re.compile('gc_time (\d+\.\d+) rec_decref (\d+) rec_free (\d+)')
 
 if len(sys.argv) == 0:
   print("Please input .log file what recording gc time.")
