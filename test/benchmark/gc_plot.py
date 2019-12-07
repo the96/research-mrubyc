@@ -119,7 +119,7 @@ def scatter(ax, x, y, xtick, xticklabels):
   if y is None or len(y) == 0:
     return
   y_max = max(y)
-  str_y = str(y_max)
+  str_y = '{:.9f}'.format(y_max)
   y_int = str_y.split('.')[0]
   y_dec = str_y.split('.')[1]
   if y_int == 0:
@@ -129,11 +129,10 @@ def scatter(ax, x, y, xtick, xticklabels):
       n = int(y_dec[i])
       if n == 0:
         continue
-      y_top = (n + 2) / (10 ** i)
+      y_top = (n + 2) / (10 ** (i + 1))
       break
-  ax.set_ylim(bottom=0)
-  yticks = list(np.arange(0, y_top, y_top / 10))
-  ax.set_yticks(yticks, minor=False)
+  ax.set_ylim(bottom=0, top=y_top)
+  ax.set_yticks(np.arange(0, y_top, y_top/10), minor=False)
 
 # pop and discard 'gc_plot.py' from sys.argv
 sys.argv.pop(0)
@@ -189,13 +188,13 @@ for file_path in sys.argv:
       gc_time_match = marksweep_pat.search(line)
       if gc_time_match:
         gc_time = gc_time_match.groups()
-        mark_time = gc_time[0]
-        sweep_time = gc_time[1]
+        mark_time = float(gc_time[0])
+        sweep_time = float(gc_time[1])
         gc_result.addItem(heap_size, mark_time, sweep_time)
     elif gc_flag == REFCOUNT:
       gc_time_match = refcount_pat.search(line)
       if gc_time_match:
-        gc_time = gc_time_match.groups()[0]
+        gc_time = float(gc_time_match.groups()[0])
         gc_result.addItem(heap_size, gc_time)
   if not gc_result is None:
     gc_results.append(gc_result)
