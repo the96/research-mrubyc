@@ -54,6 +54,10 @@ head_pat = re.compile('^test_name: (.+) vm_name: ' + vm_name + '$')
 success_pat = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat = re.compile('heap_size (\d+) failed')
 
+if len(sys.argv) == 0:
+  print("Please input .log file what recording total time of benchmark processing.")
+
+
 graphs = []
 for file_path in sys.argv:
   file = open(file_path, 'r')
@@ -108,7 +112,7 @@ for graph in graphs:
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o")
   if len(xtick) < len(graph.heap_sizes):
     xtick = graph.heap_sizes
-ax.set_ylim(ymin=0)
+ax.set_ylim(bottom=0)
 ax.set_xticks(xtick, minor=True)
 xticks_major = []
 for i in range(len(xtick)):
@@ -150,7 +154,7 @@ for graph in graphs:
   ax.set_xlabel("heap_size[kB]")
   ax.set_ylabel("process time(sec)")
   ax.set_xticklabels([])
-  ax.set_ylim(ymin=0,ymax=graph.get_max_y() * 2 )
+  ax.set_ylim(bottom=0,top=graph.get_max_y() * 2 )
   ax.legend()
   ax.grid()
   ax.set_title(graph.vm_name + " total time")
