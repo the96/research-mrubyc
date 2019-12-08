@@ -193,7 +193,6 @@ for file_path in sys.argv:
       if vm_name == marksweep or vm_name == bitmap:
         gc_result = MarkSweepGCResult(test_name, vm_name)
         gc_flag = MARKSWEEP
-        break
       elif vm_name == refcnt or vm_name == refcnt_everytime:
         gc_result = RefCountGCResult(test_name, vm_name)
         gc_flag = REFCOUNT
@@ -247,7 +246,6 @@ for index in range(len(gc_results)):
   vm_name = gc_result.vm_name
 
   if type(gc_result) is MarkSweepGCResult:
-    pass
     heap_sizes, mark_times, sweep_times, gc_times = gc_result.getItemForPlot()
     xticks, xticklabels = gc_result.getXTicks()
 

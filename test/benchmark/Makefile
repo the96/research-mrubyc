@@ -40,7 +40,10 @@ pdf:
 	ls result/bm_spectral_norm_m32/* | xargs python3 plot.py
 	ls result/string_concat/* | xargs python3 plot.py
 	ls result/string_concat_m32/* | xargs python3 plot.py
-	ls result/*_gctime/* | xargs -L 3 xargs python3 gc_plot.py
+	ls result/bm*_gctime/* | xargs -L 3 xargs python3 gc_plot.py
+	python3 gc_plot.py result/recursive_release_1_gctime/refcnt-measure-gc-everytime.log
+	python3 gc_plot.py result/recursive_release_2_gctime/refcnt-measure-gc-everytime.log
+	ls result/string_concat_gctime/* | xargs python3 gc_plot.py
 	pdfunite graph/*.pdf graph/all.pdf
 
 ln:
