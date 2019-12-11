@@ -266,10 +266,6 @@ for index in range(len(gc_results)):
     xticks, xticklabels = gc_result.getXTicks()
 
     ax = fig.add_subplot(row, col, 1)
-    scatter_x_is_heap(ax, heap_sizes, gc_times, xticks, xticklabels)
-    ax.set_title(test_name + " " + vm_name + " gc time")
-
-    ax = fig.add_subplot(row, col, 2)
     max_decref = max(rec_decrefs)
     xticks = int_to_x_tick(max_decref)
     scatter(ax, rec_decrefs, gc_times, xticks)
@@ -278,7 +274,7 @@ for index in range(len(gc_results)):
     ax.set_ylabel("process time(sec)")
     ax.set_title(test_name + "refcount gc time/func call")
     
-    ax = fig.add_subplot(row, col, 3)
+    ax = fig.add_subplot(row, col, 2)
     max_free = max(rec_frees)
     xticks = int_to_x_tick(max_free)
     scatter(ax, rec_frees, gc_times, xticks)
