@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 #include "vm_config.h"
 #include "vm.h"
 #include "alloc.h"
@@ -2087,6 +2088,7 @@ int mrbc_vm_run( struct VM *vm )
     case OP_ABORT:      ret = op_stop      (vm, code, regs); break;  // reuse
     default:
       console_printf("Skip OP=%02x\n", GET_OPCODE(code));
+      exit(1);
       break;
     }
 #ifdef MEASURE_VMLOOP
