@@ -88,6 +88,6 @@ VM_name
       * 一回の解放で発生したmrbc_raw_free(割り当て済みのメモリの解放)の回数
 
 ## Author
-MORI Shotaro B4
-Programming Languages and Systems in Kochi University of Technology
+Shotaro Mori  
+B4 Programming Languages and Systems in Kochi University of Technology  
 mori(at)pl.info.kochi-tech.ac.jp           replace (at)->@
