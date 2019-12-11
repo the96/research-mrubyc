@@ -70,8 +70,22 @@ VM_name
 * refcnt-m32
 * marksweep-measure-gc
 * bitmap-marking-gc
-* refcnt-measure-gc
 * refcnt-measure-gc-everytime
+
+### 補足
+* VM_nameの最後に`-gc`とついているものはGC時間を計測するもので、各GCごとに時間を計測します。
+
+### plotの使い方
+* plot.py <**.log path>+
+  * 渡されたlogファイルを読んで、以下のグラフを出力します。
+    * 全体の処理時間を比較する折れ線グラフ
+    * それぞれの処理時間のばらつきを見るためのbox plot
+* gc_plot.py <**.log path>+
+  * 渡されたlogファイルを読んで、以下のグラフを出力します。
+    * マークスイープの場合、各ヒープサイズでのマーク時間、スイープ時間、合計GC時間を出力します。
+    * 参照カウントの場合、次の二つです。
+      * 一回の解放で発生した参照カウントを操作する関数の呼び出し回数
+      * 一回の解放で発生したmrbc_raw_free(割り当て済みのメモリの解放)の回数
 
 ## Author
 MORI Shotaro B4
