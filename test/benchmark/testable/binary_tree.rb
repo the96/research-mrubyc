@@ -86,7 +86,6 @@ end
 puts random.size
 
 for j in 0..10 do
-  j
   for i in 1..(random.size/mul) do # 30回分
     array_cut = random[0..i * mul-1] # (0 .. size * (i / 10) - 1)
     tree = BinaryTree.new()
