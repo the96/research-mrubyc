@@ -67,7 +67,7 @@ marksweep-early min size 110088
 refcount min size 106904
 marksweep-m32 min size 88428
 marksweep-early-m32 min size 76880
-refcount min size 75436
+refcnt-m32 min size 75436
 == testable/bm_so_object ==
 marksweep min size 34456
 marksweep-early min size 34456

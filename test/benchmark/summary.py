@@ -161,6 +161,10 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   ms_ratios = []
   bm_ratios = []
 
+  ms_heap_overhead = -1
+  bm_heap_overhead = -1
+  min_heap_size = -1
+
   print("%9.9s"%"size", "%9.9s%10.10s"%(rc_label,"(ratio)"), "%9.9s%10.10s"%(ms_label,"(ratio)"), "%9.9s%10.10s"%(bm_label,"(ratio)"), sep=" | ", end=" | \n")
   for heap_size in heap_sizes:
     print("%9d"%heap_size, end=" | ")
@@ -170,6 +174,8 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
     bm_medtime = bm_res.median_total_times.get(heap_size)
 
     if rc_medtime:
+      if min_heap_size == -1:
+        min_heap_size = heap_size
       print("%7.6lfs"%rc_medtime, end="")
     else:
       print("%8ss"%"--", end="")
@@ -185,6 +191,11 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
     else:
       print("%8ss"%"--", end="")
     if rc_medtime and ms_medtime:
+      if rc_medtime > ms_medtime and ms_heap_overhead == -1:
+        if min_heap_size == -1:
+          ms_heap_overhead = 100.000
+        else:
+          ms_heap_overhead = heap_size / min_heap_size * 100
       ms_ratio = ms_medtime / rc_medtime * 100
       ms_ratios.append(ms_ratio)
       print("(%7.3lf%%)"%ms_ratio, end=" | ")
@@ -196,6 +207,11 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
     else:
       print("%8ss"%"--", end="")
     if rc_medtime and bm_medtime:
+      if rc_medtime > bm_medtime and bm_heap_overhead == -1:
+        if min_heap_size == -1:
+          bm_heap_overhead = 100.000
+        else:
+          bm_heap_overhead = heap_size / min_heap_size * 100
       bm_ratio = bm_medtime / rc_medtime * 100
       bm_ratios.append(bm_ratio)
       print("(%7.3lf%%)"%bm_ratio, end=" | ")
@@ -207,6 +223,8 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   ave_ms_ratio = sum(ms_ratios) / len(ms_ratios)
   ave_bm_ratio = sum(bm_ratios) / len(bm_ratios)
   print("%9.9s"%"", "%9.9s %7.3lf%% "%("average",ave_rc_ratio), "%9.9s %7.3lf%% "%("average",ave_ms_ratio), "%9.9s %7.3lf%% "%("average",ave_bm_ratio), sep=" | ", end=" | \n")
+  print("ms heap overhead: %7.3lf%%"%ms_heap_overhead)
+  print("bm heap overhead: %7.3lf%%"%ms_heap_overhead)
 
 def print_gc_summary(res, gc_res, gc_name):
   print("test_name:" + res.test_name)
