@@ -401,9 +401,9 @@ if msgc_res and bmgc_res:
   mark_ratios = []
   sweep_ratios = []
 
-  print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%8.8s)"%("bm gc","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms mark", "%9.9s(%8.8s)"%("bm mark","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms sweep", "%9.9s(%8.8s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%9.9s)"%("bm gc","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"ms mark", "%9.9s(%9.9s)"%("bm mark","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"ms sweep", "%9.9s(%9.9s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
   print("%8s"%"ms times", "%8s"%"bm times", sep=" | ", end=" | \n")
   for heap_size in heap_sizes:
     print("%9d"%heap_size, end=" | ")
@@ -459,17 +459,27 @@ if msgc_res and bmgc_res:
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
     else:
       ratio = "--"
-      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+      print("(%8.8s%%)"%ratio, sep=" | ", end=" | ")
     msgctimes = int(msgc_res.gc_count.get(heap_size, "--") / msgc_times)
     bmgctimes = int(bmgc_res.gc_count.get(heap_size, "--") / bmgc_times)
     print("%8s"%msgctimes, "%8s"%bmgctimes, sep=" | ", end=" | \n")
-  gc_ave_ratio = sum(gc_ratios) / len(gc_ratios)
-  mark_ave_ratio = sum(mark_ratios) / len(mark_ratios)
-  sweep_ave_ratio = sum(sweep_ratios) / len(sweep_ratios)
+  if len(gc_ratios) > 0:
+    gc_ave_ratio = sum(gc_ratios) / len(gc_ratios)
+    print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.3lf%% "%("average", gc_ave_ratio), sep=" | ", end=" | ")
+  else:
+    print("%9.9s"%"", "%9.9s"%"", "%9.9s %8.8s%% "%("average", "--"), sep=" | ", end=" | ")
+  if len(mark_ratios) > 0:
+    mark_ave_ratio = sum(mark_ratios) / len(mark_ratios)
+    print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", mark_ave_ratio), sep=" | ", end=" | ")
+  else:
+    print("%9.9s"%"", "%9.9s %8.8s%% "%("average", "--"), sep=" | ", end=" | ")
+  if len(sweep_ratios) > 0:
+    sweep_ave_ratio = sum(sweep_ratios) / len(sweep_ratios)
+    print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", sweep_ave_ratio), sep=" | ", end=" | \n")
+  else:
+    print("%9.9s"%"", "%9.9s %8.8s%% "%("average", "--"), sep=" | ", end=" | ")
 
-  print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.3lf%% "%("average", gc_ave_ratio), sep=" | ", end=" | ")
-  print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", mark_ave_ratio), sep=" | ", end=" | ")
-  print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", sweep_ave_ratio), sep=" | ", end=" | \n")
+
   print()
 
 if msgc_res and ms_res:
