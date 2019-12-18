@@ -89,3 +89,8 @@ refcount min size 62280
 marksweep-m32 min size 159240
 marksweep-early-m32 min size 56336
 refcnt-m32 min size 52216
+== testable/binary_tree ==
+marksweep min size 1006072
+refcount min size 1000928
+marksweep-m32 min size 740008
+refcnt-m32 min size 740008
