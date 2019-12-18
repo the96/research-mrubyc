@@ -26,9 +26,16 @@ class Result:
       self.total_times[heap_size] = []
     self.total_times[heap_size].append(total_time)
 
+  def addFailed(self, heap_size):
+    if not(heap_size in self.heap_sizes):
+      self.heap_sizes.append(heap_size)
+      self.total_times[heap_size] = []
+
   def calcMedian(self):
     for heap_size in self.heap_sizes:
       item = self.total_times[heap_size]
+      if len(item) == 0:
+        continue
       item.sort()
       mid_index = int(len(item) / 2)
       self.median_total_times[heap_size]= item[mid_index]
@@ -90,6 +97,17 @@ class MarkSweepGCResult(GCResult):
     self.total_mark_times[heap_size].append(0)
     self.total_sweep_times[heap_size].append(0)
     self.total_gc_times[heap_size].append(0)
+  
+  def addFailed(self, heap_size):
+    if not(heap_size in self.heap_sizes):
+      self.heap_sizes.append(heap_size)
+      self.mark_times[heap_size] = []
+      self.sweep_times[heap_size] = []
+      self.gc_times[heap_size] = []
+    
+      self.total_mark_times[heap_size] = []
+      self.total_sweep_times[heap_size] = []
+      self.total_gc_times[heap_size] = []
 
   def addItem(self, heap_size, mark_time, sweep_time):
     self.mark_times[heap_size].append(mark_time)
@@ -108,6 +126,8 @@ class MarkSweepGCResult(GCResult):
       mark_times = sorted(self.mark_times[heap_size])
       sweep_times = sorted(self.sweep_times[heap_size])
       gc_times = sorted(self.gc_times[heap_size])
+      if len(mark_times) == 0:
+        continue
       max_idx = int(len(mark_times) * 0.9)
       self.max_mark_times[heap_size] = mark_times[max_idx]
       self.max_sweep_times[heap_size] = sweep_times[max_idx]
@@ -120,6 +140,8 @@ class MarkSweepGCResult(GCResult):
     mt.sort()
     st.sort()
     gt.sort()
+    if len(mt) == 0:
+      return("--", "--", "--")
     mid_index = int(len(mt) / 2)
     retmt = mt[mid_index]
     retst = st[mid_index]
@@ -146,6 +168,18 @@ class RefCountGCResult(GCResult):
       self.heap_sizes.append(heap_size)
       self.gc_data[heap_size] = []
     self.gc_data[heap_size].append(RefCountGCData(gc_time, rec_decref, rec_free))
+
+  def getMaxTime(self):
+    gc_datas = []
+    for heap_size in self.heap_sizes:
+      ary = self.gc_data.get(heap_size)
+      if ary:
+        gc_datas.extend(ary)
+    gc_datas = sorted(gc_datas, key=lambda t:(t.rec_decref, t.rec_free, t.gc_time))
+    max_idx = int(len(gc_datas)*0.9)
+    return gc_datas[max_idx].gc_time
+
+
 
 def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   if ms_res.test_name != bm_res.test_name or bm_res.test_name != rc_res.test_name:
@@ -240,13 +274,39 @@ def print_gc_summary(res, gc_res, gc_name):
   heap_sizes = sorted(set(heap_sizes))
 
   for heap_size in heap_sizes:
-    total = res.median_total_times.get(heap_size)
+    total = res.median_total_times.get(heap_size,"--")
     mark, sweep, gc = gc_res.getMedian(heap_size)
+    if (mark == "--"):
+      print("%9d"%heap_size, "%8.8ss"%total, "%8.8ss(%7.7s%%)"%(gc,gc), "%8.8ss(%7.7s%%)"%(mark,mark), "%8.8ss(%7.7s%%)"%(sweep,sweep),  sep=" | ", end=" | \n")
+      continue
     mark_ratio = mark/total * 100
     sweep_ratio = sweep/total * 100
     gc_ratio = gc/total * 100
-    print("%9d"%heap_size, "%8.6lfs"%total, "%8.6lfs(%7.3lf%%)"%(gc,gc_ratio), "%8.6lfs(%7.3lf%%)"%(mark,mark_ratio), "%8.6lfs(%7.3lf%%)"%(sweep,sweep_ratio),  sep=" | ", end=" | ")
-    print()
+    print("%9d"%heap_size, "%8.6lfs"%total, "%8.6lfs(%7.3lf%%)"%(gc,gc_ratio), "%8.6lfs(%7.3lf%%)"%(mark,mark_ratio), "%8.6lfs(%7.3lf%%)"%(sweep,sweep_ratio),  sep=" | ", end=" | \n")
+
+def print_gc_time_vs(rcgc_res, msgc_res, rc_label, ms_label):
+  heap_sizes = msgc_res.heap_sizes
+  msgc_res.calcMax()
+  rec_gc_time = rcgc_res.getMaxTime()
+  print("%9.9s"%"size", "%9.9s"%(rc_label + " time"),  "%9.9s(%8.8s)"%(ms_label + " time", "ratio"), sep=" | ", end=" | \n")
+  for heap_size in heap_sizes:
+    print("%9d"%heap_size, end=" | ")
+    if rec_gc_time:
+      print("%8.6lfs"%rec_gc_time, end=" | ")
+    else:
+      print("%8.8ss"%"--", end=" | ")
+    
+    ms_gc_time = msgc_res.max_gc_times.get(heap_size)
+    if ms_gc_time:
+      print("%8.6lfs"%ms_gc_time, end="")
+    else:
+      print("%8.6ss"%"--", end="")
+    
+    if ms_gc_time and rec_gc_time:
+      ratio = ms_gc_time / rec_gc_time * 100
+      print("(%7.3lf%%)"%ratio, end=" | \n")
+    else:
+      print("(%7.7s%%)"%"--", end=" | \n")
 
 sys.argv.pop(0)
 
@@ -302,7 +362,6 @@ for file_path in sys.argv:
       elif vm_name == refcnt_gc or vm_name == refcnt_everytime:
         result = RefCountGCResult(_test_name, vm_name)
         gc_flag = REFCOUNT
-        break
       continue
     
     if result is None:
@@ -317,6 +376,8 @@ for file_path in sys.argv:
 
     failed = failed_pat.search(line)
     if failed:
+      heap_size = int(failed.groups()[0])
+      result.addFailed(heap_size)
       continue
 
     if gc_flag == MARKSWEEP:
@@ -373,7 +434,7 @@ for result in results:
     msgc_res = result
   if result.vm_name == bitmap_gc:
     bmgc_res = result
-  if result.vm_name == refcnt_gc:
+  if result.vm_name == refcnt_everytime:
     rcgc_res = result
 
 if ms_res and bm_res and rc_res:
@@ -401,68 +462,81 @@ if msgc_res and bmgc_res:
   mark_ratios = []
   sweep_ratios = []
 
-  print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%9.9s)"%("bm gc","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms mark", "%9.9s(%9.9s)"%("bm mark","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms sweep", "%9.9s(%9.9s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%8.8s)"%("bm gc","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"ms mark", "%9.9s(%8.8s)"%("bm mark","ratio"), sep=" | ", end=" | ")
+  print("%9.9s"%"ms sweep", "%9.9s(%8.8s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
   print("%8s"%"ms times", "%8s"%"bm times", sep=" | ", end=" | \n")
   for heap_size in heap_sizes:
     print("%9d"%heap_size, end=" | ")
     msgc_times = msgc_res.times.get(heap_size)
     bmgc_times = bmgc_res.times.get(heap_size)
-    msgc_time = sum(msgc_res.total_gc_times.get(heap_size)) / msgc_times
-    bmgc_time = sum(bmgc_res.total_gc_times.get(heap_size)) / bmgc_times
-    if msgc_time:
+
+    msgc_total_time = msgc_res.total_gc_times.get(heap_size)
+    bmgc_total_time = bmgc_res.total_gc_times.get(heap_size)
+
+    if msgc_total_time:
+      msgc_time = sum(msgc_total_time) / msgc_times
       print("%8.6lfs"%msgc_time, end=" | ")
     else:
       print("%8.8ss"%"--", end=" | ")
-    if bmgc_time:
+    if bmgc_total_time:
+      bmgc_time = sum(bmgc_total_time) / bmgc_times
       print("%8.6lfs"%bmgc_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if msgc_time and bmgc_time:
+    if msgc_total_time and bmgc_total_time:
       ratio = bmgc_time / msgc_time * 100
       gc_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
     else:
       ratio = "--"
-      print("(%8.8s%%)"%ratio, sep=" | ", end=" | ")
-    msmk_time = sum(msgc_res.total_mark_times.get(heap_size)) / msgc_times
-    bmmk_time = sum(bmgc_res.total_mark_times.get(heap_size)) / bmgc_times
-    if msmk_time:
+      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+
+    msmk_total_time = msgc_res.total_mark_times.get(heap_size)
+    bmmk_total_time = bmgc_res.total_mark_times.get(heap_size)
+    if msmk_total_time:
+      msmk_time = sum(msmk_total_time) / msgc_times
       print("%8.6lfs"%msmk_time, end=" | ")
     else:
       print("%8.8ss"%"--", end=" | ")
-    if bmmk_time:
+    if bmmk_total_time:
+      bmmk_time = sum(bmmk_total_time) / bmgc_times
       print("%8.6lfs"%bmmk_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if msmk_time and bmmk_time:
+    if msmk_total_time and bmmk_total_time:
       ratio = bmmk_time / msmk_time * 100
       mark_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
     else:
       ratio = "--"
-      print("(%8.8s%%)"%ratio, sep=" | ", end=" | ")
-    mssw_time = sum(msgc_res.total_sweep_times.get(heap_size)) / msgc_times
-    bmsw_time = sum(bmgc_res.total_sweep_times.get(heap_size)) / bmgc_times
-    if mssw_time:
+      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+    mssw_total_time = msgc_res.total_sweep_times.get(heap_size)
+    bmsw_total_time = bmgc_res.total_sweep_times.get(heap_size)
+    if mssw_total_time:
+      mssw_time = sum(mssw_total_time) / msgc_times
       print("%8.6lfs"%mssw_time, end=" | ")
     else:
       print("%8.8ss"%"--", end=" | ")
-    if bmsw_time:
+    if bmsw_total_time:
+      bmsw_time = sum(bmsw_total_time) / bmgc_times
       print("%8.6lfs"%bmsw_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if mssw_time and bmsw_time:
+    if mssw_total_time and bmsw_total_time:
       ratio = bmsw_time / mssw_time * 100
       sweep_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
     else:
       ratio = "--"
-      print("(%8.8s%%)"%ratio, sep=" | ", end=" | ")
-    msgctimes = int(msgc_res.gc_count.get(heap_size, "--") / msgc_times)
-    bmgctimes = int(bmgc_res.gc_count.get(heap_size, "--") / bmgc_times)
-    print("%8s"%msgctimes, "%8s"%bmgctimes, sep=" | ", end=" | \n")
+      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+    ms_gc_count = msgc_res.gc_count.get(heap_size, "--")
+    bm_gc_count = bmgc_res.gc_count.get(heap_size, "--")
+    if type(ms_gc_count) == "int":
+      ms_gc_count = int(ms_gc_count / msgc_times)
+    if type(bm_gc_count) == "int":
+      bm_gc_count = int(bm_gc_count / bmgc_times)
+    print("%8s"%ms_gc_count, "%8s"%bm_gc_count, sep=" | ", end=" | \n")
   if len(gc_ratios) > 0:
     gc_ave_ratio = sum(gc_ratios) / len(gc_ratios)
     print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.3lf%% "%("average", gc_ave_ratio), sep=" | ", end=" | ")
@@ -491,3 +565,14 @@ if bmgc_res and bm_res:
   print("Total Processing : GC Time(Median)")
   print_gc_summary(bm_res, bmgc_res, "bm")
   print()
+
+# TODO:
+#   refcountの停止時間とmarksweep, bitmap-markingの停止時間の比較
+
+if rcgc_res and msgc_res:
+  print("GC Time(Refcount vs MarkSweep)")
+  print_gc_time_vs(rcgc_res, msgc_res, "rc", "ms")
+
+if rcgc_res and bmgc_res:
+  print("GC Time(Refcount vs BitMapMarking)")
+  print_gc_time_vs(rcgc_res, bmgc_res, "rc", "bm")
