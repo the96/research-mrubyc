@@ -20,7 +20,7 @@ if len(sys.argv) == 0:
 
 title_pat = re.compile("Total Processing Time\((\d+)bit\)")
 testname_pat = re.compile("test_name:(.+)")
-ave_pat = re.compile("(.{2})_ave\s+(\d+.\d+)%")
+ave_pat = re.compile("(\w{2,3})_ave\s+(\d+.\d+)%")
 
 class AveTimeDict:
   def __init__(self):
@@ -63,14 +63,13 @@ class AveTimeDict:
       values.append(self.ave_time[bk][vk][tk])
     return values
 
-  def getXPoints(self, bk, vk, vm_index):
+  def getXPoints(self, bk, vk):
     xpoints = []
-    offset = 1 + (vm_index - 1) * width
     labels = self.getLabels(bk)
     keys = self.getKeys(bk, vk)
     for index in range(0, len(labels)):
       if labels[index] in keys:
-        xpoints.append(index + offset)
+        xpoints.append(index + 1)
     return xpoints
 
   def getVMs(self, bk):
@@ -107,52 +106,43 @@ for line in lines:
   for mave in mave_list:
     vm_name = mave[0]
     ave_time = float(mave[1])
-    ave_time_dict.addAveTime(test_name, vm_name, bitwidth, ave_time)
-
-ave_time_dict.dumpAll()
+    if not vm_name.startswith('rc'):
+      ave_time_dict.addAveTime(test_name, vm_name, bitwidth, ave_time)
 
 outdir = "barplot/"
 os.makedirs(outdir, exist_ok=True)
 plt.style.use('default')
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 for bk in ave_time_dict.getBitWidths():
   pdf_name = file_name + "_" + bk + ".pdf"
   pdf = PdfPages(outdir + pdf_name)
-  fig = plt.figure(figsize=(8, 12))
-  ax = fig.add_subplot(1,1,1)
+  plt.figure(figsize=(12, 8))
 
   labels = ave_time_dict.getLabels(bk)
-  xticks = list(range(1, len(ave_time_dict.getLabels(bk)) + 1))
+  xticks = list(map(lambda x: float(x), list(range(1, len(ave_time_dict.getLabels(bk)) + 1))))
   vms = ave_time_dict.getVMs(bk)
-  width = 0.2
+  width = 1 / (len(vms) + 1)
   for vm_cnt in range(0, len(vms)):
     vm = vms[vm_cnt]
     vk = vm
     values = ave_time_dict.getValues(bk, vk)
-    xpoints = ave_time_dict.getXPoints(bk, vk, vm_cnt)
+    offset = (vm_cnt - len(vms) / 2) * width
+    xpoints = list(map(lambda x: x + offset, ave_time_dict.getXPoints(bk, vk)))
     if (len(values) != len(xpoints)):
       print("assertion failed: L134")
       exit(1)
-    for i in range(0, len(values)):
-      plt.bar(
-        xpoints[i],
-        values[i],
-        width,
-        label=vm
-      )
-  pdf.savefig()
+    plt.bar(
+      xpoints,
+      values,
+      width,
+      color=colors[vm_cnt],
+      label=vm
+    )
+  plt.ylim(60,120)
+  plt.grid(True)
+  plt.legend()
+  plt.ylabel("process time compared refcount")
+  plt.xticks(xticks, labels, rotation=90)
+  pdf.savefig(bbox_inches="tight")
   pdf.close()
-
-
-  # for vm in ave_time_dict.getVMs(bk):
-  #   values = ave_time_dict.getValues(bk, vm)
-  #   print(values)
-  # plt.bar(
-  #   ind + width*i, 		        ## 棒グラフの左下の点の座標。データ毎に少しずつズラす
-  #   data[i], 			            ## 各始点にプロットされる1次元配列
-  #   width, 				            ## 棒の幅
-  #   color=colors[i], 	        ## 棒の色
-  #   label=legend_labels[i]	 	## 棒の凡例名
-  # )
-  # pdf.savefig()
-  # pdf.close()
