@@ -103,8 +103,10 @@ plt.title(test_name)
 plt.style.use('default')
 for graph in graphs:
   if graph.vm_name.endswith("early"):
+    continue
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dashed")
   elif graph.vm_name.endswith("early-m32"):
+    continue
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dashdot")
   elif graph.vm_name.endswith("m32"):
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dotted")
