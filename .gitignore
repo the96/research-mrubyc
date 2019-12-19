@@ -8,3 +8,4 @@ mrubyc/src/hal
 **/*.mrb
 **/bench.sh
 test/benchmark/**/result*/
+**backup/
