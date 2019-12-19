@@ -484,7 +484,7 @@ if msgc_res and bmgc_res:
       print("%8.6lfs"%bmgc_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if msgc_total_time and bmgc_total_time:
+    if msgc_total_time and bmgc_total_time and msgc_time > 0:
       ratio = bmgc_time / msgc_time * 100
       gc_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
@@ -504,7 +504,7 @@ if msgc_res and bmgc_res:
       print("%8.6lfs"%bmmk_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if msmk_total_time and bmmk_total_time:
+    if msmk_total_time and bmmk_total_time and msmk_time > 0:
       ratio = bmmk_time / msmk_time * 100
       mark_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
@@ -523,7 +523,7 @@ if msgc_res and bmgc_res:
       print("%8.6lfs"%bmsw_time, end="")
     else:
       print("%8.8ss"%"--", end="")
-    if mssw_total_time and bmsw_total_time:
+    if mssw_total_time and bmsw_total_time and mssw_time > 0:
       ratio = bmsw_time / mssw_time * 100
       sweep_ratios.append(ratio)
       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")

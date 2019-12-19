@@ -89,5 +89,3 @@ refcount min size 62280
 marksweep-m32 min size 159240
 marksweep-early-m32 min size 56752
 refcnt-m32 min size 52216
-== testable/bm_app_pentomino ==
-marksweep min size 538304
