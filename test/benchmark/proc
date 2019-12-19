@@ -1,0 +1,208 @@
+Total Processing Time(64bit)
+test_name:bm_app_fib
+rc1_ratio 100.000% , ms1_ratio  85.503% , bm1_ratio  89.537% 
+
+Total Processing Time(32bit)
+test_name:bm_app_fib_m32
+rc1_ratio 100.000% , ms1_ratio  89.244% , bm1_ratio  88.862% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tak
+rc1_ratio 100.000% , ms1_ratio  77.804% , bm1_ratio  79.756% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tak_m32
+rc1_ratio 100.000% , ms1_ratio  81.210% , bm1_ratio  81.191% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tarai
+rc1_ratio 100.000% , ms1_ratio  79.054% , bm1_ratio  81.467% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tarai_m32
+rc1_ratio 100.000% , ms1_ratio  81.853% , bm1_ratio  81.844% 
+
+Total Processing Time(64bit)
+test_name:bm_fannkuch
+rc1_ratio 100.000% , ms1_ratio 106.245% , bm1_ratio 114.081% 
+
+Total Processing Time(32bit)
+test_name:bm_fannkuch_m32
+rc1_ratio 100.000% , ms1_ratio 109.423% , bm1_ratio 115.111% 
+
+Total Processing Time(64bit)
+test_name:bm_fractal
+rc1_ratio 100.000% , ms1_ratio  72.468% , bm1_ratio  75.107% 
+
+Total Processing Time(32bit)
+test_name:bm_fractal_m32
+rc1_ratio 100.000% , ms1_ratio  81.833% , bm1_ratio  82.019% 
+
+Total Processing Time(64bit)
+test_name:bm_mergesort_hongli
+rc1_ratio 100.000% , ms1_ratio  92.360% , bm1_ratio  94.150% 
+
+Total Processing Time(32bit)
+test_name:bm_mergesort_hongli_m32
+rc1_ratio 100.000% , ms1_ratio  93.190% , bm1_ratio  93.396% 
+
+Total Processing Time(64bit)
+test_name:bm_partial_sums
+rc1_ratio 100.000% , ms1_ratio  65.281% , bm1_ratio  69.223% 
+
+Total Processing Time(32bit)
+test_name:bm_partial_sums_m32
+rc1_ratio 100.000% , ms1_ratio  77.968% , bm1_ratio  79.736% 
+
+Total Processing Time(64bit)
+test_name:bm_so_lists
+rc1_ratio 100.000% , ms1_ratio  91.129% , bm1_ratio  90.626% 
+
+Total Processing Time(32bit)
+test_name:bm_so_lists_m32
+rc1_ratio 100.000% , ms1_ratio  91.783% , bm1_ratio  92.175% 
+
+Total Processing Time(64bit)
+test_name:bm_so_matrix
+rc1_ratio 100.000% , ms1_ratio  79.223% , bm1_ratio  79.948% 
+
+Total Processing Time(32bit)
+test_name:bm_so_matrix_m32
+rc1_ratio 100.000% , ms1_ratio  84.218% , bm1_ratio  83.890% 
+
+Total Processing Time(64bit)
+test_name:bm_so_object
+rc1_ratio 100.000% , ms1_ratio 121.230% , bm1_ratio 127.083% 
+
+Total Processing Time(32bit)
+test_name:bm_so_object_m32
+rc1_ratio 100.000% , ms1_ratio 238.510% , bm1_ratio 285.340% 
+
+Total Processing Time(64bit)
+test_name:bm_spectral_norm
+rc1_ratio 100.000% , ms1_ratio  81.074% , bm1_ratio  83.013% 
+
+Total Processing Time(32bit)
+test_name:bm_spectral_norm_m32
+rc1_ratio 100.000% , ms1_ratio  89.532% , bm1_ratio  89.159% 
+
+Total Processing Time(64bit)
+test_name:string_concat
+rc1_ratio 100.000% , ms1_ratio  89.585% , bm1_ratio  89.714% 
+
+Total Processing Time(32bit)
+test_name:string_concat_m32
+rc1_ratio 100.000% , ms1_ratio  93.791% , bm1_ratio  93.153% 
+
+Total Processing Time(64bit)
+test_name:binary_tree
+rc1_ratio 100.000% , ms1_ratio  86.723% , bm1_ratio  85.349% 
+
+Total Processing Time(32bit)
+test_name:binary_tree_m32
+rc1_ratio 100.000% , ms1_ratio  88.757% , bm1_ratio  89.251% 
+
+Total Processing Time(64bit)
+test_name:bm_app_fib
+rc2_ratio 100.000% , ms2_ratio  90.748% , bm2_ratio  88.166% 
+
+Total Processing Time(32bit)
+test_name:bm_app_fib_m32
+rc2_ratio 100.000% , ms2_ratio  89.123% , bm2_ratio  86.679% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tak
+rc2_ratio 100.000% , ms2_ratio  81.748% , bm2_ratio  79.164% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tak_m32
+rc2_ratio 100.000% , ms2_ratio  81.414% , bm2_ratio  77.795% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tarai
+rc2_ratio 100.000% , ms2_ratio  83.975% , bm2_ratio  80.180% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tarai_m32
+rc2_ratio 100.000% , ms2_ratio  85.446% , bm2_ratio  83.253% 
+
+Total Processing Time(64bit)
+test_name:bm_fannkuch
+rc2_ratio 100.000% , ms2_ratio 104.574% , bm2_ratio 109.363% 
+
+Total Processing Time(32bit)
+test_name:bm_fannkuch_m32
+rc2_ratio 100.000% , ms2_ratio  89.593% , bm2_ratio  88.087% 
+
+Total Processing Time(64bit)
+test_name:bm_fractal
+rc2_ratio 100.000% , ms2_ratio  73.665% , bm2_ratio  73.544% 
+
+Total Processing Time(32bit)
+test_name:bm_fractal_m32
+rc2_ratio 100.000% , ms2_ratio  79.553% , bm2_ratio  74.674% 
+
+Total Processing Time(64bit)
+test_name:bm_mergesort_hongli
+rc2_ratio 100.000% , ms2_ratio  94.142% , bm2_ratio  92.695% 
+
+Total Processing Time(32bit)
+test_name:bm_mergesort_hongli_m32
+rc2_ratio 100.000% , ms2_ratio  92.315% , bm2_ratio  90.323% 
+
+Total Processing Time(64bit)
+test_name:bm_partial_sums
+rc2_ratio 100.000% , ms2_ratio  67.166% , bm2_ratio  66.514% 
+
+Total Processing Time(32bit)
+test_name:bm_partial_sums_m32
+rc2_ratio 100.000% , ms2_ratio  78.423% , bm2_ratio  74.759% 
+
+Total Processing Time(64bit)
+test_name:bm_so_lists
+rc2_ratio 100.000% , ms2_ratio  92.005% , bm2_ratio  90.819% 
+
+Total Processing Time(32bit)
+test_name:bm_so_lists_m32
+rc2_ratio 100.000% , ms2_ratio  91.957% , bm2_ratio  91.499% 
+
+Total Processing Time(64bit)
+test_name:bm_so_matrix
+rc2_ratio 100.000% , ms2_ratio  79.921% , bm2_ratio  79.305% 
+
+Total Processing Time(32bit)
+test_name:bm_so_matrix_m32
+rc2_ratio 100.000% , ms2_ratio  84.026% , bm2_ratio  81.261% 
+
+Total Processing Time(64bit)
+test_name:bm_so_object
+rc2_ratio 100.000% , ms2_ratio 115.584% , bm2_ratio 117.776% 
+
+Total Processing Time(32bit)
+test_name:bm_so_object_m32
+rc2_ratio 100.000% , ms2_ratio 232.805% , bm2_ratio 266.533% 
+
+Total Processing Time(64bit)
+test_name:bm_spectral_norm
+rc2_ratio 100.000% , ms2_ratio  82.205% , bm2_ratio  81.509% 
+
+Total Processing Time(32bit)
+test_name:bm_spectral_norm_m32
+rc2_ratio 100.000% , ms2_ratio  89.349% , bm2_ratio  87.118% 
+
+Total Processing Time(64bit)
+test_name:string_concat
+rc2_ratio 100.000% , ms2_ratio  89.658% , bm2_ratio  87.529% 
+
+Total Processing Time(32bit)
+test_name:string_concat_m32
+rc2_ratio 100.000% , ms2_ratio  92.428% , bm2_ratio  90.128% 
+
+Total Processing Time(64bit)
+test_name:binary_tree
+rc2_ratio 100.000% , ms2_ratio  84.954% , bm2_ratio  85.318% 
+
+Total Processing Time(32bit)
+test_name:binary_tree_m32
+rc2_ratio 100.000% , ms2_ratio  87.769% , bm2_ratio  84.758% 
+
