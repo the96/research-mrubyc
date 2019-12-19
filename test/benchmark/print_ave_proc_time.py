@@ -200,6 +200,9 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   min_heap_size = -1
 
   # print("%9.9s"%"size", "%9.9s%10.10s"%(rc_label,"(ratio)"), "%9.9s%10.10s"%(ms_label,"(ratio)"), "%9.9s%10.10s"%(bm_label,"(ratio)"), sep=" | ", end=" | \n")
+  rc_time_first = None
+  ms_time_first = None
+  bm_time_first = None
   for heap_size in heap_sizes:
     # print("%9d"%heap_size, end=" | ")
     
@@ -211,6 +214,8 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
       if min_heap_size == -1:
         min_heap_size = heap_size
       # print("%7.6lfs"%rc_medtime, end="")
+      if not rc_time_first:
+        rc_time_first = rc_medtime
     else:
       pass
       # print("%8ss"%"--", end="")
@@ -223,8 +228,9 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
       # print("(%7.7s%%)"%"--", end=" | ")
 
     if ms_medtime:
-      pass
       # print("%7.6lfs"%ms_medtime, end="")
+      if not ms_time_first:
+        ms_time_first = ms_medtime
     else:
       pass
       # print("%8ss"%"--", end="")
@@ -242,8 +248,9 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
       # print("(%7.7s%%)"%"--", end=" | ")
     
     if bm_medtime:
-      pass
       # print("%7.6lfs"%bm_medtime, end="")
+      if not bm_time_first:
+        bm_time_first = bm_medtime
     else:
       pass
       # print("%8ss"%"--", end="")
@@ -264,7 +271,7 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   ave_rc_ratio = sum(rc_ratios) / len(rc_ratios)
   ave_ms_ratio = sum(ms_ratios) / len(ms_ratios)
   ave_bm_ratio = sum(bm_ratios) / len(bm_ratios)
-  print("rc_ave %7.3lf%% "%(ave_rc_ratio), "ms_ave %7.3lf%% "%(ave_ms_ratio), "bm_ave %7.3lf%% "%(ave_bm_ratio), sep=", ", end="\n")
+  print("rc_ratio %7.3lf%% "%(rc_time_first / rc_time_first * 100), "ms_ratio %7.3lf%% "%(ms_time_first / rc_time_first * 100), "bm_ratio %7.3lf%% "%(bm_time_first / rc_time_first * 100), sep=", ", end="\n")
   # print("ms heap overhead: %7.3lf%%"%ms_heap_overhead)
   # print("bm heap overhead: %7.3lf%%"%ms_heap_overhead)
 
