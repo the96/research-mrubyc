@@ -20,7 +20,7 @@ if len(sys.argv) == 0:
 
 title_pat = re.compile("Total Processing Time\((\d+)bit\)")
 testname_pat = re.compile("test_name:(.+)")
-ave_pat = re.compile("(\w{2,3})_ave\s+(\d+.\d+)%")
+ave_pat = re.compile("(\w{2,3})_ratio\s+(\d+.\d+)%")
 
 class AveTimeDict:
   def __init__(self):
@@ -114,13 +114,16 @@ os.makedirs(outdir, exist_ok=True)
 plt.style.use('default')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
+xmax = 0
 for bk in ave_time_dict.getBitWidths():
   pdf_name = file_name + "_" + bk + ".pdf"
   pdf = PdfPages(outdir + pdf_name)
-  plt.figure(figsize=(12, 8))
+  plt.figure(figsize=(14, 3))
 
   labels = ave_time_dict.getLabels(bk)
   xticks = list(map(lambda x: float(x), list(range(1, len(ave_time_dict.getLabels(bk)) + 1))))
+  if max(xticks) > xmax:
+    xmax = max(xticks)
   vms = ave_time_dict.getVMs(bk)
   width = 1 / (len(vms) + 1)
   for vm_cnt in range(0, len(vms)):
@@ -129,6 +132,8 @@ for bk in ave_time_dict.getBitWidths():
     values = ave_time_dict.getValues(bk, vk)
     offset = (vm_cnt - len(vms) / 2) * width
     xpoints = list(map(lambda x: x + offset, ave_time_dict.getXPoints(bk, vk)))
+    if max(xpoints)+offset > xmax:
+      xmax = max(xpoints)+offset
     if (len(values) != len(xpoints)):
       print("assertion failed: L134")
       exit(1)
@@ -137,12 +142,14 @@ for bk in ave_time_dict.getBitWidths():
       values,
       width,
       color=colors[vm_cnt],
-      label=vm
+      label=vm.upper()
     )
-  plt.ylim(60,120)
+  plt.ylim(0,145)
+  plt.xlim(-width*4, xmax + width*1)
   plt.grid(True)
-  plt.legend()
-  plt.ylabel("process time compared refcount")
-  plt.xticks(xticks, labels, rotation=90)
+  plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed')
+  plt.legend(fontsize=10)
+  plt.ylabel("process time ratio[%]")
+  plt.xticks(xticks, labels, rotation=12, fontsize=10)
   pdf.savefig(bbox_inches="tight")
   pdf.close()
