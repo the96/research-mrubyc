@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_so_object
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     34192 | 0.430007s(100.000%) |       --s(     --%) |       --s(     --%) | 

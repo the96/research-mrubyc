@@ -1,0 +1,104 @@
+Total Processing Time(64bit)
+test_name:bm_app_fib
+rc_ave 100.000% , ms_ave  88.828% , bm_ave  88.480% 
+
+Total Processing Time(32bit)
+test_name:bm_app_fib_m32
+rc_ave 100.000% , ms_ave  90.888% , bm_ave  88.221% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tak
+rc_ave 100.000% , ms_ave  82.646% , bm_ave  82.257% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tak_m32
+rc_ave 100.000% , ms_ave  84.119% , bm_ave  80.689% 
+
+Total Processing Time(64bit)
+test_name:bm_app_tarai
+rc_ave 100.000% , ms_ave  81.761% , bm_ave  81.905% 
+
+Total Processing Time(32bit)
+test_name:bm_app_tarai_m32
+rc_ave 100.000% , ms_ave  84.494% , bm_ave  81.693% 
+
+Total Processing Time(64bit)
+test_name:bm_fannkuch
+rc_ave 100.000% , ms_ave  84.701% , bm_ave  85.024% 
+
+Total Processing Time(32bit)
+test_name:bm_fannkuch_m32
+rc_ave 100.000% , ms_ave  88.398% , bm_ave  85.390% 
+
+Total Processing Time(64bit)
+test_name:bm_fractal
+rc_ave 100.000% , ms_ave  71.575% , bm_ave  70.778% 
+
+Total Processing Time(32bit)
+test_name:bm_fractal_m32
+rc_ave 100.000% , ms_ave  80.558% , bm_ave  75.526% 
+
+Total Processing Time(64bit)
+test_name:bm_mergesort_hongli
+rc_ave 100.000% , ms_ave  91.557% , bm_ave  90.262% 
+
+Total Processing Time(32bit)
+test_name:bm_mergesort_hongli_m32
+rc_ave 100.000% , ms_ave  90.681% , bm_ave  88.888% 
+
+Total Processing Time(64bit)
+test_name:bm_partial_sums
+rc_ave 100.000% , ms_ave  67.024% , bm_ave  66.198% 
+
+Total Processing Time(32bit)
+test_name:bm_partial_sums_m32
+rc_ave 100.000% , ms_ave  78.530% , bm_ave  74.903% 
+
+Total Processing Time(64bit)
+test_name:bm_so_lists
+rc_ave 100.000% , ms_ave  91.648% , bm_ave  91.261% 
+
+Total Processing Time(32bit)
+test_name:bm_so_lists_m32
+rc_ave 100.000% , ms_ave  91.977% , bm_ave  91.598% 
+
+Total Processing Time(64bit)
+test_name:bm_so_matrix
+rc_ave 100.000% , ms_ave  80.199% , bm_ave  79.471% 
+
+Total Processing Time(32bit)
+test_name:bm_so_matrix_m32
+rc_ave 100.000% , ms_ave  84.400% , bm_ave  81.771% 
+
+Total Processing Time(64bit)
+test_name:bm_so_object
+rc_ave 100.000% , ms_ave  93.784% , bm_ave  92.960% 
+
+Total Processing Time(32bit)
+test_name:bm_so_object_m32
+rc_ave 100.000% , ms_ave  88.371% , bm_ave  87.415% 
+
+Total Processing Time(64bit)
+test_name:bm_spectral_norm
+rc_ave 100.000% , ms_ave  81.931% , bm_ave  80.795% 
+
+Total Processing Time(32bit)
+test_name:bm_spectral_norm_m32
+rc_ave 100.000% , ms_ave  88.764% , bm_ave  87.072% 
+
+Total Processing Time(64bit)
+test_name:string_concat
+rc_ave 100.000% , ms_ave  89.286% , bm_ave  87.624% 
+
+Total Processing Time(32bit)
+test_name:string_concat_m32
+rc_ave 100.000% , ms_ave  92.836% , bm_ave  90.225% 
+
+Total Processing Time(64bit)
+test_name:binary_tree
+rc_ave 100.000% , ms_ave  85.084% , bm_ave  85.736% 
+
+Total Processing Time(32bit)
+test_name:binary_tree_m32
+rc_ave 100.000% , ms_ave  87.919% , bm_ave  85.326% 
+

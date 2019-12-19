@@ -78,7 +78,7 @@ test_name:bm_app_tarai_gctime
     54008 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     55008 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     56008 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
-          |           |   average       --%  |           |   average       --%  |           |   average       --%  | 
+          |           |   average      --%  |           |   average      --%  |           |   average      --%  | 
 Total Processing : GC Time(Median)
 test_name:bm_app_tarai
 test_name:bm_app_tarai_gctime

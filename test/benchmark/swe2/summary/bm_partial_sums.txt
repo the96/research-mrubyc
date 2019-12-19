@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_partial_sums
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     31168 | 2.661674s(100.000%) | 1.787743s( 67.166%) | 1.770383s( 66.514%) | 

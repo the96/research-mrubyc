@@ -199,9 +199,9 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
   bm_heap_overhead = -1
   min_heap_size = -1
 
-  print("%9.9s"%"size", "%9.9s%10.10s"%(rc_label,"(ratio)"), "%9.9s%10.10s"%(ms_label,"(ratio)"), "%9.9s%10.10s"%(bm_label,"(ratio)"), sep=" | ", end=" | \n")
+  # print("%9.9s"%"size", "%9.9s%10.10s"%(rc_label,"(ratio)"), "%9.9s%10.10s"%(ms_label,"(ratio)"), "%9.9s%10.10s"%(bm_label,"(ratio)"), sep=" | ", end=" | \n")
   for heap_size in heap_sizes:
-    print("%9d"%heap_size, end=" | ")
+    # print("%9d"%heap_size, end=" | ")
     
     rc_medtime = rc_res.median_total_times.get(heap_size)
     ms_medtime = ms_res.median_total_times.get(heap_size)
@@ -210,20 +210,24 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
     if rc_medtime:
       if min_heap_size == -1:
         min_heap_size = heap_size
-      print("%7.6lfs"%rc_medtime, end="")
+      # print("%7.6lfs"%rc_medtime, end="")
     else:
-      print("%8ss"%"--", end="")
+      pass
+      # print("%8ss"%"--", end="")
     if rc_medtime:
       rc_ratio = rc_medtime / rc_medtime * 100
       rc_ratios.append(rc_ratio)
-      print("(%7.3lf%%)"%rc_ratio, end=" | ")
+      # print("(%7.3lf%%)"%rc_ratio, end=" | ")
     else:
-      print("(%7.7s%%)"%"--", end=" | ")
+      pass
+      # print("(%7.7s%%)"%"--", end=" | ")
 
     if ms_medtime:
-      print("%7.6lfs"%ms_medtime, end="")
+      pass
+      # print("%7.6lfs"%ms_medtime, end="")
     else:
-      print("%8ss"%"--", end="")
+      pass
+      # print("%8ss"%"--", end="")
     if rc_medtime and ms_medtime:
       if rc_medtime > ms_medtime and ms_heap_overhead == -1:
         if min_heap_size == -1:
@@ -232,14 +236,17 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
           ms_heap_overhead = heap_size / min_heap_size * 100
       ms_ratio = ms_medtime / rc_medtime * 100
       ms_ratios.append(ms_ratio)
-      print("(%7.3lf%%)"%ms_ratio, end=" | ")
+      # print("(%7.3lf%%)"%ms_ratio, end=" | ")
     else:
-      print("(%7.7s%%)"%"--", end=" | ")
+      pass
+      # print("(%7.7s%%)"%"--", end=" | ")
     
     if bm_medtime:
-      print("%7.6lfs"%bm_medtime, end="")
+      pass
+      # print("%7.6lfs"%bm_medtime, end="")
     else:
-      print("%8ss"%"--", end="")
+      pass
+      # print("%8ss"%"--", end="")
     if rc_medtime and bm_medtime:
       if rc_medtime > bm_medtime and bm_heap_overhead == -1:
         if min_heap_size == -1:
@@ -248,17 +255,18 @@ def print_summary(ms_res, bm_res, rc_res, ms_label, bm_label, rc_label):
           bm_heap_overhead = heap_size / min_heap_size * 100
       bm_ratio = bm_medtime / rc_medtime * 100
       bm_ratios.append(bm_ratio)
-      print("(%7.3lf%%)"%bm_ratio, end=" | ")
+      # print("(%7.3lf%%)"%bm_ratio, end=" | ")
     else:
-      print("(%7.7s%%)"%"--", end=" | ")
+      pass
+      # print("(%7.7s%%)"%"--", end=" | ")
 
-    print("")
+    # print("")
   ave_rc_ratio = sum(rc_ratios) / len(rc_ratios)
   ave_ms_ratio = sum(ms_ratios) / len(ms_ratios)
   ave_bm_ratio = sum(bm_ratios) / len(bm_ratios)
-  print("%9.9s"%"", "%9.9s %7.3lf%% "%("average",ave_rc_ratio), "%9.9s %7.3lf%% "%("average",ave_ms_ratio), "%9.9s %7.3lf%% "%("average",ave_bm_ratio), sep=" | ", end=" | \n")
-  print("ms heap overhead: %7.3lf%%"%ms_heap_overhead)
-  print("bm heap overhead: %7.3lf%%"%ms_heap_overhead)
+  print("rc_ave %7.3lf%% "%(ave_rc_ratio), "ms_ave %7.3lf%% "%(ave_ms_ratio), "bm_ave %7.3lf%% "%(ave_bm_ratio), sep=", ", end="\n")
+  # print("ms heap overhead: %7.3lf%%"%ms_heap_overhead)
+  # print("bm heap overhead: %7.3lf%%"%ms_heap_overhead)
 
 def print_gc_summary(res, gc_res, gc_name):
   print("test_name:" + res.test_name)
@@ -354,6 +362,7 @@ for file_path in sys.argv:
 
     res = gc_head_pat.search(line)
     if res:
+      break
       _test_name = res.groups()[0]
       vm_name = res.groups()[1]
       if vm_name == marksweep_gc or vm_name == bitmap_gc:
@@ -447,132 +456,132 @@ if msm32_res and bmm32_res and rcm32_res:
   print_summary(msm32_res, bmm32_res, rcm32_res, "ms_m32", "bm_m32", "rc_m32")
   print()
 
-if msgc_res and bmgc_res:
-  print("Total GC Time")
-  if msgc_res.test_name != bmgc_res.test_name:
-    print("(Warning) Found different test name.")
-  print("test_name:" + msgc_res.test_name)
+# if msgc_res and bmgc_res:
+#   print("Total GC Time")
+#   if msgc_res.test_name != bmgc_res.test_name:
+#     print("(Warning) Found different test name.")
+#   print("test_name:" + msgc_res.test_name)
 
-  heap_sizes = []
-  heap_sizes.extend(msgc_res.heap_sizes)
-  heap_sizes.extend(bmgc_res.heap_sizes)
-  heap_sizes = sorted(set(heap_sizes))
+#   heap_sizes = []
+#   heap_sizes.extend(msgc_res.heap_sizes)
+#   heap_sizes.extend(bmgc_res.heap_sizes)
+#   heap_sizes = sorted(set(heap_sizes))
 
-  gc_ratios = []
-  mark_ratios = []
-  sweep_ratios = []
+#   gc_ratios = []
+#   mark_ratios = []
+#   sweep_ratios = []
 
-  print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%8.8s)"%("bm gc","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms mark", "%9.9s(%8.8s)"%("bm mark","ratio"), sep=" | ", end=" | ")
-  print("%9.9s"%"ms sweep", "%9.9s(%8.8s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
-  print("%8s"%"ms times", "%8s"%"bm times", sep=" | ", end=" | \n")
-  for heap_size in heap_sizes:
-    print("%9d"%heap_size, end=" | ")
-    msgc_times = msgc_res.times.get(heap_size)
-    bmgc_times = bmgc_res.times.get(heap_size)
+#   print("%9.9s"%"size", "%9.9s"%"ms gc", "%9.9s(%8.8s)"%("bm gc","ratio"), sep=" | ", end=" | ")
+#   print("%9.9s"%"ms mark", "%9.9s(%8.8s)"%("bm mark","ratio"), sep=" | ", end=" | ")
+#   print("%9.9s"%"ms sweep", "%9.9s(%8.8s)"%("bm sweep","ratio"), sep=" | ", end=" | ")
+#   print("%8s"%"ms times", "%8s"%"bm times", sep=" | ", end=" | \n")
+#   for heap_size in heap_sizes:
+#     print("%9d"%heap_size, end=" | ")
+#     msgc_times = msgc_res.times.get(heap_size)
+#     bmgc_times = bmgc_res.times.get(heap_size)
 
-    msgc_total_time = msgc_res.total_gc_times.get(heap_size)
-    bmgc_total_time = bmgc_res.total_gc_times.get(heap_size)
+#     msgc_total_time = msgc_res.total_gc_times.get(heap_size)
+#     bmgc_total_time = bmgc_res.total_gc_times.get(heap_size)
 
-    if msgc_total_time:
-      msgc_time = sum(msgc_total_time) / msgc_times
-      print("%8.6lfs"%msgc_time, end=" | ")
-    else:
-      print("%8.8ss"%"--", end=" | ")
-    if bmgc_total_time:
-      bmgc_time = sum(bmgc_total_time) / bmgc_times
-      print("%8.6lfs"%bmgc_time, end="")
-    else:
-      print("%8.8ss"%"--", end="")
-    if msgc_total_time and bmgc_total_time and msgc_time > 0:
-      ratio = bmgc_time / msgc_time * 100
-      gc_ratios.append(ratio)
-      print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
-    else:
-      ratio = "--"
-      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+#     if msgc_total_time:
+#       msgc_time = sum(msgc_total_time) / msgc_times
+#       print("%8.6lfs"%msgc_time, end=" | ")
+#     else:
+#       print("%8.8ss"%"--", end=" | ")
+#     if bmgc_total_time:
+#       bmgc_time = sum(bmgc_total_time) / bmgc_times
+#       print("%8.6lfs"%bmgc_time, end="")
+#     else:
+#       print("%8.8ss"%"--", end="")
+#     if msgc_total_time and bmgc_total_time and msgc_time > 0:
+#       ratio = bmgc_time / msgc_time * 100
+#       gc_ratios.append(ratio)
+#       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
+#     else:
+#       ratio = "--"
+#       print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
 
-    msmk_total_time = msgc_res.total_mark_times.get(heap_size)
-    bmmk_total_time = bmgc_res.total_mark_times.get(heap_size)
-    if msmk_total_time:
-      msmk_time = sum(msmk_total_time) / msgc_times
-      print("%8.6lfs"%msmk_time, end=" | ")
-    else:
-      print("%8.8ss"%"--", end=" | ")
-    if bmmk_total_time:
-      bmmk_time = sum(bmmk_total_time) / bmgc_times
-      print("%8.6lfs"%bmmk_time, end="")
-    else:
-      print("%8.8ss"%"--", end="")
-    if msmk_total_time and bmmk_total_time and msmk_time > 0:
-      ratio = bmmk_time / msmk_time * 100
-      mark_ratios.append(ratio)
-      print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
-    else:
-      ratio = "--"
-      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
-    mssw_total_time = msgc_res.total_sweep_times.get(heap_size)
-    bmsw_total_time = bmgc_res.total_sweep_times.get(heap_size)
-    if mssw_total_time:
-      mssw_time = sum(mssw_total_time) / msgc_times
-      print("%8.6lfs"%mssw_time, end=" | ")
-    else:
-      print("%8.8ss"%"--", end=" | ")
-    if bmsw_total_time:
-      bmsw_time = sum(bmsw_total_time) / bmgc_times
-      print("%8.6lfs"%bmsw_time, end="")
-    else:
-      print("%8.8ss"%"--", end="")
-    if mssw_total_time and bmsw_total_time and mssw_time > 0:
-      ratio = bmsw_time / mssw_time * 100
-      sweep_ratios.append(ratio)
-      print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
-    else:
-      ratio = "--"
-      print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
-    ms_gc_count = msgc_res.gc_count.get(heap_size, "--")
-    bm_gc_count = bmgc_res.gc_count.get(heap_size, "--")
-    if type(ms_gc_count) == "int":
-      ms_gc_count = int(ms_gc_count / msgc_times)
-    if type(bm_gc_count) == "int":
-      bm_gc_count = int(bm_gc_count / bmgc_times)
-    print("%8s"%ms_gc_count, "%8s"%bm_gc_count, sep=" | ", end=" | \n")
-  if len(gc_ratios) > 0:
-    gc_ave_ratio = sum(gc_ratios) / len(gc_ratios)
-    print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.3lf%% "%("average", gc_ave_ratio), sep=" | ", end=" | ")
-  else:
-    print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
-  if len(mark_ratios) > 0:
-    mark_ave_ratio = sum(mark_ratios) / len(mark_ratios)
-    print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", mark_ave_ratio), sep=" | ", end=" | ")
-  else:
-    print("%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
-  if len(sweep_ratios) > 0:
-    sweep_ave_ratio = sum(sweep_ratios) / len(sweep_ratios)
-    print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", sweep_ave_ratio), sep=" | ", end=" | \n")
-  else:
-    print("%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
+#     msmk_total_time = msgc_res.total_mark_times.get(heap_size)
+#     bmmk_total_time = bmgc_res.total_mark_times.get(heap_size)
+#     if msmk_total_time:
+#       msmk_time = sum(msmk_total_time) / msgc_times
+#       print("%8.6lfs"%msmk_time, end=" | ")
+#     else:
+#       print("%8.8ss"%"--", end=" | ")
+#     if bmmk_total_time:
+#       bmmk_time = sum(bmmk_total_time) / bmgc_times
+#       print("%8.6lfs"%bmmk_time, end="")
+#     else:
+#       print("%8.8ss"%"--", end="")
+#     if msmk_total_time and bmmk_total_time and msmk_time > 0:
+#       ratio = bmmk_time / msmk_time * 100
+#       mark_ratios.append(ratio)
+#       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
+#     else:
+#       ratio = "--"
+#       print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+#     mssw_total_time = msgc_res.total_sweep_times.get(heap_size)
+#     bmsw_total_time = bmgc_res.total_sweep_times.get(heap_size)
+#     if mssw_total_time:
+#       mssw_time = sum(mssw_total_time) / msgc_times
+#       print("%8.6lfs"%mssw_time, end=" | ")
+#     else:
+#       print("%8.8ss"%"--", end=" | ")
+#     if bmsw_total_time:
+#       bmsw_time = sum(bmsw_total_time) / bmgc_times
+#       print("%8.6lfs"%bmsw_time, end="")
+#     else:
+#       print("%8.8ss"%"--", end="")
+#     if mssw_total_time and bmsw_total_time and mssw_time > 0:
+#       ratio = bmsw_time / mssw_time * 100
+#       sweep_ratios.append(ratio)
+#       print("(%7.3lf%%)"%ratio, sep=" | ", end=" | ")
+#     else:
+#       ratio = "--"
+#       print("(%7.7s%%)"%ratio, sep=" | ", end=" | ")
+#     ms_gc_count = msgc_res.gc_count.get(heap_size, "--")
+#     bm_gc_count = bmgc_res.gc_count.get(heap_size, "--")
+#     if type(ms_gc_count) == "int":
+#       ms_gc_count = int(ms_gc_count / msgc_times)
+#     if type(bm_gc_count) == "int":
+#       bm_gc_count = int(bm_gc_count / bmgc_times)
+#     print("%8s"%ms_gc_count, "%8s"%bm_gc_count, sep=" | ", end=" | \n")
+#   if len(gc_ratios) > 0:
+#     gc_ave_ratio = sum(gc_ratios) / len(gc_ratios)
+#     print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.3lf%% "%("average", gc_ave_ratio), sep=" | ", end=" | ")
+#   else:
+#     print("%9.9s"%"", "%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
+#   if len(mark_ratios) > 0:
+#     mark_ave_ratio = sum(mark_ratios) / len(mark_ratios)
+#     print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", mark_ave_ratio), sep=" | ", end=" | ")
+#   else:
+#     print("%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
+#   if len(sweep_ratios) > 0:
+#     sweep_ave_ratio = sum(sweep_ratios) / len(sweep_ratios)
+#     print("%9.9s"%"", "%9.9s %7.3lf%% "%("average", sweep_ave_ratio), sep=" | ", end=" | \n")
+#   else:
+#     print("%9.9s"%"", "%9.9s %7.7s%% "%("average", "--"), sep=" | ", end=" | ")
 
 
-  print()
+#   print()
 
-if msgc_res and ms_res:
-  print("Total Processing : GC Time(Median)")
-  print_gc_summary(ms_res, msgc_res, "ms")
-  print()
+# if msgc_res and ms_res:
+#   print("Total Processing : GC Time(Median)")
+#   print_gc_summary(ms_res, msgc_res, "ms")
+#   print()
 
-if bmgc_res and bm_res:
-  print("Total Processing : GC Time(Median)")
-  print_gc_summary(bm_res, bmgc_res, "bm")
-  print()
+# if bmgc_res and bm_res:
+#   print("Total Processing : GC Time(Median)")
+#   print_gc_summary(bm_res, bmgc_res, "bm")
+#   print()
 
-# TODO:
-#   refcountの停止時間とmarksweep, bitmap-markingの停止時間の比較
+# # TODO:
+# #   refcountの停止時間とmarksweep, bitmap-markingの停止時間の比較
 
-if rcgc_res and msgc_res:
-  print("GC Time(Refcount vs MarkSweep)")
-  print_gc_time_vs(rcgc_res, msgc_res, "rc", "ms")
+# if rcgc_res and msgc_res:
+#   print("GC Time(Refcount vs MarkSweep)")
+#   print_gc_time_vs(rcgc_res, msgc_res, "rc", "ms")
 
-if rcgc_res and bmgc_res:
-  print("GC Time(Refcount vs BitMapMarking)")
-  print_gc_time_vs(rcgc_res, bmgc_res, "rc", "bm")
+# if rcgc_res and bmgc_res:
+#   print("GC Time(Refcount vs BitMapMarking)")
+#   print_gc_time_vs(rcgc_res, bmgc_res, "rc", "bm")

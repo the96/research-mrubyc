@@ -15,7 +15,7 @@ ls result/bm_partial_sums*/*.log | xargs python3 ../summary.py > summary/bm_part
 echo "bm_so_lists summary"
 ls result/bm_so_lists*/*.log | xargs python3 ../summary.py > summary/bm_so_lists.txt
 echo "bm_so_matrix summary"
-ls result/bm_so_matrix/*.log | xargs python3 ../summary.py > summary/bm_so_matrix.txt
+ls result/bm_so_matrix*/*.log | xargs python3 ../summary.py > summary/bm_so_matrix.txt
 echo "bm_so_object summary"
 ls result/bm_so_object*/*.log | xargs python3 ../summary.py > summary/bm_so_object.txt
 echo "bm_spectral_norm summary"

@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_fannkuch
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     32144 |       --s(     --%) | 0.208891s(     --%) | 0.218456s(     --%) | 

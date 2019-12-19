@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:binary_tree
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
   1000928 | 1.060479s(100.000%) |       --s(     --%) |       --s(     --%) | 

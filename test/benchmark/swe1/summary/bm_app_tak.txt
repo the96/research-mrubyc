@@ -78,7 +78,7 @@ test_name:bm_app_tak_gctime
     50840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     51840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     52840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
-          |           |   average       --%  |           |   average       --%  |           |   average       --%  | 
+          |           |   average      --%  |           |   average      --%  |           |   average      --%  | 
 Total Processing : GC Time(Median)
 test_name:bm_app_tak
 test_name:bm_app_tak_gctime

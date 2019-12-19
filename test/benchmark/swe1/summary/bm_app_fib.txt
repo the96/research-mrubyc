@@ -78,7 +78,7 @@ test_name:bm_app_fib_gctime
     51176 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     52176 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     53176 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
-          |           |   average       --%  |           |   average       --%  |           |   average       --%  | 
+          |           |   average      --%  |           |   average      --%  |           |   average      --%  | 
 Total Processing : GC Time(Median)
 test_name:bm_app_fib
 test_name:bm_app_fib_gctime

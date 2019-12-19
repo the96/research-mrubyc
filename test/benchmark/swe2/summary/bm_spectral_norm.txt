@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_spectral_norm
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     41440 |       --s(     --%) |       --s(     --%) |       --s(     --%) | 

@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_app_tak
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     32840 | 0.531989s(100.000%) | 0.434889s( 81.748%) | 0.421142s( 79.164%) | 
@@ -78,7 +78,7 @@ test_name:bm_app_tak_gctime
     50840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     51840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
     52840 | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) | 0.000000s | 0.000000s(     --%) |        0 |        0 | 
-          |           |   average       --%  |           |   average       --%  |           |   average       --%  | 
+          |           |   average      --%  |           |   average      --%  |           |   average      --%  | 
 Total Processing : GC Time(Median)
 test_name:bm_app_tak
 test_name:bm_app_tak_gctime

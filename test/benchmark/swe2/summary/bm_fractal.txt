@@ -1,4 +1,4 @@
-Total Processsing Time(64bit)
+Total Processing Time(64bit)
 test_name:bm_fractal
      size |        rc   (ratio) |        ms   (ratio) |        bm   (ratio) | 
     32296 | 0.727669s(100.000%) |       --s(     --%) |       --s(     --%) | 
