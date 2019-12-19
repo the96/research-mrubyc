@@ -31,7 +31,7 @@ name |      size (   ratio) |
   rc |     32288 (100.000%) | 
   ms |     32144 ( 99.554%) | 
 rcm3 |     22472 (100.000%) | 
-ms32 |     21532 ( 95.817%) | 
+ms32 |     21580 ( 96.031%) | 
 
 test_name: testable/bm_fractal
 name |      size (   ratio) | 
@@ -43,9 +43,9 @@ ms32 |     21604 ( 97.070%) |
 test_name: testable/bm_mergesort_hongli
 name |      size (   ratio) | 
   rc |     44584 (100.000%) | 
-  ms |     48416 (108.595%) | 
+  ms |     48168 (108.039%) | 
 rcm3 |     30792 (100.000%) | 
-ms32 |     32984 (107.119%) | 
+ms32 |     32960 (107.041%) | 
 
 test_name: testable/bm_partial_sums
 name |      size (   ratio) | 
@@ -64,9 +64,9 @@ ms32 |    140484 (118.925%) |
 test_name: testable/bm_so_matrix
 name |      size (   ratio) | 
   rc |    106904 (100.000%) | 
-  ms |    122952 (115.012%) | 
+  ms |    123312 (115.348%) | 
 rcm3 |     75436 (100.000%) | 
-ms32 |     88428 (117.223%) | 
+ms32 |     88332 (117.095%) | 
 
 test_name: testable/bm_so_object
 name |      size (   ratio) | 
@@ -78,9 +78,9 @@ ms32 |     22692 ( 96.974%) |
 test_name: testable/bm_spectral_norm
 name |      size (   ratio) | 
   rc |     41240 (100.000%) | 
-  ms |     43320 (105.044%) | 
+  ms |     42832 (103.860%) | 
 rcm3 |     29640 (100.000%) | 
-ms32 |     30284 (102.173%) | 
+ms32 |     29776 (100.459%) | 
 
 test_name: testable/string_concat
 name |      size (   ratio) | 
@@ -88,11 +88,4 @@ name |      size (   ratio) |
   ms |    178788 (287.071%) | 
 rcm3 |     52216 (100.000%) | 
 ms32 |    159240 (304.964%) | 
-
-test_name: testable/binary_tree
-name |      size (   ratio) | 
-  rc |   1000928 (100.000%) | 
-  ms |   1006072 (100.514%) | 
-rcm3 |    740008 (100.000%) | 
-ms32 |    740008 (100.000%) | 
 

@@ -24,4 +24,4 @@ echo "string_concat summary"
 ls result/string_concat*/*.log | xargs python3 ../summary.py > summary/string_concat.txt
 echo "binary_tree summary"
 ls result/binary_tree*/*.log | xargs python3 ../summary.py > summary/binary_tree.txt
-python3 ../calc_heap_ratio.py ../freelist_regenerate_min_heap.result > summary/heap_size.txt
+python3 ../calc_heap_ratio.py ../bench_min_heap.result > summary/heap_size.txt
