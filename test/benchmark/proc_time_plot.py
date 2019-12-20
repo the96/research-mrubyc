@@ -7,8 +7,17 @@ import pandas as pd
 import os
 import os.path
 
+PLOT_MODE = "OFF"
+ON = "ON"
+OFF = "OFF"
 
 sys.argv.pop(0)
+if sys.argv[0] == "-noplt":
+  PLOT_MODE = OFF
+  sys.argv.pop(0)
+if sys.argv[0] == "-plt":
+  PLOT_MODE = ON
+  sys.argv.pop(0)
 if len(sys.argv) == 0:
   print("Please input .log file what recording total time of benchmark processing.")
 
@@ -109,17 +118,21 @@ for line in lines:
     if not vm_name.startswith('rc'):
       ave_time_dict.addAveTime(test_name, vm_name, bitwidth, ave_time)
 
-outdir = "barplot/"
-os.makedirs(outdir, exist_ok=True)
-plt.style.use('default')
-colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+if PLOT_MODE == ON:
+  outdir = "barplot/"
+  os.makedirs(outdir, exist_ok=True)
+  plt.style.use('default')
+  colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-xmax = 0
 for bk in ave_time_dict.getBitWidths():
-  pdf_name = file_name + "_" + bk + ".pdf"
-  pdf = PdfPages(outdir + pdf_name)
-  plt.figure(figsize=(14, 3))
+  if PLOT_MODE == ON:
+    pdf_name = file_name + "_" + bk + ".pdf"
+    pdf_path = outdir + pdf_name
+    print("output file: %s"%pdf_path)
+    pdf = PdfPages(pdf_path)
+    plt.figure(figsize=(14, 3))
 
+  xmax = 0
   labels = ave_time_dict.getLabels(bk)
   xticks = list(map(lambda x: float(x), list(range(1, len(ave_time_dict.getLabels(bk)) + 1))))
   if max(xticks) > xmax:
@@ -129,6 +142,7 @@ for bk in ave_time_dict.getBitWidths():
   for vm_cnt in range(0, len(vms)):
     vm = vms[vm_cnt]
     vk = vm
+    vm = vm.upper()
     values = ave_time_dict.getValues(bk, vk)
     offset = (vm_cnt - len(vms) / 2) * width
     xpoints = list(map(lambda x: x + offset, ave_time_dict.getXPoints(bk, vk)))
@@ -137,19 +151,35 @@ for bk in ave_time_dict.getBitWidths():
     if (len(values) != len(xpoints)):
       print("assertion failed: L134")
       exit(1)
-    plt.bar(
-      xpoints,
-      values,
-      width,
-      color=colors[vm_cnt],
-      label=vm.upper()
-    )
-  plt.ylim(0,145)
-  plt.xlim(-width*4, xmax + width*1)
-  plt.grid(True)
-  plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed')
-  plt.legend(fontsize=10)
-  plt.ylabel("process time ratio[%]")
-  plt.xticks(xticks, labels, rotation=12, fontsize=10)
-  pdf.savefig(bbox_inches="tight")
-  pdf.close()
+    if PLOT_MODE == ON:
+      plt.bar(
+        xpoints,
+        values,
+        width,
+        color=colors[vm_cnt],
+        label=vm
+      )
+    improve_sum_ratio = 0
+    improve_cnt = 0
+    improve_max_ratio = 0
+    improve_min_ratio = 100
+    for value in values:
+      if 100 > value:
+        improve_sum_ratio += value
+        improve_cnt += 1
+        improve_max_ratio = max([improve_max_ratio, value])
+        improve_min_ratio = min([improve_min_ratio, value])
+    print("%s (%sbit): mean improve ratio %7.3lf%%(max %7.3lf%%, min %7.3lf%%)"%
+         (vm, bk, improve_sum_ratio / improve_cnt, improve_max_ratio, improve_min_ratio)
+         )
+
+  if PLOT_MODE == ON:
+    plt.ylim(0,145)
+    plt.xlim(-width*4, xmax + width*1)
+    plt.grid(True)
+    plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed')
+    plt.legend(fontsize=10)
+    plt.ylabel("process time ratio[%]")
+    plt.xticks(xticks, labels, rotation=12, fontsize=10)
+    pdf.savefig(bbox_inches="tight")
+    pdf.close()
