@@ -52,7 +52,7 @@
 #define GC_COUNT
 #define GC_MS_OR_BM
 // sweep method
-#define REGENERATE_FREELIST
+// #define REGENERATE_FREELIST
 #endif
 
 #if (GC_MODE == BITMAP_MARKING)
@@ -60,7 +60,7 @@
 #define GC_COUNT
 #define GC_MS_OR_BM
 // sweep method
-#define REGENERATE_FREELIST
+// #define REGENERATE_FREELIST
 #endif
 
 #if (GC_MODE == MARKSWEEP_DEBUG)
