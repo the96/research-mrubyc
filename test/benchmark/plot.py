@@ -13,6 +13,7 @@ class Graph:
   def __init__(self):
     self.vm_name = ""
     self.index = 0
+    self.swe = 0
 # x
     self.heap_sizes = []
 # y
@@ -50,6 +51,8 @@ sys.argv.pop(0)
 
 test_name = None
 vm_name = '(marksweep|marksweep-early|bitmap-marking|bitmap-marking-m32|bitmap-marking-early|marksweep-m32|marksweep-early-m32|bitmap-marking-early-m32|refcount|refcnt-m32)'
+vm_label = {"marksweep": "MS", "bitmap-marking": "BM", "refcount": "RC", 
+            "marksweep-m32": "MS", "bitmap-marking-m32": "BM", "refcnt-m32": "RC"}  
 head_pat = re.compile('^test_name: (.+) vm_name: ' + vm_name + '$')
 success_pat = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat = re.compile('heap_size (\d+) failed')
@@ -72,6 +75,10 @@ for file_path in sys.argv:
     if head:
       _test_name = head.groups()[0]
       _vm_name = head.groups()[1]
+      if "swe1" in file_path:
+        new_graph.swe = 1
+      if "swe2" in file_path:
+        new_graph.swe = 2
       if test_name == None:
         test_name = _test_name
       elif test_name != _test_name:
@@ -90,7 +97,7 @@ for file_path in sys.argv:
   new_graph.calc_median()
   graphs.append(new_graph)
 
-out_dir = "graph/"
+out_dir = "graph/merged/"
 os.makedirs(out_dir, exist_ok=True)
 save_dest = out_dir + test_name + "_total_time.pdf"
 pdf = PdfPages(save_dest)
@@ -109,9 +116,9 @@ for graph in graphs:
     continue
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dashdot")
   elif graph.vm_name.endswith("m32"):
-    ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dotted")
+    ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o", linestyle="dotted")
   else:
-    ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o")
+    ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o")
   if len(xtick) < len(graph.heap_sizes):
     xtick = graph.heap_sizes
 ax.set_ylim(bottom=0)

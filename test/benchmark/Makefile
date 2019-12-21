@@ -46,6 +46,36 @@ pdf:
 	ls result/string_concat_gctime/* | xargs python3 gc_plot.py
 	pdfunite graph/*.pdf graph/all.pdf
 
+merge-graph:
+	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi
+	ls swe?/result/bm_app_fib/* | xargs python3 plot.py
+	ls swe?/result/bm_app_fib_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_app_tak/* | xargs python3 plot.py
+	ls swe?/result/bm_app_tak_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_app_tarai/* | xargs python3 plot.py
+	ls swe?/result/bm_app_tarai_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_fannkuch/* | xargs python3 plot.py
+	ls swe?/result/bm_fannkuch_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_fractal/* | xargs python3 plot.py
+	ls swe?/result/bm_fractal_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_mergesort_hongli/* | xargs python3 plot.py
+	ls swe?/result/bm_mergesort_hongli_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_partial_sums/* | xargs python3 plot.py
+	ls swe?/result/bm_partial_sums_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_so_lists/* | xargs python3 plot.py
+	ls swe?/result/bm_so_lists_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_so_matrix/* | xargs python3 plot.py
+	ls swe?/result/bm_so_matrix_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_so_object/* | xargs python3 plot.py
+	ls swe?/result/bm_so_object_m32/* | xargs python3 plot.py
+	ls swe?/result/bm_spectral_norm/* | xargs python3 plot.py
+	ls swe?/result/bm_spectral_norm_m32/* | xargs python3 plot.py
+	ls swe?/result/string_concat/* | xargs python3 plot.py
+	ls swe?/result/string_concat_m32/* | xargs python3 plot.py
+	ls swe?/result/binary_tree/* | xargs python3 plot.py
+	ls swe?/result/binary_tree_m32/* | xargs python3 plot.py
+	pdfunite graph/*.pdf graph/all.pdf
+
 ln:
 	ln -s ../../mrubyc/sample_c/marksweep
 	ln -s ../../mrubyc/sample_c/bitmap-marking
