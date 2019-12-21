@@ -125,7 +125,7 @@ class MarkSweepGCResult(GCResult):
       gc_times = sorted(self.gc_times[heap_size])
       if len(mark_times) == 0:
         continue
-      max_idx = int(len(mark_times) * 0.9)
+      max_idx = int(len(mark_times) * 0.95)
       self.max_mark_times[heap_size] = mark_times[max_idx]
       self.max_sweep_times[heap_size] = sweep_times[max_idx]
       self.max_gc_times[heap_size] = gc_times[max_idx]
@@ -173,7 +173,7 @@ class RefCountGCResult(GCResult):
       if ary:
         gc_datas.extend(ary)
     gc_datas = sorted(gc_datas, key=lambda t:(t.rec_decref, t.rec_free, t.gc_time))
-    max_idx = int(len(gc_datas)*0.9)
+    max_idx = int(len(gc_datas)*0.95)
     return gc_datas[max_idx].gc_time
 
 
