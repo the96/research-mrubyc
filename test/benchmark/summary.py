@@ -119,7 +119,7 @@ class MarkSweepGCResult(GCResult):
     self.gc_count[heap_size] += 1
 
   def calcMax(self):
-    for heap_size in heap_sizes:
+    for heap_size in self.heap_sizes:
       mark_times = sorted(self.mark_times[heap_size])
       sweep_times = sorted(self.sweep_times[heap_size])
       gc_times = sorted(self.gc_times[heap_size])
