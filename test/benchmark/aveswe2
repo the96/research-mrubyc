@@ -96,9 +96,9 @@ rc_ratio 100.000% , ms_ratio  91.435% , bm_ratio  89.414%
 
 Total Processing Time(64bit)
 test_name:binary_tree
-rc_ratio 100.000% , ms_ratio  85.010% , bm_ratio  85.606% 
+rc_ratio 100.000% , ms_ratio  84.664% , bm_ratio  85.159% 
 
 Total Processing Time(32bit)
 test_name:binary_tree_m32
-rc_ratio 100.000% , ms_ratio  87.113% , bm_ratio  84.457% 
+rc_ratio 100.000% , ms_ratio  87.864% , bm_ratio  84.893% 
 

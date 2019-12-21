@@ -62,6 +62,8 @@ if len(sys.argv) == 0:
 
 
 graphs = []
+swe1_flag = False
+swe2_flag = True
 for file_path in sys.argv:
   file = open(file_path, 'r')
   lines = file.readlines()
@@ -76,8 +78,10 @@ for file_path in sys.argv:
       _test_name = head.groups()[0]
       _vm_name = head.groups()[1]
       if "swe1" in file_path:
+        swe1_flag = True
         new_graph.swe = 1
       if "swe2" in file_path:
+        swe2_flag = True
         new_graph.swe = 2
       if test_name == None:
         test_name = _test_name
@@ -97,7 +101,10 @@ for file_path in sys.argv:
   new_graph.calc_median()
   graphs.append(new_graph)
 
-out_dir = "graph/merged/"
+if swe1_flag and swe2_flag:
+  out_dir = "graph/merged/"
+else:
+  out_dir = "graph/"
 os.makedirs(out_dir, exist_ok=True)
 save_dest = out_dir + test_name + "_total_time.pdf"
 pdf = PdfPages(save_dest)
@@ -109,6 +116,8 @@ ax = fig.add_subplot(1,1,1)
 plt.title(test_name)
 plt.style.use('default')
 for graph in graphs:
+  if swe1_flag and swe2_flag and (graph.vm_name == "refcount" or graph.vm_name == "refcnt") and graph.swe == 2:
+    continue
   if graph.vm_name.endswith("early"):
     continue
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dashed")
@@ -116,7 +125,7 @@ for graph in graphs:
     continue
     ax.plot(graph.heap_sizes, graph.median_total_times, label=graph.vm_name, marker="o", linestyle="dashdot")
   elif graph.vm_name.endswith("m32"):
-    ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o", linestyle="dotted")
+    ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o")
   else:
     ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o")
   if len(xtick) < len(graph.heap_sizes):
@@ -138,36 +147,37 @@ png_dest = png_dir + test_name + "_total_time.png"
 plt.savefig(png_dest)
 pdf.savefig()
 
-row = 3
-col = 2
-number = 0
-fig = plt.figure(figsize=(10, 12))
-for graph in graphs:
-  # graph initialize
-  if number >= row * col:
-    pdf.savefig()
-    plt.title(test_name + " boxplot")
-    fig = plt.figure(figsize=(10, 12))
-    number = 0
-  number += 1
-  ax = fig.add_subplot(3, 2, number)
-  df = pd.DataFrame()
-# format
-  for i in range(len(graph.heap_sizes)):
-    df[graph.heap_sizes[i]] = graph.total_times[i]
-  df_melt = pd.melt(df)
-  df_melt['vm_name'] = graph.vm_name
+# BOX PLOT
+# row = 3
+# col = 2
+# number = 0
+# fig = plt.figure(figsize=(10, 12))
+# for graph in graphs:
+#   # graph initialize
+#   if number >= row * col:
+#     pdf.savefig()
+#     plt.title(test_name + " boxplot")
+#     fig = plt.figure(figsize=(10, 12))
+#     number = 0
+#   number += 1
+#   ax = fig.add_subplot(3, 2, number)
+#   df = pd.DataFrame()
+# # format
+#   for i in range(len(graph.heap_sizes)):
+#     df[graph.heap_sizes[i]] = graph.total_times[i]
+#   df_melt = pd.melt(df)
+#   df_melt['vm_name'] = graph.vm_name
 
-# generate plot
-  sns.boxplot(x='variable', y='value', data=df_melt, hue='vm_name', ax=ax, linewidth=0.5)
-  ax.set_xlabel("heap_size[kB]")
-  ax.set_ylabel("process time(sec)")
-  ax.set_xticklabels([])
-  ax.set_ylim(bottom=0,top=graph.get_max_y() * 2 )
-  ax.legend()
-  ax.grid()
-  ax.set_title(graph.vm_name + " total time")
-  plt.tight_layout()
+# # generate plot
+#   sns.boxplot(x='variable', y='value', data=df_melt, hue='vm_name', ax=ax, linewidth=0.5)
+#   ax.set_xlabel("heap_size[kB]")
+#   ax.set_ylabel("process time(sec)")
+#   ax.set_xticklabels([])
+#   ax.set_ylim(bottom=0,top=graph.get_max_y() * 2 )
+#   ax.legend()
+#   ax.grid()
+#   ax.set_title(graph.vm_name + " total time")
+#   plt.tight_layout()
 
 pdf.savefig()
 

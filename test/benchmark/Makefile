@@ -47,7 +47,7 @@ pdf:
 	pdfunite graph/*.pdf graph/all.pdf
 
 merge-graph:
-	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi
+	if [ -e graph/merged/all.pdf ]; then rm graph/merged/all.pdf; fi
 	ls swe?/result/bm_app_fib/* | xargs python3 plot.py
 	ls swe?/result/bm_app_fib_m32/* | xargs python3 plot.py
 	ls swe?/result/bm_app_tak/* | xargs python3 plot.py
@@ -74,7 +74,7 @@ merge-graph:
 	ls swe?/result/string_concat_m32/* | xargs python3 plot.py
 	ls swe?/result/binary_tree/* | xargs python3 plot.py
 	ls swe?/result/binary_tree_m32/* | xargs python3 plot.py
-	pdfunite graph/*.pdf graph/all.pdf
+	pdfunite graph/merged/*.pdf graph/merged/all.pdf
 
 ln:
 	ln -s ../../mrubyc/sample_c/marksweep

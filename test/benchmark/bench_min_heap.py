@@ -39,6 +39,7 @@ refcnt_m32_bin = "refcount/mrubyc-bench-m32"
 def benchmark(test_name, test_path, binary_name, binary_path):
   # result file and output file open
   heap_size = min_size + (4 - min_size % 4)
+  prev_print_size = heap_size
   while heap_size <= max_size:
     stdout = subprocess.run([binary_path, "-m", str(heap_size) , test_path], stdout=subprocess.PIPE).stdout.decode('UTF-8')
 
@@ -53,6 +54,9 @@ def benchmark(test_name, test_path, binary_name, binary_path):
   # increment size
     prev_size = heap_size
     heap_size += 4
+    if heap_size - prev_print_size > 1000:
+      print(heap_size)
+      prev_print_size = heap_size
   print(binary_name + " failed max size " + str(prev_size))
 
 # main
@@ -89,7 +93,7 @@ benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
 # benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
 # benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
 benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
-min_size -= 10000
+#min_size -= 10000
 benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
 # benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
 # benchmark(test_name, benchmark_path, bitmap_earlygc_m32,   bitmap_earlygc_m32_bin  )
