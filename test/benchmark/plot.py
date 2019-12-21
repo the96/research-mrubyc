@@ -115,6 +115,7 @@ fig = plt.figure(figsize=(12, 8))
 ax = fig.add_subplot(1,1,1)
 plt.title(test_name)
 plt.style.use('default')
+min_sub = None
 for graph in graphs:
   if swe1_flag and swe2_flag and (graph.vm_name == "refcount" or graph.vm_name == "refcnt") and graph.swe == 2:
     continue
@@ -128,10 +129,16 @@ for graph in graphs:
     ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o")
   else:
     ax.plot(graph.heap_sizes, graph.median_total_times, label=vm_label[graph.vm_name] + str(graph.swe), marker="o")
-  if len(xtick) < len(graph.heap_sizes):
-    xtick = graph.heap_sizes
+  xtick.extend(graph.heap_sizes)
 ax.set_ylim(bottom=0)
-ax.set_xticks(xtick, minor=True)
+xtick = sorted(set(xtick))
+prev_size = xtick[0]
+for i in range(1,len(xtick)):
+  sub = xtick[i] - prev_size
+  if (not min_sub) or sub < min_sub:
+    min_sub = sub
+xtick = list(range(xtick[0], xtick[len(xtick)-1] + min_sub, min_sub))
+ax.set_xticks(xtick, minor=True,)
 xticks_major = []
 for i in range(len(xtick)):
   if i % 2 == 0:
