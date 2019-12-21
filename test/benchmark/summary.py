@@ -172,9 +172,14 @@ class RefCountGCResult(GCResult):
       ary = self.gc_data.get(heap_size)
       if ary:
         gc_datas.extend(ary)
-    gc_datas = sorted(gc_datas, key=lambda t:(t.rec_decref, t.rec_free, t.gc_time))
-    max_idx = int(len(gc_datas)*0.95)
-    return gc_datas[max_idx].gc_time
+    gc_datas = sorted(gc_datas, key=lambda t:(t.gc_time, t.rec_decref, t.rec_free), reverse=True)
+    max_rec_data = max(gc_datas, key=lambda t:(t.rec_decref, t.rec_free))
+    datas = []
+    for gc_data in gc_datas:
+      if gc_data.rec_decref == max_rec_data.rec_decref and gc_data.rec_free == max_rec_data.rec_free:
+        datas.append(gc_data)
+    return datas[int(len(datas) * 0.05)].gc_time
+    # 再帰回数が最大のものの上位5%目を最大値とした
 
 
 
