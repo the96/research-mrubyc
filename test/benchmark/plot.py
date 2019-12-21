@@ -137,8 +137,9 @@ for i in range(1,len(xtick)):
   sub = xtick[i] - prev_size
   if (not min_sub) or sub < min_sub:
     min_sub = sub
+  prev_size = xtick[i]
 xtick = list(range(xtick[0], xtick[len(xtick)-1] + min_sub, min_sub))
-ax.set_xticks(xtick, minor=True,)
+ax.set_xticks(xtick, minor=True)
 xticks_major = []
 for i in range(len(xtick)):
   if i % 2 == 0:
@@ -185,8 +186,6 @@ pdf.savefig()
 #   ax.grid()
 #   ax.set_title(graph.vm_name + " total time")
 #   plt.tight_layout()
-
-pdf.savefig()
 
 # write
 pdf.close()
