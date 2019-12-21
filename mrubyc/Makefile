@@ -95,7 +95,7 @@ refcount-m-vml:
 
 all-vm: all-normal all-bench
 all-normal: marksweep bitmap-marking refcount
-all-measure: marksweep-m-gc marksweep-m-vml bitmap-marking-m-gc bitmap-marking-m-vml refcount-m-gc refcount-m-gc-everytime refcount-m-vml
+all-measure: marksweep-m-gc bitmap-marking-m-gc refcount-m-gc refcount-m-gc-everytime
 all-bench: marksweep-bench bitmap-marking-bench refcount-bench marksweep-earlygc bitmap-marking-earlygc
 all-m32: marksweep-m32 bitmap-marking-m32 refcount-m32 marksweep-earlygc-m32 bitmap-marking-earlygc-m32
 
