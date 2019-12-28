@@ -9,3 +9,9 @@ mrubyc/src/hal
 **/bench.sh
 test/benchmark/**/result*/
 **backup/
+**/ext/bitmap*
+**/ext/marksweep*
+**/ext/refcount*
+**/src/bitmap*
+**/src/marksweep*
+**/src/refcount*

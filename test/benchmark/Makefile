@@ -2,17 +2,10 @@ MRBC=../../mrbc
 all:
 	ls testable/*.rb | xargs -n 1 $(MRBC)
 	ls *.rb | xargs -n 1 $(MRBC)
+	
 clean:
 	rm testable/*.mrb
 	rm marksweep bitmap-marking refcount
-mrubyc:
-	make -C ../../mrubyc all-normal
-mrubyc-bench:
-	make -C ../../mrubyc all-bench
-mrubyc-measure:
-	make -C ../../mrubyc all-measure
-mrubyc-m32:
-	make -C ../../mrubyc all-m32
 
 pdf:
 	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi
@@ -76,10 +69,25 @@ merge-graph:
 	ls swe?/result/binary_tree_m32/* | xargs python3 plot.py
 	pdfunite graph/merged/*.pdf graph/merged/all.pdf
 
+mrubyc:
+	$(MAKE) -C ../../mrubyc/all
+marksweep-swe1:
+	$(MAKE) -C ../../mrubyc/ marksweep-swe1
+marksweep-swe2:
+	$(MAKE) -C ../../mrubyc/ marksweep-swe2
+bitmap-swe1:
+	$(MAKE) -C ../../mrubyc/ bitmap-swe1
+bitmap-swe2:
+	$(MAKE) -C ../../mrubyc/ bitmap-swe2
+refcount:
+	$(MAKE) -C ../../mrubyc/ refcount
+
 ln:
-	ln -s ../../mrubyc/sample_c/marksweep
-	ln -s ../../mrubyc/sample_c/bitmap-marking
-	ln -s ../../mrubyc/sample_c/refcount
+	@if [ ! -e marksweep1]; then ln -s ../../mrubyc/sample_c/marksweep-swe1 marksweep1; fi
+	@if [ ! -e marksweep2]; then ln -s ../../mrubyc/sample_c/marksweep-swe2 marksweep2; fi
+	@if [ ! -e bitmap1]; then ln -s ../../mrubyc/sample_c/bitmap-swe1 bitmap1; fi
+	@if [ ! -e bitmap2]; then ln -s ../../mrubyc/sample_c/bitmap-swe2 bitmap2; fi
+	@if [ ! -e refcount]; then ln -s ../../mrubyc/sample_c/refcount refcount; fi
 
 mrubyc-clean:
 	make -C ../../mrubyc clean
