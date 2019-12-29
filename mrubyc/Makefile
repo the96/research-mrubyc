@@ -11,7 +11,7 @@ BENCH_TEMPLATE = -O2 -DPRINT_OBJ_SIZE -DNDEBUG -UDEBUG -UMRBC_DEBUG
 
 dummy:
 	@echo "make rule list:"
-	@echo "all"
+	@echo "all / all-64"
 	@echo "- marksweep-swe1"
 	@echo "  - marksweep-swe1-bench"
 	@echo "  - marksweep-swe1-m-gc"
@@ -37,8 +37,14 @@ dummy:
 all:
 	$(MAKE) marksweep-swe1 marksweep-swe2 bitmap-swe1 bitmap-swe2 refcount
 
+all-64:
+	$(MAKE) marksweep-swe1-64 marksweep-swe2-64 bitmap-swe1-64 bitmap-swe2-64 refcount-64
+
 marksweep-swe1:
-	$(MAKE) marksweep-swe1-bench marksweep-swe1-m-gc marksweep-swe1-m32
+	$(MAKE) marksweep-swe1-64 marksweep-swe1-m32
+
+marksweep-swe1-64:
+	$(MAKE) marksweep-swe1-bench marksweep-swe1-m-gc
 
 marksweep-swe1-bench:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP"
@@ -48,7 +54,10 @@ marksweep-swe1-m32:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -m32"
 
 marksweep-swe2:
-	$(MAKE) marksweep-swe2-bench marksweep-swe2-m-gc marksweep-swe2-m32
+	$(MAKE) marksweep-swe2-64 marksweep-swe2-m32
+
+marksweep-swe2-64:
+	$(MAKE) marksweep-swe2-bench marksweep-swe2-m-gc
 
 marksweep-swe2-bench:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DREGENERATE_FREELIST"
@@ -58,7 +67,10 @@ marksweep-swe2-m32:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -m32 -DREGENERATE_FREELIST"
 
 bitmap-swe1:
-	$(MAKE) bitmap-swe1-bench bitmap-swe1-m-gc bitmap-swe1-m32
+	$(MAKE) bitmap-swe1-64 bitmap-swe1-m32
+
+bitmap-swe1-64:
+	$(MAKE) bitmap-swe1-bench bitmap-swe1-m-gc
 
 bitmap-swe1-bench:
 	$(MAKE) mrubyc-series SERIES="bitmap-swe1" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=BITMAP_MARKING"
@@ -68,7 +80,10 @@ bitmap-swe1-m32:
 	$(MAKE) mrubyc-series SERIES="bitmap-swe1" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=BITMAP_MARKING -m32"
 
 bitmap-swe2:
-	$(MAKE) bitmap-swe2-bench bitmap-swe2-m-gc bitmap-swe2-m32
+	$(MAKE) bitmap-swe2-64 bitmap-swe2-m32
+
+bitmap-swe2-64:
+	$(MAKE) bitmap-swe2-bench bitmap-swe2-m-gc
 
 bitmap-swe2-bench:
 	$(MAKE) mrubyc-series SERIES="bitmap-swe2" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=BITMAP_MARKING -DREGENERATE_FREELIST"
@@ -78,7 +93,10 @@ bitmap-swe2-m32:
 	$(MAKE) mrubyc-series SERIES="bitmap-swe2" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=BITMAP_MARKING -m32 -DREGENERATE_FREELIST"
 
 refcount:
-	$(MAKE) refcount-bench refcount-m-gc refcount-m32
+	$(MAKE) refcount-64 refcount-m32
+
+refcount-64:
+	$(MAKE) refcount-bench refcount-m-gc
 
 refcount-bench:
 	$(MAKE) mrubyc-series SERIES="refcount" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=REFERENCE_COUNT"
