@@ -98,7 +98,9 @@ line_plot:
 # 	pdfunite graph/merged/*.pdf graph/merged/all.pdf
 
 mrubyc:
-	$(MAKE) -C ../../mrubyc/all
+	$(MAKE) -C ../../mrubyc/ all
+mrubyc-64:
+	$(MAKE) -C ../../mrubyc/ all-64
 marksweep-swe1:
 	$(MAKE) -C ../../mrubyc/ marksweep-swe1
 marksweep-swe2:
