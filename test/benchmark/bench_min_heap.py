@@ -16,6 +16,19 @@ max_size = min_size * 1024 * 256
 SIZE_PATTERN = re.compile('size (\d+)')
 TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
 
+vms = {
+       "01 ms1"     : "marksweep1/mrubyc-bench",
+       "02 ms2"     : "marksweep2/mrubyc-bench",
+       "03 bm1"     : "bitmap1/mrubyc-bench",
+       "04 bm2"     : "bitmap2/mrubyc-bench",
+       "05 rc"      : "refcount/mrubyc-bench",
+       "06 ms1-m32" : "marksweep1/mrubyc-m32",
+       "07 ms2-m32" : "marksweep2/mrubyc-m32",
+       "08 bm1-m32" : "bitmap1/mrubyc-m32",
+       "09 bm2-m32" : "bitmap2/mrubyc-m32",
+       "10 rc-m32"  : "refcount/mrubyc-m32",
+      }
+
 marksweep = "marksweep"
 earlygc = "marksweep-early"
 bitmap = "bitmap-marking"
@@ -88,13 +101,16 @@ if benchmark_path == None:
 
 test_name = benchmark_path[0:-4]
 print("== " + test_name + " ==")
-benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
+for key in sorted(vms.keys()):
+  benchmark(test_name, benchmark_path, key, vms[key])
+
+# benchmark(test_name, benchmark_path, marksweep, marksweep_bin)
 # benchmark(test_name, benchmark_path, bitmap,    bitmap_bin  )
 # benchmark(test_name, benchmark_path, earlygc,   earlygc_bin  )
 # benchmark(test_name, benchmark_path, bitmap_earlygc,   bitmap_earlygc_bin  )
-benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
+# benchmark(test_name, benchmark_path, refcnt,    refcnt_bin   )
 #min_size -= 10000
-benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
+# benchmark(test_name, benchmark_path, marksweep_m32, marksweep_m32_bin )
 # benchmark(test_name, benchmark_path, earlygc_m32,   earlygc_m32_bin  )
 # benchmark(test_name, benchmark_path, bitmap_earlygc_m32,   bitmap_earlygc_m32_bin  )
-benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_m32_bin   )
+# benchmark(test_name, benchmark_path, refcnt_m32,    refcnt_m32_bin   )

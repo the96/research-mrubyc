@@ -10,36 +10,23 @@ DEF_MIN_SIZE = 1024 * 30
 DEF_MAX_SIZE = DEF_MIN_SIZE * 10
 DEF_TIMES = 10
 
-marksweep = "marksweep"
-marksweep_bin = "marksweep/mrubyc-bench"
-earlygc = "marksweep-early"
-earlygc_bin = "marksweep/mrubyc-bench-earlygc"
-bitmap = "bitmap-marking"
-bitmap_bin = "bitmap-marking/mrubyc-bench"
-bitmap_earlygc = "bitmap-marking-early"
-bitmap_earlygc_bin = "bitmap-marking/mrubyc-bench-earlygc"
-refcnt = "refcount"
-refcnt_bin = "refcount/mrubyc-bench"
-marksweep_m32 = "marksweep-m32"
-marksweep_m32_bin = "marksweep/mrubyc-bench-m32"
-earlygc_m32 = "marksweep-early-m32"
-earlygc_m32_bin = "marksweep/mrubyc-bench-earlygc-m32"
-bitmap_m32 = "bitmap-marking-m32"
-bitmap_m32_bin = "bitmap-marking/mrubyc-bench-m32"
-bitmap_earlygc_m32 = "bitmap-marking-early-m32"
-bitmap_earlygc_m32_bin = "bitmap-marking/mrubyc-bench-earlygc-m32"
-refcnt_m32 = "refcnt-m32"
-refcnt_m32_bin = "refcount/mrubyc-bench-m32"
-marksweep_mgc = "marksweep-measure-gc"
-marksweep_mgc_bin = "marksweep/mrubyc-measure-gc"
-bitmap_mgc = "bitmap-marking-gc"
-bitmap_mgc_bin = "bitmap-marking/mrubyc-measure-gc"
-refcnt_mgc = "refcnt-measure-gc"
-refcnt_mgc_bin = "refcount/mrubyc-measure-gc"
-refcnt_mgc = "refcnt-measure-gc-everytime"
-refcnt_mgc_bin = "refcount/mrubyc-m-gc-everytime"
-vm_names = [marksweep, earlygc, bitmap, bitmap_earlygc, refcnt, marksweep_m32, earlygc_m32, bitmap_m32, bitmap_earlygc_m32, refcnt_m32, marksweep_mgc, bitmap_mgc, refcnt_mgc]
-vm_bins = [marksweep_bin, earlygc_bin, bitmap_bin, bitmap_earlygc_bin, refcnt_bin, marksweep_m32_bin, earlygc_m32_bin, bitmap_m32_bin, bitmap_earlygc_m32_bin, refcnt_m32_bin, marksweep_mgc_bin, bitmap_mgc_bin, refcnt_mgc_bin]
+vms = {
+       "ms1"     : "marksweep1/mrubyc-bench",
+       "ms1-gc"  : "marksweep1/mrubyc-gc",
+       "ms1-m32" : "marksweep1/mrubyc-m32",
+       "ms2"     : "marksweep2/mrubyc-bench",
+       "ms2-gc"  : "marksweep2/mrubyc-gc",
+       "ms2-m32" : "marksweep2/mrubyc-m32",
+       "bm1"     : "bitmap1/mrubyc-bench",
+       "bm1-gc"  : "bitmap1/mrubyc-gc",
+       "bm1-m32" : "bitmap1/mrubyc-m32",
+       "bm2"     : "bitmap2/mrubyc-bench",
+       "bm2-gc"  : "bitmap2/mrubyc-gc",
+       "bm2-m32" : "bitmap2/mrubyc-m32",
+       "rc"      : "refcount/mrubyc-bench",
+       "rc-gc"   : "refcount/mrubyc-gc",
+       "rc-m32"  : "refcount/mrubyc-m32",
+      }
 
 def benchmark(test_name, test_path, binary_name, binary_path, min_size, max_size, outpath):  
   # output format
@@ -159,33 +146,10 @@ for line in config:
       inc_size = int((max_heap - min_heap) / 10)
     matched_strings = conf_vm_match.groups()
     vm_name = matched_strings[0]
-    vm_path = None
-    for index in range(len(vm_names)):
-      if vm_name == vm_names[index]:
-        vm_path = vm_bins[index]
-        break
+    vm_path = vms.get(vm_name)
     if vm_path == None:
       print("Error: " + vm_name + " is not found.")
-    # if vm_name == marksweep:
-    #   vm_path = marksweep_bin
-    # elif vm_name == marksweep_m32:
-    #   vm_path = marksweep_m32_bin
-    # elif vm_name == earlygc:
-    #   vm_path = earlygc_bin
-    # elif vm_name == earlygc_m32:
-    #   vm_path = earlygc_m32_bin
-    # elif vm_name == refcnt:
-    #   vm_path = refcnt_bin
-    # elif vm_name == refcnt_m32:
-    #   vm_path = refcnt_m32_bin
-    # elif vm_name == bitmap:
-    #   vm_path = bitmap_bin
-    # elif vm_name == bitmap_earlygc:
-    #   vm_path = bitmap_earlygc_m32_bin
-    # elif vm_name == bitmap_m32:
-    #   vm_path = bitmap_m32_bin
-    # elif vm_name == bitmap_earlygc_m32:
-    #   vm_path = bitmap_earlygc_m32_bin
+      break
     outdir = "./result/" + test_name + "/"
     os.makedirs(os.path.dirname(outdir), exist_ok=True)
     outfile = outdir + "/" + vm_name + ".log"

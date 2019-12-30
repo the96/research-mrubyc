@@ -133,16 +133,17 @@ for graph in graphs:
     print(vm_label[graph.vm_name] + str(graph.swe))
   if swe1_flag and swe2_flag and graph.swe == 2:
     continue
+  prev_size = graph.heap_sizes[0]
+  for i in range(1,len(graph.heap_sizes)):
+    sub = graph.heap_sizes[i] - prev_size
+    if (not min_sub) or sub < min_sub:
+      min_sub = sub
+    prev_size = graph.heap_sizes[i]
   xtick.extend(graph.heap_sizes)
 ax.set_ylim(bottom=0)
-xtick = sorted(set(xtick))
-prev_size = xtick[0]
-for i in range(1,len(xtick)):
-  sub = xtick[i] - prev_size
-  if (not min_sub) or sub < min_sub:
-    min_sub = sub
-  prev_size = xtick[i]
-xtick = list(range(xtick[0], xtick[len(xtick)-1] + min_sub, min_sub))
+xmax = max(xtick)
+xmin = min(xtick)
+xtick = list(range(xmin, xmax + min_sub, min_sub))
 ax.set_xticks(xtick, minor=True)
 xticks_major = []
 for i in range(len(xtick)):

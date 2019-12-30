@@ -6,7 +6,7 @@ def fib(n)
   end
 end
 
-array = [28]
+array = [29, 32]
 # array = [30, 35]
 for n in array
  puts fib(n)
