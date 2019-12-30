@@ -24,7 +24,7 @@ class ProcessTime:
   def values(self):
     values = []
     for key in self.keys():
-      process_time = sorted(self.process_time[heap_size])
+      process_time = sorted(self.process_time[key])
       idx = int(len(process_time) / 2)
       values.append(process_time[idx])
     return values
