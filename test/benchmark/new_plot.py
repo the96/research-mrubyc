@@ -127,6 +127,7 @@ for file_path in sys.argv:
         rec_decref = int(gc_info[1])
         rec_free = int(gc_info[2])
 
+
 for vm_mode in results.keys():
   if len(results[vm_mode]) == 0:
     continue
@@ -144,7 +145,9 @@ for vm_mode in results.keys():
   xticks = []
   step = None
   y_max = None
-  for vm_name in results[vm_mode].keys():
+  vm_names = ["ms1", "ms2", "bm1", "bm2", "rc"]
+  for vm_name in vm_names:
+    print(vm_name)
     current_result = results[vm_mode][vm_name]
     x_data = current_result.keys()
     y_data = current_result.values()

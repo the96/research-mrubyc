@@ -34,6 +34,7 @@ line_plot:
 	ls result/bm_spectral_norm_m32/* | xargs python3 new_plot.py
 	ls result/string_concat/* | xargs python3 new_plot.py
 	ls result/string_concat_m32/* | xargs python3 new_plot.py
+	ls result/*/*.log | xargs python3 new_barplot.py
 
 # pdf:
 # 	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi
