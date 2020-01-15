@@ -9,6 +9,12 @@ import datetime
 import math
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy.stats.mstats import gmean
+import matplotlib
+from matplotlib.font_manager import FontProperties
+font_path = '/usr/share/fonts/truetype/takao-gothic/TakaoPGothic.ttf'
+font_prop = FontProperties(fname=font_path)
+matplotlib.rcParams['font.family'] = font_prop.get_name()
+
 
 class ProcessTime:
   def __init__(self):
@@ -83,6 +89,22 @@ vms = {
        "rc-m32"  : "refcount/mrubyc-m32",
       }
 
+test_list = [
+  "bm_app_fib",
+  "bm_app_tak",
+  "bm_app_tarai",
+  "bm_partial_sums",
+  "bm_fractal",
+  "bm_mergesort_hongli",
+  "bm_spectral_norm",
+  "bm_fannkuch",
+  "bm_so_object",
+  "string_concat",
+  "bm_so_lists",
+  "bm_so_matrix",
+  "binary_tree"
+]
+
 head_pat      = re.compile('^test_name: (.+) vm_name: (.+)$')
 success_pat   = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat    = re.compile('heap_size (\d+) failed')
@@ -97,7 +119,7 @@ def parse_lines(lines):
   for line in lines:
     res = head_pat.search(line)
     if res:
-      test_name = res.groups()[0]
+      test_name = res.groups()[0].replace("_m32", "")
       vm_name = res.groups()[1]
       if vm_name in normal64.keys():
         current_result = ProcessTime()
@@ -138,6 +160,16 @@ def parse_lines(lines):
         rec_free = int(gc_info[2])
 
 sys.argv.pop(0)
+PLOT_MODE = "OFF"
+ON = "ON"
+OFF = "OFF"
+if sys.argv[0] == "-noplt":
+  PLOT_MODE = OFF
+  sys.argv.pop(0)
+if sys.argv[0] == "-plt":
+  PLOT_MODE = ON
+  sys.argv.pop(0)
+
 if len(sys.argv) == 0:
   print("Please input .log file what recording total time of benchmark processing.")
 
@@ -154,19 +186,21 @@ for file_path in sys.argv:
 for vm_env in results.keys():
   if vm_env == "GC-bench":
     continue
-  out_dir = "new_graph/" + vm_env + "/process_time/"
-  os.makedirs(out_dir, exist_ok=True)
-  plt.style.use('default')
-  plt.figure(figsize=(14, 3))
-  colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-  pdf_path = out_dir + "barplot.pdf"
-  print(pdf_path)
-  pdf = PdfPages(pdf_path)
-  test_index = 0
-  labels = results[vm_env].keys()
-  xticks = list(map(lambda x: float(x), 
-                    list(range(1, len(results[vm_env].keys()) + 1)
-                    )))
+  if PLOT_MODE == ON:
+    out_dir = "new_graph/" + vm_env + "/process_time/"
+    os.makedirs(out_dir, exist_ok=True)
+    plt.style.use('default')
+    plt.figure(figsize=(14, 3))
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    pdf_path = out_dir + "barplot.pdf"
+    print(pdf_path)
+    pdf = PdfPages(pdf_path)
+    labels = results[vm_env].keys()
+    xticks = list(map(lambda x: float(x), 
+                      list(range(1, len(results[vm_env].keys()) + 1)
+                      )))
+  else:
+    print(vm_env)
   
   # refcount での最小ヒープサイズを取得
   base_heap_sizes = {}
@@ -179,24 +213,41 @@ for vm_env in results.keys():
   target_vmtype = ["ms1", "ms2", "bm1", "bm2"]
 
   # ラベルの配列を作成
-  labels = sorted(results[vm_env].keys())
+  labels = test_list[:]
   labels.append("geomean")
   xticks = list(map(lambda x: float(x), list(range(1, len(labels) + 1))))
   xmax = max(xticks)
   width = 1 / (len(target_vmtype) + 1)
 
   # それぞれのVMについての処理
+  deteriorated_values = []
+  entire_improved_values = []
   for vm_index in range(0, len(target_vmtype)):
     vmtype = target_vmtype[vm_index]
+    if PLOT_MODE == OFF:
+      print("vmtype:" + vmtype)
     # まずはテストごとのvaluesの配列を作成
     values = []
-    for test_name in sorted(results[vm_env].keys()):
+    improved_values = []
+    for test_name in test_list:
       # ベースとなる値(参照カウントの実験した最小ヒープサイズ)より大きくて最小のヒープサイズでの処理時間の中央値を取得
       base_size = base_heap_sizes[test_name]
       value = results[vm_env][test_name][vmtype].valueAtBaseKey(base_size)
-      values.append(value / base_times[test_name] * 100)
+      ratio = value / base_times[test_name] * 100
+      values.append(ratio)
+      if PLOT_MODE == OFF:
+        print(test_name + ": " + "{:7.3f}".format(ratio) + "%")
+      if ratio < 100:
+        improved_values.append(ratio)
+        entire_improved_values.append(ratio)
+      elif PLOT_MODE == OFF:
+        deteriorated_values.append(ratio)
+
     # 幾何平均geomeanを求める
-    x_gmean = gmean(values)
+    x_gmean = gmean(improved_values)
+    if PLOT_MODE == OFF:
+      print("geomean(improved values):" + "{:7.3f}%".format(x_gmean))
+      print("geomean(all):" + "{:7.3f}%".format(gmean(values)))
     values.append(x_gmean)
     # 描画したい
     # 棒グラフ群の中心からの距離
@@ -207,126 +258,29 @@ for vm_env in results.keys():
                        list(range(1, len(values) + 1))))
     if max(xpoints)+offset > xmax:
       xmax = max(xpoints)+offset
-    # PLOT
-    plt.bar(
-      xpoints,
-      values,
-      width,
-      color=colors[vm_index],
-      label=vmtype
-    )
-    for idx in range(0, len(values)):
-      if values[idx] > 140:
-        plt.text(idx + 1 + width*2 , 135 - 10 * vm_index, vmtype + " {:7.3f}%".format(values[idx]))
-    
-  plt.ylim(0,145)
-  plt.xlim(-width*4, xmax + width*1)
-  plt.grid(True)
-  plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed')
-  plt.legend(fontsize=10)
-  plt.ylabel("process time ratio[%]")
-  plt.xticks(xticks, labels, rotation=12, fontsize=10)
-  pdf.savefig(bbox_inches="tight")
-  pdf.close()
-
-#   xmax = 0
-#   labels = ave_time_dict.getLabels(bk)
-#   xticks = list(map(lambda x: float(x), list(range(1, len(ave_time_dict.getLabels(bk)) + 1))))
-#   if max(xticks) > xmax:
-#     xmax = max(xticks)
-#   vms = ave_time_dict.getVMs(bk)
-#   width = 1 / (len(vms) + 1)
-#   for vm_cnt in range(0, len(vms)):
-#     vm = vms[vm_cnt]
-#     vk = vm
-#     vm = vm.upper()
-#     values = ave_time_dict.getValues(bk, vk)
-#     offset = (vm_cnt - len(vms) / 2) * width
-#     xpoints = list(map(lambda x: x + offset, ave_time_dict.getXPoints(bk, vk)))
-
-#     if (len(values) != len(xpoints)):
-#       print("assertion failed: L134")
-#       exit(1)
-#     if PLOT_MODE == ON:
-#       plt.bar(
-#         xpoints,
-#         values,
-#         width,
-#         color=colors[vm_cnt],
-#         label=vm
-#       )
-#     improve_sum_ratio = 0
-#     improve_cnt = 0
-#     improve_max_ratio = 0
-#     improve_min_ratio = 100
-#     for value in values:
-#       if 100 > value:
-#         improve_sum_ratio += value
-#         improve_cnt += 1
-#         improve_max_ratio = max([improve_max_ratio, value])
-#         improve_min_ratio = min([improve_min_ratio, value])
-#     print("%s (%sbit): mean improve ratio %7.3lf%%(max %7.3lf%%, min %7.3lf%%)"%
-#          (vm, bk, improve_sum_ratio / improve_cnt, improve_max_ratio, improve_min_ratio)
-#          )
-
-#   if PLOT_MODE == ON:
-#     plt.ylim(0,145)
-#     plt.xlim(-width*4, xmax + width*1)
-#     plt.grid(True)
-#     plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed')
-#     plt.legend(fontsize=10)
-#     plt.ylabel("process time ratio[%]")
-#     plt.xticks(xticks, labels, rotation=12, fontsize=10)
-#     pdf.savefig(bbox_inches="tight")
-#     pdf.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-# for vm_mode in results.keys():
-#   if len(results[vm_mode]) == 0:
-#     continue
-  
-#   fig = plt.figure(figsize=(6,4))
-#   ax = fig.add_subplot(1,1,1)
-#   plt.title("process time")
-#   plt.style.use('default')
-  
-#   xticks = []
-#   step = None
-#   y_max = None
-#   for vm_name in results[vm_mode].keys():
-#     current_result = results[vm_mode][vm_name]
-#     x_data = current_result.keys()
-#     y_data = current_result.values()
-#     ax.plot(x_data, y_data, label=vm_name, marker="o")
-#     _y_max = max(y_data)
-#     if y_max is None or y_max < _y_max:
-#       y_max = _y_max
-#     xticks.extend(x_data)
-#     for idx in range(1, len(x_data)):
-#       _step = x_data[idx] - x_data[idx - 1]
-#       if step is None or step > _step:
-#         step = _step
-#   xticks = list(range(min(xticks), max(xticks) + step*2, step*2))
-#   xticklabels = map(lambda x: '{:.2f}'.format(x / 1000), xticks)
-#   ax.set_ylim(bottom=0, top=y_max * 1.1)
-#   ax.set_xticks(xticks, minor=False)
-#   ax.set_xticklabels(xticklabels, minor=False, rotation=15)
-#   ax.set_xlabel("heap size[KB]")
-#   ax.set_ylabel("process time[sec]")
-#   ax.legend()
-#   ax.grid()
-#   plt.tight_layout()
-
-# pdf.savefig()
-# pdf.close()
+    if PLOT_MODE == ON:
+      # PLOT
+      plt.bar(
+        xpoints,
+        values,
+        width,
+        color=colors[vm_index],
+        label=vmtype.upper()
+      )
+      for idx in range(0, len(values)):
+        if values[idx] > 145:
+          plt.text(idx + 1 + width*2 , 135 - 10 * vm_index, vmtype + ":{:7.3f}%".format(values[idx]))
+          
+  if PLOT_MODE == ON:
+    plt.ylim(0,145)
+    plt.xlim(-width*4, xmax + width*1)
+    plt.grid(True)
+    plt.plot([-width*4, xmax + width*1],[100,100], "red", linestyle='dashed', label="RC")
+    plt.legend(fontsize=10)
+    plt.ylabel(u"実行時間の比[%]", fontproperties=font_prop)
+    plt.xticks(xticks, labels, rotation=12, fontsize=10)
+    pdf.savefig(bbox_inches="tight")
+    pdf.close()
+  else:
+    print("improved_values gmean:" + "{:7.3f}%".format(gmean(entire_improved_values)))
+    print("deteriorated_values range:" + "{:7.3f}%".format(sorted(deteriorated_values)[0]) + " ~ " + "{:7.3f}%".format(sorted(deteriorated_values)[len(deteriorated_values)-1]))
