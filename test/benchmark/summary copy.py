@@ -9,7 +9,6 @@ class Result:
     self.vm_name = vm_name
 # x
     self.heap_sizes = []
-    
 # y
     self.total_times = {}
     self.median_total_times = {}
@@ -285,7 +284,7 @@ def print_gc_summary(res, gc_res, gc_name):
     mark_ratio = mark/total * 100
     sweep_ratio = sweep/total * 100
     gc_ratio = gc/total * 100
-    print("%9d"%heap_size, "%8.6lfs"%total, "%8.6lfs(%7.3lf%%)"%(gc,gc_ratio), "%8.6lfs(%7.3lf%%)"%(mark,mark_ratio), "%8.6lfs(%7.3lf%%)"%(sweep,sweep_ratio),  sep=" | ", end=" | \n")
+    print("%9d"%heap_size, "%8.6lfs"%total, "%8.6lfs(%7.3lf%%)"%(gc*1000,gc_ratio), "%8.6lfs(%7.3lf%%)"%(mark*1000,mark_ratio), "%8.6lfs(%7.3lf%%)"%(sweep*1000,sweep_ratio),  sep=" | ", end=" | \n")
 
 def print_gc_time_vs(rcgc_res, msgc_res, rc_label, ms_label):
   heap_sizes = msgc_res.heap_sizes
@@ -314,31 +313,40 @@ def print_gc_time_vs(rcgc_res, msgc_res, rc_label, ms_label):
 sys.argv.pop(0)
 
 test_name = None
-marksweep = "ms1"
-bitmap = "bm1"
-refcount = "rc"
-marksweep_m32 = "ms1-m32"
-bitmap_m32 = "bm1-m32"
-refcount_m32 = "rc-m32"
 # marksweep = "marksweep"
 # bitmap = "bitmap-marking"
 # refcount = "refcount"
 # marksweep_m32 = "marksweep-m32"
 # bitmap_m32 = "bitmap-marking-m32"
 # refcount_m32 = "refcnt-m32"
-vm_name = '('+marksweep+'|'+bitmap+'|'+refcount+'|'+marksweep_m32+'|'+bitmap_m32+'|'+refcount_m32+')'
+# vm_name = '('+marksweep+'|'+bitmap+'|'+refcount+'|'+marksweep_m32+'|'+bitmap_m32+'|'+refcount_m32+')'
 # vm_name = '(marksweep|marksweep-early|bitmap-marking|bitmap-marking-m32|bitmap-marking-early|marksweep-m32|marksweep-early-m32|bitmap-marking-early-m32|refcount|refcnt-m32)'
-head_pat = re.compile('^test_name: (.+) vm_name: ' + vm_name + '$')
+vms = {
+       "ms1"     : "marksweep1/mrubyc-bench",
+       "ms1-gc"  : "marksweep1/mrubyc-gc",
+       "ms1-m32" : "marksweep1/mrubyc-m32",
+       "ms2"     : "marksweep2/mrubyc-bench",
+       "ms2-gc"  : "marksweep2/mrubyc-gc",
+       "ms2-m32" : "marksweep2/mrubyc-m32",
+       "bm1"     : "bitmap1/mrubyc-bench",
+       "bm1-gc"  : "bitmap1/mrubyc-gc",
+       "bm1-m32" : "bitmap1/mrubyc-m32",
+       "bm2"     : "bitmap2/mrubyc-bench",
+       "bm2-gc"  : "bitmap2/mrubyc-gc",
+       "bm2-m32" : "bitmap2/mrubyc-m32",
+       "rc"      : "refcount/mrubyc-bench",
+       "rc-gc"   : "refcount/mrubyc-gc",
+       "rc-m32"  : "refcount/mrubyc-m32",       
+      }
+vm_names = vms.keys()
+head_pat = re.compile('^test_name: (.+) vm_name: (.+)$')
 success_pat = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat = re.compile('heap_size (\d+) failed')
 
-# marksweep_gc = "marksweep-measure-gc"
-# bitmap_gc = "bitmap-marking-gc"
-# refcnt_gc = "refcnt-measure-gc"
+marksweep_gc = "marksweep-measure-gc"
+bitmap_gc = "bitmap-marking-gc"
+refcnt_gc = "refcnt-measure-gc"
 refcnt_everytime = "refcnt-measure-gc-everytime"
-marksweep_gc = "ms2-gc"
-bitmap_gc = "bm2-gc"
-refcnt_gc = "rc-gc"
 vm_pat = '(' + marksweep_gc + "|" + bitmap_gc + "|" + refcnt_gc + "|" + refcnt_everytime + ')'
 vm_name = {marksweep_gc: 'marksweep', bitmap_gc: 'bitmap-marking', refcnt_gc: 'refcount'}
 
@@ -446,7 +454,7 @@ for result in results:
     msgc_res = result
   if result.vm_name == bitmap_gc:
     bmgc_res = result
-  if result.vm_name == refcnt_gc:
+  if result.vm_name == refcnt_everytime:
     rcgc_res = result
 
 if ms_res and bm_res and rc_res:

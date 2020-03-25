@@ -8,6 +8,11 @@ import os.path
 import datetime
 import math
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.font_manager import FontProperties
+import matplotlib
+font_path = '/usr/share/fonts/truetype/takao-gothic/TakaoPGothic.ttf'
+font_prop = FontProperties(fname=font_path)
+matplotlib.rcParams['font.family'] = font_prop.get_name()
 
 class ProcessTime:
   def __init__(self):
@@ -139,19 +144,32 @@ for vm_mode in results.keys():
   
   fig = plt.figure(figsize=(6,4))
   ax = fig.add_subplot(1,1,1)
-  plt.title(test_name + " process time")
+  if "_m32" in test_name:
+    test_name =  test_name.replace('_m32', '(32bit)')
+  else:
+    test_name += "(64bit)"
+  print(test_name)
+  plt.title(test_name)
   plt.style.use('default')
   
   xticks = []
   step = None
   y_max = None
   vm_names = ["ms1", "ms2", "bm1", "bm2", "rc"]
+  rc_result = results[vm_mode]["rc"]
+  rc_x = rc_result.keys()
+  rc_y = rc_result.values()
   for vm_name in vm_names:
     print(vm_name)
     current_result = results[vm_mode][vm_name]
     x_data = current_result.keys()
     y_data = current_result.values()
-    ax.plot(x_data, y_data, label=vm_name, marker="o")
+    if vm_name != "rc":
+      for ms_idx in range(0, len(y_data)):
+        if rc_y[0] > y_data[ms_idx]:
+          print("ms ga rc yori hayakunatta:(ms heap/rc heap) {:7.6f}%".format(x_data[ms_idx] / rc_x[0] * 100))
+          break
+    ax.plot(x_data, y_data, label=vm_name.upper(), marker="o")
     _y_max = max(y_data)
     if y_max is None or y_max < _y_max:
       y_max = _y_max
@@ -165,8 +183,8 @@ for vm_mode in results.keys():
   ax.set_ylim(bottom=0, top=y_max * 1.1)
   ax.set_xticks(xticks, minor=False)
   ax.set_xticklabels(xticklabels, minor=False, rotation=15)
-  ax.set_xlabel("heap size[KB]")
-  ax.set_ylabel("process time[sec]")
+  ax.set_xlabel(u"ヒープサイズ[KB]", fontproperties=font_prop)
+  ax.set_ylabel(u"処理時間[sec]", fontproperties=font_prop)
   ax.legend()
   ax.grid()
   plt.tight_layout()

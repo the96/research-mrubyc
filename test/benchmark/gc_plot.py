@@ -10,6 +10,11 @@ import os.path
 import datetime
 import math
 from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib
+from matplotlib.font_manager import FontProperties
+font_path = '/usr/share/fonts/truetype/takao-gothic/TakaoPGothic.ttf'
+font_prop = FontProperties(fname=font_path)
+matplotlib.rcParams['font.family'] = font_prop.get_name()
 
 MARKSWEEP = 1
 REFCOUNT = 2
@@ -114,6 +119,19 @@ class RefCountGCResult(GCResult):
         ticklabels.append(str(int(heap_size/1024)))
       i+=1
     return (ticks, ticklabels)
+  
+  def printMaxResumeTime50kB(self):
+    resume_times = []
+    for heap_size in self.heap_sizes:
+      gc_num = len(self.gc_data[heap_size])
+      for index in range(gc_num):
+        gc_data = self.gc_data[heap_size][index]
+        rec_frees = gc_data.rec_free
+        if rec_frees == 166:
+          resume_times.append(gc_data.gc_time)
+    if len(resume_times) > 0:
+      print("len " + str(len(resume_times)))
+      print("max resume time " + str(resume_times[int(len(resume_times) * 0.95)]))
 
 class ParseErrorException(Exception):
   pass
@@ -161,14 +179,35 @@ def int_to_x_tick(num):
 sys.argv.pop(0)
 
 test_name = None
+
+gc_bench = {
+  "ms1-gc": "ms1", "ms2-gc": "ms2", "bm1-gc": "bm1", "bm2-gc": "bm2", "rc-gc": "rc"
+}
+
+vms = {
+       "ms1"     : "marksweep1/mrubyc-bench",
+       "ms1-gc"  : "marksweep1/mrubyc-gc",
+       "ms1-m32" : "marksweep1/mrubyc-m32",
+       "ms2"     : "marksweep2/mrubyc-bench",
+       "ms2-gc"  : "marksweep2/mrubyc-gc",
+       "ms2-m32" : "marksweep2/mrubyc-m32",
+       "bm1"     : "bitmap1/mrubyc-bench",
+       "bm1-gc"  : "bitmap1/mrubyc-gc",
+       "bm1-m32" : "bitmap1/mrubyc-m32",
+       "bm2"     : "bitmap2/mrubyc-bench",
+       "bm2-gc"  : "bitmap2/mrubyc-gc",
+       "bm2-m32" : "bitmap2/mrubyc-m32",
+       "rc"      : "refcount/mrubyc-bench",
+       "rc-gc"   : "refcount/mrubyc-gc",
+       "rc-m32"  : "refcount/mrubyc-m32",
+      }
 marksweep = "marksweep-measure-gc"
 bitmap = "bitmap-marking-gc"
-refcnt = "refcnt-measure-gc"
+refcnt = "rc-gc"
 refcnt_everytime = "refcnt-measure-gc-everytime"
-vm_pat = '(' + marksweep + "|" + bitmap + "|" + refcnt + "|" + refcnt_everytime + ')'
 vm_name = {marksweep: 'marksweep', bitmap: 'bitmap-marking', refcnt: 'refcount'}
 
-head_pat      = re.compile('^test_name: (.+) vm_name: ' + vm_pat + '$')
+head_pat      = re.compile('test_name: (.+) vm_name: (.+)')
 success_pat   = re.compile('heap_size (\d+) total_time (\d+\.\d+)')
 failed_pat    = re.compile('heap_size (\d+) failed')
 marksweep_pat = re.compile('mark_time (\d+\.\d+) sweep_time (\d+\.\d+)')
@@ -190,10 +229,10 @@ for file_path in sys.argv:
       properties = head.groups()
       test_name = properties[0]
       vm_name = properties[1]
-      if vm_name == marksweep or vm_name == bitmap:
+      if vm_name != "rc-gc":
         gc_result = MarkSweepGCResult(test_name, vm_name)
         gc_flag = MARKSWEEP
-      elif vm_name == refcnt or vm_name == refcnt_everytime:
+      else:
         gc_result = RefCountGCResult(test_name, vm_name)
         gc_flag = REFCOUNT
       continue
@@ -219,14 +258,18 @@ for file_path in sys.argv:
       gc_time_match = refcount_pat.search(line)
       if gc_time_match:
         gc_info = gc_time_match.groups()
-        gc_time = float(gc_info[0])
+        gc_time = float(gc_info[0])*1000
         rec_decref = int(gc_info[1])
         rec_free = int(gc_info[2])
         gc_result.addItem(heap_size, gc_time, rec_decref, rec_free)
   if not gc_result is None:
     gc_results.append(gc_result)
 
-pdf_dir = "graph/"
+# for gc_result in gc_results:
+#   gc_result.printMaxResumeTime50kB()
+# sys.exit(1)
+
+pdf_dir = "new_graph/gc_scatter/20200217/"
 os.makedirs(pdf_dir, exist_ok=True)
 test_name = None
 
@@ -240,7 +283,7 @@ pdf = PdfPages(pdf_dest)
 row = 2
 col = 2
 for index in range(len(gc_results)):
-  fig = plt.figure(figsize=(12, 12))
+  fig = plt.figure(figsize=(8, 6))
   gc_result = gc_results[index]
   test_name = gc_result.test_name
   vm_name = gc_result.vm_name
@@ -265,23 +308,35 @@ for index in range(len(gc_results)):
     heap_sizes, gc_times, rec_decrefs, rec_frees = gc_result.getItemForPlot()
     xticks, xticklabels = gc_result.getXTicks()
 
-    ax = fig.add_subplot(row, col, 1)
-    max_decref = max(rec_decrefs)
-    xticks = int_to_x_tick(max_decref)
-    scatter(ax, rec_decrefs, gc_times, xticks)
-    ax.set_xticklabels(xticks, minor=False)
-    ax.set_xlabel("recursive dec_ref_counter times")
-    ax.set_ylabel("process time(sec)")
-    ax.set_title(test_name + "refcount gc time/func call")
+    # ax = fig.add_subplot(row, col, 1)
+    # max_decref = max(rec_decrefs)
+    # xticks = int_to_x_tick(max_decref)
+    # scatter(ax, rec_decrefs, gc_times, xticks)
+    # ax.set_xticklabels(xticks, minor=False)
+    # ax.set_xlabel("recursive dec_ref_counter times")
+    # ax.set_ylabel("process time(sec)")
+    # ax.set_title(test_name + "refcount gc time/func call")
     
-    ax = fig.add_subplot(row, col, 2)
+    ax = fig.add_subplot(1,1,1)
     max_free = max(rec_frees)
-    xticks = int_to_x_tick(max_free)
+    print(max_free)
+    # xticks = int_to_x_tick(max_free)
+    xticks = list(range(0, max_free, int(max_free / 12)))
+    # xticks.insert(1, 166)
+    yticks = list(map(lambda x: x / 100, list(range(0, 5, 1))))
     scatter(ax, rec_frees, gc_times, xticks)
-    ax.set_xticklabels(xticks, minor=False)
-    ax.set_xlabel("recursive free times")
-    ax.set_ylabel("process time(sec)")
-    ax.set_title(test_name + "refcount gc time/free")
+    # plt.plot([166,166],[0,0.25], "red", linestyle='dashed')
+    ax.set_ylim(0, 0.05)
+    plt.tick_params(labelsize=16)
+    ax.set_xticks(xticks, minor=False)
+    ax.set_yticks(yticks, minor=False)
+    ax.set_xlabel(u"連鎖的な解放数", fontproperties=font_prop, fontsize=18)
+    ax.set_ylabel(u"解放による停止時間[ms]", fontproperties=font_prop, fontsize=18)
+    if test_name == "binary_tree_gctime":
+      test_name = u"二分木ベンチマーク"
+    # ax.set_title(test_name + u"の連鎖的な解放数と停止時間", fontproperties=font_prop)
+    ax.grid()
+    plt.tight_layout()
   pdf.savefig()
 
 pdf.close()

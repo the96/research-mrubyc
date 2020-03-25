@@ -17,16 +17,20 @@ SIZE_PATTERN = re.compile('size (\d+)')
 TIME_PATTERN = re.compile('vm time (\d+\.\d+)')
 
 vms = {
-       "01 ms1"     : "marksweep1/mrubyc-bench",
+      #  "01 ms1"     : "marksweep1/mrubyc-bench",
        "02 ms2"     : "marksweep2/mrubyc-bench",
-       "03 bm1"     : "bitmap1/mrubyc-bench",
-       "04 bm2"     : "bitmap2/mrubyc-bench",
+      #  "03 bm1"     : "bitmap1/mrubyc-bench",
+      #  "04 bm2"     : "bitmap2/mrubyc-bench",
        "05 rc"      : "refcount/mrubyc-bench",
-       "06 ms1-m32" : "marksweep1/mrubyc-m32",
-       "07 ms2-m32" : "marksweep2/mrubyc-m32",
-       "08 bm1-m32" : "bitmap1/mrubyc-m32",
-       "09 bm2-m32" : "bitmap2/mrubyc-m32",
-       "10 rc-m32"  : "refcount/mrubyc-m32",
+      #  "06 ms1-m32" : "marksweep1/mrubyc-m32",
+      #  "07 ms2-m32" : "marksweep2/mrubyc-m32",
+      #  "08 bm1-m32" : "bitmap1/mrubyc-m32",
+      #  "09 bm2-m32" : "bitmap2/mrubyc-m32",
+      #  "10 rc-m32"  : "refcount/mrubyc-m32",
+      # "11 ms1-e"    : "marksweep1/mrubyc-earlygc",
+      # "12 ms2-e"    : "marksweep2/mrubyc-earlygc",
+      # "13 ms1-m32-e": "marksweep1/mrubyc-m32-earlygc",
+      # "14 ms2-m32-e": "marksweep2/mrubyc-m32-earlygc"
       }
 
 marksweep = "marksweep"
@@ -102,6 +106,10 @@ if benchmark_path == None:
 test_name = benchmark_path[0:-4]
 print("== " + test_name + " ==")
 for key in sorted(vms.keys()):
+  # if "m32" in vms[key]:
+  #   min_size = 20000
+  # else:
+  #   min_size = 30000
   benchmark(test_name, benchmark_path, key, vms[key])
 
 # benchmark(test_name, benchmark_path, marksweep, marksweep_bin)

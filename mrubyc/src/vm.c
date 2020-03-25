@@ -767,6 +767,7 @@ static inline int op_send( mrbc_vm *vm, uint32_t code, mrbc_value *regs )
     mrb_class *cls = find_class_by_object( vm, &recv );
     console_printf("No method. Class:%s Method:%s\n",
 		   symid_to_str(cls->sym_id), sym_name );
+    exit(1);
     return 0;
   }
 

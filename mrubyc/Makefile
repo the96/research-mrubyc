@@ -41,10 +41,10 @@ all-64:
 	$(MAKE) marksweep-swe1-64 marksweep-swe2-64 bitmap-swe1-64 bitmap-swe2-64 refcount-64
 
 marksweep-swe1:
-	$(MAKE) marksweep-swe1-64 marksweep-swe1-m32
+	$(MAKE) marksweep-swe1-64 marksweep-swe1-m32 marksweep-swe1-m32-early
 
 marksweep-swe1-64:
-	$(MAKE) marksweep-swe1-bench marksweep-swe1-m-gc
+	$(MAKE) marksweep-swe1-bench marksweep-swe1-m-gc marksweep-swe1-early
 
 marksweep-swe1-bench:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP"
@@ -52,12 +52,16 @@ marksweep-swe1-m-gc:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="gc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DMEASURE_GC"
 marksweep-swe1-m32:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -m32"
+marksweep-swe1-early:
+	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="earlygc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DEARLY_GC"
+marksweep-swe1-m32-early:
+	$(MAKE) mrubyc-series SERIES="marksweep-swe1" MODE="m32-earlygc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DEARLY_GC -m32"
 
 marksweep-swe2:
-	$(MAKE) marksweep-swe2-64 marksweep-swe2-m32
+	$(MAKE) marksweep-swe2-64 marksweep-swe2-m32 marksweep-swe2-m32-early
 
 marksweep-swe2-64:
-	$(MAKE) marksweep-swe2-bench marksweep-swe2-m-gc
+	$(MAKE) marksweep-swe2-bench marksweep-swe2-m-gc marksweep-swe2-early
 
 marksweep-swe2-bench:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="bench" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DREGENERATE_FREELIST"
@@ -65,6 +69,11 @@ marksweep-swe2-m-gc:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="gc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DMEASURE_GC -DREGENERATE_FREELIST"
 marksweep-swe2-m32:
 	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="m32" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -m32 -DREGENERATE_FREELIST"
+marksweep-swe2-early:
+	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="earlygc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DREGENERATE_FREELIST -DEARLY_GC"
+marksweep-swe2-m32-early:
+	$(MAKE) mrubyc-series SERIES="marksweep-swe2" MODE="m32-earlygc" BENCHMARK="$(BENCH_TEMPLATE) -DGC_MODE=MARKSWEEP -DREGENERATE_FREELIST -DEARLY_GC -m32"
+
 
 bitmap-swe1:
 	$(MAKE) bitmap-swe1-64 bitmap-swe1-m32

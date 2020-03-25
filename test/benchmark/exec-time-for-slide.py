@@ -11,7 +11,7 @@ from scipy.stats.mstats import gmean
 import matplotlib
 from matplotlib.font_manager import FontProperties
 font_path = '/usr/share/fonts/truetype/takao-gothic/TakaoPGothic.ttf'
-font_prop = FontProperties(fname=font_path, size=12)
+font_prop = FontProperties(fname=font_path, size=15)
 
 BENCHMARKS=[
   "bm_app_fib",
@@ -31,8 +31,8 @@ BENCHMARKS=[
 # VM_NAMES=[u"マークスイープ"]
 # VM_TAGS=["rc", "ms2"]
 
-VM_NAMES=["MS1", "MS2", "BM1", "BM2"]
-VM_TAGS=["rc", "ms1", "ms2", "bm1", "bm2"]
+VM_NAMES=[u"マークスイープ(32bit)"]
+VM_TAGS=["rc", "ms2"]
 
 RESULT_DIR="result"
 
@@ -60,13 +60,13 @@ results = read_data()
 #     vm_results.append(gmean([x for x in vm_results if x != 0]))
     
 plt.style.use('default')
-plt.figure(figsize=(14, 4.5))
+plt.figure(figsize=(12, 4.5))
 
 colors = [
-  "#fef0d9",
+  # "#fef0d9",
   "#fdcc8a",
   "#fc8d59",
-  "#d7301f"
+  # "#d7301f"
 ]
 
 # plot bars
@@ -82,26 +82,26 @@ for (vm_index, vm_results) in enumerate(results):
     values = [0 if ms == 0 else float(ms) / float(rc) * 100 for (rc, ms)
               in itertools.zip_longest(results[0], results[vm_index])]
     values.append(gmean([i for i in values if i != 0]))
-    print(VM_NAMES[vm_index-1] + ": " + str(values[len(values)-1]))
-    # i = 0
+    # print(values[len(values)-1])
+    i = 0
     # print(values)
-    # while i < len(values):
-    #     if values[i] == 0:
-    #         values.pop(i)
-    #         BENCHMARKS.pop(i)
-    #     else:
-    #         i += 1
-    # print(values)
+    while i < len(values):
+        if values[i] == 0:
+            values.pop(i)
+            BENCHMARKS.pop(i)
+        else:
+            i += 1
+    print(values)
 
     xpoints = [x + offset for x in range(1, len(values) + 1)]
     if max(xpoints)+offset > xmax:
-        xmax = max(xpoints)+offset
+        xmax = max(xpoints)+offset+width
     
     plt.bar(xpoints
             , values
             , width
-            , color=colors[vm_index - 1]
-            , label=VM_NAMES[vm_index - 1]
+            , color=colors[vm_index - 2]
+            , label=VM_NAMES[vm_index - 2]
             , edgecolor="black"
     )
 
@@ -153,23 +153,23 @@ fill_y_max = 180
 text_y_margin = 10
 text_x_margin = width * 0.5
 num = len(VM_NAMES)
-for group in groups:
-  fill_x_min = group["start"] - ((num - 1.5) * width)
-  fill_x_max = group["end"] + (num - (num-1) / 2) * width
-  xfill=[fill_x_min, fill_x_min, fill_x_max, fill_x_max]
-  yfill=[fill_y_min, fill_y_max, fill_y_max, fill_y_min]
-  plt.text(fill_x_max - text_x_margin,
-           fill_y_max - text_y_margin,
-           group["name"],
-           verticalalignment='top',
-           horizontalalignment='right',
-           fontproperties=font_prop,
-           backgroundcolor="#ffffffaa")
-  plt.vlines([fill_x_min, fill_x_max], fill_y_min, fill_y_max, linestyle="solid", color="lightgrey")
+# for group in groups:
+#   fill_x_min = group["start"] - ((num - 1.5) * width)
+#   fill_x_max = group["end"] + (num - (num-1) / 2) * width
+#   xfill=[fill_x_min, fill_x_min, fill_x_max, fill_x_max]
+#   yfill=[fill_y_min, fill_y_max, fill_y_max, fill_y_min]
+#   plt.text(fill_x_max - text_x_margin,
+#            fill_y_max - text_y_margin,
+#            group["name"],
+#            verticalalignment='top',
+#            horizontalalignment='right',
+#            fontproperties=font_prop,
+#            backgroundcolor="#ffffffaa")
+#   plt.vlines([fill_x_min, fill_x_max], fill_y_min, fill_y_max, linestyle="solid", color="lightgrey")
     
 # RC
-# xmax = len(BENCHMARKS) + 2
-plt.plot([0, xmax], [100,100], "red", linestyle='dashed', label=u"RC")
+xmax = len(BENCHMARKS) + 2
+plt.plot([0, xmax], [100,100], "red", linestyle='dashed', label=u"参照カウント")
 
 # plt.grid(True)
 xlabels = BENCHMARKS + ["geo.mean"]
@@ -185,6 +185,7 @@ plt.ylim(0,180)
 plt.xlim(0, xmax)
 
 plt.tight_layout()
-# plt.savefig('exec_time32.pdf', bbox_inches="tight")
+plt.savefig('exec_time_for_slide.pdf', bbox_inches="tight")
+# plt.savefig('exec_time32-2.pdf', bbox_inches="tight")
 
 #plt.show()

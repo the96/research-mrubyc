@@ -40,6 +40,30 @@ mrbc_class *mrbc_class_hash;
 
 void init_static(void)
 {
+#if (GC_MODE == REFERENCE_COUNT)
+printf("gc_mode=refcount\n");
+#endif
+#if (GC_MODE == MARKSWEEP)
+#ifdef REGENERATE_FREELIST
+printf("gc_mode=marksweep2\n");
+#else
+printf("gc_mode=marksweep1\n");
+#endif
+#endif
+#if (GC_MODE == BITMAP_MARKING)
+#ifdef REGENERATE_FREELIST
+printf("gc_mode=bitmap2\n");
+#else
+printf("gc_mode=bitmap1\n");
+#endif
+#endif
+#ifdef MEASURE_GC
+printf("gc_measure=True\n");
+#else
+printf("gc_measure=False\n");
+#endif
+printf("word_size=%zu\n", sizeof(void *));
+
   mrbc_init_global();
 
   mrbc_init_class();
