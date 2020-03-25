@@ -7,7 +7,7 @@ clean:
 	rm testable/*.mrb
 	rm marksweep bitmap-marking refcount
 
-line_plot:
+lineplot:
 	ls result/binary_tree/* | xargs python3 new_plot.py
 	ls result/binary_tree_m32/* | xargs python3 new_plot.py
 	ls result/bm_app_fib/* | xargs python3 new_plot.py
@@ -34,7 +34,19 @@ line_plot:
 	ls result/bm_spectral_norm_m32/* | xargs python3 new_plot.py
 	ls result/string_concat/* | xargs python3 new_plot.py
 	ls result/string_concat_m32/* | xargs python3 new_plot.py
+
+barplot:
+	ls result/*/*.log | xargs python3 new_barplot.py -plt
+
+proc-geomean:
 	ls result/*/*.log | xargs python3 new_barplot.py
+
+minheap-plot:
+	python3 min_heap_size_plot.py -plt
+
+minheap-geomean:
+	python3 min_heap_size_plot.py -plt
+
 
 # pdf:
 # 	if [ -e graph/all.pdf ]; then rm graph/all.pdf; fi

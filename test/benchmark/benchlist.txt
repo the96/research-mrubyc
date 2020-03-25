@@ -6,8 +6,10 @@ testable/bm_fannkuch.mrb
 testable/bm_fractal.mrb
 testable/bm_mergesort_hongli.mrb
 testable/bm_partial_sums.mrb
-testable/bm_so_lists_small.mrb
-testable/bm_so_matrix.mrb
-testable/bm_so_object.mrb
 testable/bm_spectral_norm.mrb
 testable/string_concat.mrb
+testable/bm_so_object.mrb
+testable/bm_so_matrix.mrb
+testable/bm_so_lists_small.mrb
+testable/binary_tree_50kb.mrb
+testable/binary_tree.mrb
